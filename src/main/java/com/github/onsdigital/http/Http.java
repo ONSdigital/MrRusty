@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by david on 25/03/2015.
@@ -44,6 +45,7 @@ public class Http implements Closeable {
 
         // Send the request and process the response
         try (CloseableHttpResponse response = httpClient().execute(get)) {
+            System.out.println(response);
             T body = deserialiseResponseMessage(response, responseClass);
             return new Response<>(response.getStatusLine(), body);
         }
@@ -141,11 +143,22 @@ public class Http implements Closeable {
      */
 
     private Header[] combineHeaders(NameValuePair[] headers) {
-        ArrayList<Header> fullHeaders = new ArrayList<>(this.headers);
-        for (NameValuePair header : headers) {
-            fullHeaders.add(new BasicHeader(header.getName(), header.getValue()));
+
+        Header[] fullHeaders = new Header[this.headers.size() + headers.length];
+
+        // Add class-level headers (for all requests)
+        for (int i = 0; i < this.headers.size(); i++) {
+            fullHeaders[i] = this.headers.get(i);
         }
-        return (Header[])fullHeaders.toArray();
+
+        // Add headers specific to this request:
+        for (int i = 0; i < headers.length; i++) {
+            NameValuePair header = headers[i];
+            fullHeaders[i+this.headers.size()] = new BasicHeader(header.getName(), header.getValue());
+        }
+
+        System.out.println( Arrays.toString(fullHeaders));
+        return fullHeaders;
     }
 
     /**
@@ -182,7 +195,7 @@ public class Http implements Closeable {
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             try (InputStream inputStream = entity.getContent()) {
-                body = Serialiser.deserialise(entity.getContent(), responseClass);
+                body = Serialiser.deserialise(inputStream, responseClass);
             }
         } else {
             EntityUtils.consume(entity);
