@@ -26,20 +26,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>2.4.0</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -56,11 +48,6 @@
             <groupId>com.github.davidcarboni</groupId>
             <artifactId>resource-utils</artifactId>
             <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.davidcarboni</groupId>
-            <artifactId>cryptolite</artifactId>
-            <version>1.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -80,17 +67,6 @@
     </dependencies>
 
     <build>
-
-        <resources>
-            <!-- Standard resources -->
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-            <!-- Taxonomy structure -->
-            <resource>
-                <directory>src/main/web</directory>
-            </resource>
-        </resources>
 
         <plugins>
 
@@ -144,23 +120,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- A folder of dependencies is used in development when reloading classes: -->
-            <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-dependency-plugin</artifactId>-->
-            <!--<version>2.9</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<id>copy-dependencies</id>-->
-            <!--<phase>package</phase>-->
-            <!--<goals>-->
-            <!--<goal>copy-dependencies</goal>-->
-            <!--</goals>-->
-            <!--&lt;!&ndash; Default output folder is ${project.build.directory}/dependency &ndash;&gt;-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
 
         </plugins>
 
