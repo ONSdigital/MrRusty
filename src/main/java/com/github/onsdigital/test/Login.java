@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Host;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.zebedee.json.Credentials;
+import org.junit.Test;
 
 import java.io.IOException;
 
@@ -17,11 +18,13 @@ import java.io.IOException;
 public class Login {
 
     public static String florenceToken;
+    public static Host zebedeeHost;
 
-    public static boolean main() throws IOException {
-        Host host = new Host("http://localhost:8082");
+    @Test
+    public static void main() throws IOException {
+        zebedeeHost = new Host("http://localhost:8082");
 
-        Endpoint login = new Endpoint(host, "login");
+        Endpoint login = new Endpoint(zebedeeHost, "login");
         Http http = new Http();
 
         Credentials credentials =new Credentials();
@@ -33,7 +36,7 @@ public class Login {
 
         florenceToken = response.body;
 
-        return response.statusLine.getStatusCode() == 200;
+
     }
 
 

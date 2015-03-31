@@ -11,6 +11,7 @@ public class Response<T> {
     public StatusLine statusLine;
     public T body;
 
+
     public Response(StatusLine statusLine, T body) {
         this.statusLine = statusLine;
         this.body = body;
