@@ -8,6 +8,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.junit.Test;
+import sun.jvm.hotspot.utilities.Assert;
 
 import java.io.IOException;
 
@@ -21,24 +22,46 @@ public class Login {
     public static Host zebedeeHost;
 
     @Test
-    public static void main() throws IOException {
-        zebedeeHost = new Host("http://localhost:8082");
+    public static void adminShouldBeAbleToLogIn() throws IOException {
+        loginAttempt("florence@magicroundabout.ons.gov.uk","Doug4l",200);
+    }
+
+    @Test
+    public static void return400IfEmailNotSpecified() throws IOException {
+        //given
+        loginAttempt(null, "password", 400);
+    }
+
+    @Test
+    public static void return401IfWrongPassword() throws IOException {
+       loginAttempt("florence@magicroundabout.ons.gov.uk","denied",401);
+    }
+
+
+    private static void loginAttempt(String email,String password, int expectedCode) throws IOException {
+        if (zebedeeHost == null){
+            zebedeeHost = new Host("http://localhost:8082");
+        }
 
         Endpoint login = new Endpoint(zebedeeHost, "login");
         Http http = new Http();
 
         Credentials credentials =new Credentials();
-        credentials.email="florence@magicroundabout.ons.gov.uk";
-        credentials.password = "Doug4l";
+        credentials.email = email;
+        credentials.password = password;
 
         Response<String> response = http.post(login, credentials, String.class);
-        System.out.println("response = " + response);
+        System.out.println(response);
+        checkResponseCode(response, expectedCode);
 
-        florenceToken = response.body;
-
-
+        // if we managed to log in then make the other tests use us as the user
+        if( expectedCode == 200){
+            florenceToken = response.body;
+        }
     }
 
-
+    private static void checkResponseCode(Response response, int code){
+        org.junit.Assert.assertEquals(response.statusLine.getStatusCode(),code);
+    }
 
 }
