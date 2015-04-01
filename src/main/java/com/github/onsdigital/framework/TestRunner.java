@@ -4,6 +4,7 @@ import com.github.onsdigital.test.*;
 import junit.framework.AssertionFailedError;
 import org.junit.Test;
 import org.reflections.Reflections;
+import sun.jvm.hotspot.StackTrace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -41,23 +42,11 @@ public class TestRunner {
     }
 
     private static void runReady() {
-        for (Class<?> test : ready) {
+
+        // creating a new hashset to avoid a concurrent modification exception on the
+        // ready set in runTestClass
+        for (Class<?> test : new HashSet<>(ready)) {
             runTestClass(test);
-//            try {
-//                boolean result;
-//                result = (boolean) test.getMethod("main").invoke(test);
-//
-//                if (result) {
-//                    passed.add(test);
-//                } else {
-//                    failed.add(test);
-//                }
-//            } catch (Exception e) {
-//                errored.add(test);
-//
-//            } finally {
-//                ready.remove(test);
-//            }
         }
     }
 
@@ -98,6 +87,7 @@ public class TestRunner {
                 } else {
 
                     // Deal with test error
+                    System.out.println(testClass);
                     errored.add(testClass);
                 }
 

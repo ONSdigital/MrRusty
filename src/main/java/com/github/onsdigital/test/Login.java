@@ -46,7 +46,7 @@ public class Login {
         Endpoint login = new Endpoint(zebedeeHost, "login");
         Http http = new Http();
 
-        Credentials credentials =new Credentials();
+        Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
 
