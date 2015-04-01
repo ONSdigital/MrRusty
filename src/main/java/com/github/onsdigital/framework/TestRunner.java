@@ -1,14 +1,12 @@
 package com.github.onsdigital.framework;
 
 import org.junit.runner.JUnitCore;
+import org.junit.runner.notification.Failure;
 import org.junit.runners.model.InitializationError;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by kanemorgan on 30/03/2015.
@@ -34,8 +32,21 @@ public class TestRunner {
 
             readySize = getReady(queue);
             if (readySize > 0) {
+
+                // Run the tests
                 RustyRequest rustyRequest = new RustyRequest(ready);
                 jUnitCore.run(rustyRequest);
+
+                // Add passed classes to the passed Set to unlock more tests
+                List<String> failedClassNames = new ArrayList<>();
+                for (Failure failure : listener.rustyResult.getFailures()) {
+                    failedClassNames.add(failure.getDescription().getClassName());
+                }
+               for (Class<?> klass : ready) {
+                   if (!failedClassNames.contains(klass.getName())) {
+                       passed.add(klass);
+                   }
+               }
             }
 
         } while (readySize > 0);

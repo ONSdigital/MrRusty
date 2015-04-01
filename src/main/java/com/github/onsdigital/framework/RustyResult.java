@@ -5,6 +5,7 @@ import org.junit.runner.notification.Failure;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,13 +76,16 @@ public class RustyResult extends Result {
 
         // Run count
         count.getAndAdd(result.getRunCount());
+        System.out.println(" - Count is now " + count.get());
 
         // Failures
         failures.addAll(result.getFailures());
+        System.out.println(" - Failures now has " + failures.size());
 
         // Start time
         if (startTime == 0) {
             startTime = System.currentTimeMillis();
+            System.out.println(" - Start time is " + new Date(startTime));
         }
 
         // Run time
@@ -90,9 +94,12 @@ public class RustyResult extends Result {
         // End time
         long endTime = System.currentTimeMillis();
         runTime += endTime - startTime;
+        System.out.println(" - End time is now " + new Date(endTime));
+        System.out.println(" - Run time is now " + runTime);
 
         // Ignore count:
         ignoreCount.getAndAdd(result.getIgnoreCount());
+        System.out.println(" - Ignore now has " + ignoreCount.get());
 
         // Assumption failures - not avavilable yet it seems?
         //fAssumptionFailures.addAll(result.g)
