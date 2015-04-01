@@ -1,10 +1,10 @@
 package com.github.onsdigital.framework;
 
-import com.github.onsdigital.test.*;
-import junit.framework.AssertionFailedError;
 import org.junit.Test;
+import org.junit.internal.TextListener;
+import org.junit.runner.JUnitCore;
+import org.junit.runners.model.InitializationError;
 import org.reflections.Reflections;
-import sun.jvm.hotspot.StackTrace;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class TestRunner {
 
+    static JUnitCore jUnitCore = new JUnitCore();
 
     static Set<Class<?>> queue;
 
@@ -26,7 +27,10 @@ public class TestRunner {
 
     static Set<Class<?>> errored = new HashSet<>();
 
-    public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InitializationError {
+
+        jUnitCore.addListener(new TextListener(System.out));
+
         queue = getQueue();
 
         int readySize;
@@ -41,13 +45,28 @@ public class TestRunner {
         System.out.println("Errored: " + errored);
     }
 
-    private static void runReady() {
+    private static void runReady() throws InitializationError {
+        jUnitCore.run(new RustyRequest(ready));
+        //       for (Class<?> test : ready) {
 
-        // creating a new hashset to avoid a concurrent modification exception on the
-        // ready set in runTestClass
-        for (Class<?> test : new HashSet<>(ready)) {
-            runTestClass(test);
-        }
+
+        //runTestClass(test);
+//            try {
+//                boolean result;
+//                result = (boolean) test.getMethod("main").invoke(test);
+//
+//                if (result) {
+//                    passed.add(test);
+//                } else {
+//                    failed.add(test);
+//                }
+//            } catch (Exception e) {
+//                errored.add(test);
+//
+//            } finally {
+//                ready.remove(test);
+//            }
+        //   }
     }
 
 
