@@ -22,8 +22,6 @@ import static org.junit.Assert.assertTrue;
  */
 @DependsOn(Login.class)
 public class Collection {
-    //TODO: depends on login
-
 
     static Endpoint collectionEndpoint = new Endpoint(Login.zebedeeHost, "collection");
 
@@ -34,7 +32,7 @@ public class Collection {
         roundabout.publishDate = new Date();
 
         // can create a collection
-        create(roundabout,200);
+        create(roundabout, 200);
         // can't create a collection that already exist
         create(roundabout,409);
         // can't create a collection without a name
@@ -42,7 +40,7 @@ public class Collection {
         create(anon,400);
     }
 
-    private static CollectionDescription create(CollectionDescription collection,int expectedResponse) throws IOException {
+    public static CollectionDescription create(CollectionDescription collection,int expectedResponse) throws IOException {
         Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
         Http http = new Http();
         http.addHeader("X-Florence-Token",Login.florenceToken);
@@ -51,12 +49,20 @@ public class Collection {
         return collection;
     }
 
-//    @Test
-//    updateCollection(){
-//
-//
-//    }
-//
+
+    public static CollectionDescription create(int expectedResponse) throws IOException {
+
+        CollectionDescription collection = new CollectionDescription();
+        collection.name = Random.id();
+        collection.publishDate = new Date();
+        return create(collection,expectedResponse);
+    }
+
+    public static CollectionDescription create() throws IOException {
+        return create(200);
+    }
+
+
     @Test
     public static void getCollection() throws IOException {
 
@@ -70,6 +76,8 @@ public class Collection {
         org.junit.Assert.assertEquals(collection.name,serverCollection.name);
 
 //   we can't get a collection that's not there
+        get("unknown",404);
+
 
     }
 
