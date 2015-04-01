@@ -1,14 +1,14 @@
 package com.github.onsdigital.framework;
 
-import org.junit.Test;
-import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runners.model.InitializationError;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by kanemorgan on 30/03/2015.
@@ -16,20 +16,16 @@ import java.util.*;
 public class TestRunner {
 
     static JUnitCore jUnitCore = new JUnitCore();
+    static RustyListener listener = new RustyListener();
 
     static Set<Class<?>> queue;
-
     static Set<Class<?>> ready;
-
     static Set<Class<?>> passed = new HashSet<>();
-
-    static Set<Class<?>> failed = new HashSet<>();
-
-    static Set<Class<?>> errored = new HashSet<>();
 
     public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InitializationError {
 
-        jUnitCore.addListener(new TextListener(System.out));
+        listener = new RustyListener();
+        jUnitCore.addListener(listener);
 
         queue = getQueue();
 
@@ -37,87 +33,15 @@ public class TestRunner {
         do {
 
             readySize = getReady(queue);
-            runReady();
+            if (readySize > 0) {
+                RustyRequest rustyRequest = new RustyRequest(ready);
+                jUnitCore.run(rustyRequest);
+            }
 
         } while (readySize > 0);
-        System.out.println("Passed: " + passed);
-        System.out.println("Failed: " + failed);
-        System.out.println("Errored: " + errored);
-    }
 
-    private static void runReady() throws InitializationError {
-        jUnitCore.run(new RustyRequest(ready));
-        //       for (Class<?> test : ready) {
-
-
-        //runTestClass(test);
-//            try {
-//                boolean result;
-//                result = (boolean) test.getMethod("main").invoke(test);
-//
-//                if (result) {
-//                    passed.add(test);
-//                } else {
-//                    failed.add(test);
-//                }
-//            } catch (Exception e) {
-//                errored.add(test);
-//
-//            } finally {
-//                ready.remove(test);
-//            }
-        //   }
-    }
-
-
-    private static void runTestClass(Class<?> testClass) {
-
-        // Get test methods
-        List<Method> tests = new ArrayList<>();
-        for (Method method : testClass.getMethods()) {
-            if (method.getAnnotation(Test.class) != null) {
-                tests.add(method);
-            }
-        }
-
-        // run tests
-        for (Method testMethod : tests) {
-            try {
-
-                testMethod.invoke(testClass);
-                // Deal with success.
-                passed.add(testClass);
-
-            } catch (IllegalAccessException e) {
-
-                // Develop fail
-                System.out.println("You have an issue with class " + testClass + ": unable to access all test methods.");
-
-            } catch (InvocationTargetException e) {
-
-                // Inspect the exeption that was thrown when invoking the method
-                // to determine whether it's a failed assertion or an error.
-                Throwable cause = e.getCause();
-                if (cause != null && AssertionError.class.isAssignableFrom(cause.getClass())) {
-
-                    // Deal with test failure
-                    failed.add(testClass);
-
-                } else {
-
-                    // Deal with test error
-                    System.out.println(testClass);
-                    errored.add(testClass);
-                }
-
-            } finally {
-
-                // Remove the test from the pool of tests to run this time
-                ready.remove(testClass);
-
-            }
-        }
-
+        // Now trigger printing out the results:
+        listener.testRunsAllFinished();
     }
 
 

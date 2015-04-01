@@ -20,18 +20,18 @@ public class Login {
     public static Host zebedeeHost;
 
     @Test
-    public static void adminShouldBeAbleToLogIn() throws IOException {
+    public  void adminShouldBeAbleToLogIn() throws IOException {
         loginAttempt("florence@magicroundabout.ons.gov.uk", "Doug4l", 200);
     }
 
     @Test
-    public static void return400IfEmailNotSpecified() throws IOException {
+    public  void return400IfEmailNotSpecified() throws IOException {
         //given
         loginAttempt(null, "password", 400);
     }
 
     @Test
-    public static void return401IfWrongPassword() throws IOException {
+    public  void return401IfWrongPassword() throws IOException {
         loginAttempt("florence@magicroundabout.ons.gov.uk", "denied", 401);
     }
 

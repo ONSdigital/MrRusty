@@ -21,7 +21,7 @@ public class RustyRequest extends Request {
         // Put the classes into an array for varargs parameter
         Class<?>[] classes = new Class<?>[ready.size()];
         int i = 0;
-        for (Class<?> klass : classes) {
+        for (Class<?> klass : ready) {
             classes[i++] = klass;
         }
 
@@ -36,7 +36,7 @@ public class RustyRequest extends Request {
     }
 
     @Override
-    public Runner getRunner()  {
+    public Runner getRunner() {
         return runner;
     }
 

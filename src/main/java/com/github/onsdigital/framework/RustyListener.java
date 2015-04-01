@@ -8,7 +8,7 @@ import org.junit.runner.Result;
  */
 public class RustyListener extends TextListener {
 
-    RustyResult rustyResult=new RustyResult();
+    RustyResult rustyResult = new RustyResult();
 
     RustyListener() {
         super(System.out);
@@ -20,7 +20,7 @@ public class RustyListener extends TextListener {
      * @param result the summary of the test run for this round, including all the tests that failed
      */
     @Override
-    public void testRunFinished(Result result)  {
+    public void testRunFinished(Result result) {
         rustyResult.add(result);
     }
 
