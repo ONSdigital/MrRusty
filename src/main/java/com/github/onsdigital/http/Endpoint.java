@@ -15,19 +15,45 @@ public class Endpoint {
     List<String> path;
     Map<String, String> parameters = new HashMap<>();
 
-    public Endpoint(String path) {
-        host = new Host("http://localhost:8080/");
-        parseUri(path);
-    }
-
+    /**
+     * Creates and endpoint for the given {@code host} and {@code path}.
+     *
+     * @param host The base URL, e.g. {@code http://localhost:8080/api/}.
+     * @param path The relative path of the endpoint under the base URL, e.g. {@code /login}
+     *             (this would result in {@code http://localhost:8080/api/login}, regardless of leading slash).
+     */
     public Endpoint(Host host, String path) {
         this.host = host;
         parseUri(path);
     }
 
+    /**
+     * Creates and endpoint for the given {@code host} string and {@code path}.
+     *
+     * @param host The base URL as a string, e.g. {@code http://localhost:8080/api/}.
+     *             This will be used to instantiate a {@link Host}.
+     * @param path The relative path of the endpoint under the base URL, e.g. {@code /login}
+     *             (this would result in {@code http://localhost:8080/api/login}, regardless of leading slash).
+     */
+    public Endpoint(String host, String path) {
+        this.host = new Host(host);
+        parseUri(path);
+    }
+
+    /**
+     * Creates an endpoint where the {@link Host} is instantiated with the string {@code http://localhost:8080/}.
+     * This is a convenience for quick local testing.
+     *
+     * @param path
+     */
+    public Endpoint(String path) {
+        host = new Host("http://localhost:8080/");
+        parseUri(path);
+    }
+
     public Endpoint setParameter(String name, Object value) {
         Endpoint configured = new Endpoint(host, uriBuilder().getPath());
-        if (StringUtils.isNotBlank(name) && value !=null) {
+        if (StringUtils.isNotBlank(name) && value != null) {
             parameters.put(name, value.toString());
         }
         return this;
@@ -76,6 +102,6 @@ public class Endpoint {
 
     @Override
     public String toString() {
-        return  url().toString();
+        return url().toString();
     }
 }
