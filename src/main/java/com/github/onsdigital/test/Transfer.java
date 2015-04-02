@@ -18,7 +18,7 @@ import java.io.IOException;
 @DependsOn({Login.class,Collection.class,Content.class})
 public class Transfer {
     @Test
-    public static void main() throws IOException {
+    public void main() throws IOException {
         CollectionDescription collection_1 = Collection.create();
         CollectionDescription collection_2 = Collection.create();
         String fileUri = Random.id() + ".json";
