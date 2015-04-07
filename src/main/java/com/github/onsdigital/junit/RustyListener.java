@@ -4,7 +4,10 @@ import org.junit.internal.TextListener;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by david on 31/03/2015.
@@ -46,7 +49,7 @@ public class RustyListener extends TextListener {
 
     private void printRounds() {
         System.out.println();
-        System.out.println(rustyResult.getRounds() + " of tests ran.");
+        System.out.println(rustyResult.getRounds() + " rounds of tests ran.");
     }
 
     private void printBlocked() {
@@ -62,7 +65,7 @@ public class RustyListener extends TextListener {
             System.out.println("The following classes failed:");
             for (String className : failedClassNames) {
                 try {
-                    System.out.println(" > "+ Class.forName(className).getSimpleName());
+                    System.out.println(" > " + Class.forName(className).getSimpleName());
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
