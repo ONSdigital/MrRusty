@@ -4,7 +4,7 @@ package com.github.onsdigital.test;
  * Created by kanemorgan on 30/03/2015.
  */
 
-import com.github.onsdigital.framework.DependsOn;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;

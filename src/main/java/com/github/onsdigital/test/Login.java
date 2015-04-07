@@ -1,6 +1,6 @@
 package com.github.onsdigital.test;
 
-import com.github.onsdigital.framework.DependsOn;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Host;
 import com.github.onsdigital.http.Http;

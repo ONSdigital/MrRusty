@@ -1,6 +1,6 @@
 package com.github.onsdigital.test;
 
-import com.github.onsdigital.framework.DependsOn;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by kanemorgan on 02/04/2015.

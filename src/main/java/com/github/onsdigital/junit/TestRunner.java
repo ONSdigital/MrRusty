@@ -1,4 +1,4 @@
-package com.github.onsdigital.framework;
+package com.github.onsdigital.junit;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.Failure;

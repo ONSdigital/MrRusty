@@ -1,4 +1,4 @@
-package com.github.onsdigital.framework;
+package com.github.onsdigital.junit;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
