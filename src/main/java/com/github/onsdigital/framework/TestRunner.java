@@ -52,7 +52,7 @@ public class TestRunner {
         } while (readySize > 0);
 
         // Now trigger printing out the results:
-        listener.testRunsAllFinished();
+        listener.testRunsAllFinished(queue, passed);
     }
 
 

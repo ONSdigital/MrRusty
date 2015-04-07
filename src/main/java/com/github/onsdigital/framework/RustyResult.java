@@ -3,10 +3,7 @@ package com.github.onsdigital.framework;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -15,13 +12,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RustyResult extends Result {
 
-    private static final long serialVersionUID = 1L;
+    private AtomicInteger rounds = new AtomicInteger();
     private AtomicInteger count = new AtomicInteger();
     private AtomicInteger ignoreCount = new AtomicInteger();
     private final List<Failure> failures = Collections.synchronizedList(new ArrayList<Failure>());
+    private final Set<Class<?>> blocked = Collections.synchronizedSet(new HashSet<Class<?>>());
+    //private final Set<Class<?>> pasesed = Collections.synchronizedSet(new HashSet<Class<?>>());
     //private final List<Failure> fAssumptionFailures = Collections.synchronizedList(new ArrayList<Failure>());
     private long runTime = 0;
     private long startTime;
+
+    /**
+     * @return the number of testing rounds run
+     */
+    public int getRounds() {
+        return rounds.get();
+    }
 
     /**
      * @return the number of tests run
@@ -68,24 +74,37 @@ public class RustyResult extends Result {
      */
     @Override
     public boolean wasSuccessful() {
-        return getFailureCount() == 0;
+        return getFailureCount() == 0 && blocked.size() == 0;
     }
+
+    public java.util.Collection<Class<?>> getBlocked() {
+        return Collections.unmodifiableCollection(this.blocked);
+    }
+
+    //public java.util.Collection<Class<?>> getPassed() {
+    //    return Collections.unmodifiableCollection(this.passed);
+    //}
+
+    public void setBlocked(java.util.Collection<Class<?>> blocked) {
+        this.blocked.addAll(blocked);
+    }
+
+    // public void setPassed(java.util.Collection<Class<?>> passed) {
+    //    this.passed.addAll(passed);
+    //}
 
 
     public void add(Result result) {
 
         // Run count
         count.getAndAdd(result.getRunCount());
-        System.out.println(" - Count is now " + count.get());
 
         // Failures
         failures.addAll(result.getFailures());
-        System.out.println(" - Failures now has " + failures.size());
 
         // Start time
         if (startTime == 0) {
             startTime = System.currentTimeMillis();
-            System.out.println(" - Start time is " + new Date(startTime));
         }
 
         // Run time
@@ -94,14 +113,13 @@ public class RustyResult extends Result {
         // End time
         long endTime = System.currentTimeMillis();
         runTime += endTime - startTime;
-        System.out.println(" - End time is now " + new Date(endTime));
-        System.out.println(" - Run time is now " + runTime);
 
         // Ignore count:
         ignoreCount.getAndAdd(result.getIgnoreCount());
-        System.out.println(" - Ignore now has " + ignoreCount.get());
 
         // Assumption failures - not avavilable yet it seems?
         //fAssumptionFailures.addAll(result.g)
+
+        rounds.getAndIncrement();
     }
 }

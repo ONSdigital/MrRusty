@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by kanemorgan on 30/03/2015.
@@ -35,6 +36,7 @@ public class Collection {
         // can't create a collection without a name
         CollectionDescription anon = new CollectionDescription();
         create(anon, 400);
+        fail("Spurious");
     }
 
 
