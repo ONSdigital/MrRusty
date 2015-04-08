@@ -81,17 +81,9 @@ public class RustyResult extends Result {
         return Collections.unmodifiableCollection(this.blocked);
     }
 
-    //public java.util.Collection<Class<?>> getPassed() {
-    //    return Collections.unmodifiableCollection(this.passed);
-    //}
-
     public void setBlocked(java.util.Collection<Class<?>> blocked) {
         this.blocked.addAll(blocked);
     }
-
-    // public void setPassed(java.util.Collection<Class<?>> passed) {
-    //    this.passed.addAll(passed);
-    //}
 
 
     public void add(Result result) {

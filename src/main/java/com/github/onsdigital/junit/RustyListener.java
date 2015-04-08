@@ -14,11 +14,11 @@ import java.util.TreeSet;
  */
 public class RustyListener extends TextListener {
 
-    RustyResult rustyResult = new RustyResult();
+    public final RustyResult rustyResult = new RustyResult();
     Set<Class<?>> blocked;
     Collection<Class<?>> passed;
 
-    RustyListener() {
+    public RustyListener() {
         super(System.out);
     }
 

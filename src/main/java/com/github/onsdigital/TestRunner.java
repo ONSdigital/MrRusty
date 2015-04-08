@@ -1,5 +1,8 @@
-package com.github.onsdigital.junit;
+package com.github.onsdigital;
 
+import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.junit.RustyListener;
+import com.github.onsdigital.junit.RustyRequest;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.Failure;
 import org.junit.runners.model.InitializationError;
@@ -9,6 +12,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
+ * This is the main class and the entry point for testing.
+ * <p/>
+ * This is the class which will be set as the JAR main class in the manifest when running <code>mvn assembly:assembly</code>.
+ * <p/>
  * Created by kanemorgan on 30/03/2015.
  */
 public class TestRunner {
@@ -42,11 +49,11 @@ public class TestRunner {
                 for (Failure failure : listener.rustyResult.getFailures()) {
                     failedClassNames.add(failure.getDescription().getClassName());
                 }
-               for (Class<?> klass : ready) {
-                   if (!failedClassNames.contains(klass.getName())) {
-                       passed.add(klass);
-                   }
-               }
+                for (Class<?> klass : ready) {
+                    if (!failedClassNames.contains(klass.getName())) {
+                        passed.add(klass);
+                    }
+                }
             }
 
         } while (readySize > 0);
