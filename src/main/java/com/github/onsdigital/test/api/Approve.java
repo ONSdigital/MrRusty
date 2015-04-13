@@ -52,7 +52,11 @@ public class Approve {
     private static boolean approve(String collectionID, int expectedResponse) throws IOException {
         Http http = new Http();
         http.addHeader("X-Florence-Token", Login.florenceToken);
+<<<<<<< HEAD:src/main/java/com/github/onsdigital/test/api/Approve.java
         Endpoint endpoint = new Endpoint(Login.zebedeeHost, "approve/" + collectionID);
+=======
+        Endpoint endpoint = new Endpoint( Login.zebedeeHost,"approve/"+collectionID);
+>>>>>>> 0443d74a87c2f7c7b437b06c7c75fc7c7efa5ffd:src/main/java/com/github/onsdigital/test/api/Approve.java
 
         Response<String> postResponse = http.post(endpoint, null, String.class);
 
