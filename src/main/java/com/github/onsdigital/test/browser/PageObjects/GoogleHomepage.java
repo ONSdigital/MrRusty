@@ -1,4 +1,4 @@
-package com.github.onsdigital.test.PageObjects;
+package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.Drivers;
 import com.github.onsdigital.selenium.PageObject;
