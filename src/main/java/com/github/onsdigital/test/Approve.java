@@ -1,5 +1,6 @@
 package com.github.onsdigital.test;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -26,10 +27,17 @@ public class Approve {
     //TODO Test for approve with in progress uris
     @Test
     public void rejectsCollectionsThatHaveInProgressUris() throws IOException {
+        // Given
+        // ...a collection
         CollectionDescription collection = Collection.create();
-        Content.create(collection.name,"foo","/where/foo/lives",409);
+        // When
+        // ...we do nothing except create a resource
+        String filename = Random.id() + ".json";
+        Content.create(collection.name,"foo","/approve/" + filename,200);
 
-        approve(collection.name);
+        // We expect
+        // ...the resource is in progress so the collection will not be approved
+        approve(collection.name, 409);
     }
 
     public static boolean approve(String collectionID) throws IOException {
