@@ -1,4 +1,4 @@
-package com.github.onsdigital.test;
+package com.github.onsdigital.test.api;
 
 /**
  * Created by kanemorgan on 30/03/2015.

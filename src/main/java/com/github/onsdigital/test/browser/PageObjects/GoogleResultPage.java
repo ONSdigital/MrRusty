@@ -1,4 +1,4 @@
-package com.github.onsdigital.test.PageObjects;
+package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObject;
 import org.apache.http.NameValuePair;

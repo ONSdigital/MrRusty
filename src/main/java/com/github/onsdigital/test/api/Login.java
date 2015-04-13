@@ -1,4 +1,4 @@
-package com.github.onsdigital.test;
+package com.github.onsdigital.test.api;
 
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;

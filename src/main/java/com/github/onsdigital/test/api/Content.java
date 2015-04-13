@@ -1,4 +1,4 @@
-package com.github.onsdigital.test;
+package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.junit.DependsOn;
