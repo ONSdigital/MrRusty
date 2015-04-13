@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -57,9 +58,8 @@ public class Content {
     }
 
     public static void create(String collectionName, String content, String uri, int expectedResponse) throws IOException {
-        Http http = new Http();
-        http.addHeader("X-Florence-Token", Login.florenceToken);
-        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", uri);
+        Http http = Sessions.get("admin");
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
 
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
         assertEquals(createResponse.statusLine.getStatusCode(), expectedResponse);
@@ -68,9 +68,8 @@ public class Content {
 
 
     public static String get(String collectionName, String uri, int expectedResponse) throws IOException {
-        Http http = new Http();
-        http.addHeader("X-Florence-Token", Login.florenceToken);
-        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", uri);
+        Http http = Sessions.get("admin");
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
 
         Response<String> getResponse = http.get(contentEndpoint, String.class);
         assertEquals(getResponse.statusLine.getStatusCode(), expectedResponse);

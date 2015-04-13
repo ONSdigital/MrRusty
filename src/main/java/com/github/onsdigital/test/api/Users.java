@@ -1,6 +1,5 @@
 package com.github.onsdigital.test.api;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -20,7 +19,7 @@ import java.io.IOException;
 
 @Api
 @DependsOn(Content.class)
-public class Approve {
+public class Users {
     @Test
     public void approveACollection() throws IOException {
         CollectionDescription collection = Collection.create();
@@ -32,30 +31,24 @@ public class Approve {
     @POST
     @Test
     public void rejectsCollectionsThatHaveInProgressUris() throws IOException {
-        // Given
-        // ...a collection
         CollectionDescription collection = Collection.create();
-        // When
-        // ...we do nothing except create a resource
-        String filename = Random.id() + ".json";
-        Content.create(collection.name, "foo", "/approve/" + filename, 200);
+        Content.create(collection.name,"foo","/where/foo/lives",409);
 
-        // We expect
-        // ...the resource is in progress so the collection will not be approved
-        approve(collection.name, 409);
+        approve(collection.name);
     }
 
     public static boolean approve(String collectionID) throws IOException {
-        return approve(collectionID, 200);
+        return approve(collectionID,200);
     }
 
 
-    private static boolean approve(String collectionID, int expectedResponse) throws IOException {
+    private static boolean approve(String collectionID, int expectedResponse ) throws IOException {
         Http http = Sessions.get("admin");
-        Endpoint endpoint = ZebedeeHost.approve.addPathSegment(collectionID);
+        Endpoint endpoint =  ZebedeeHost.approve.addPathSegment(collectionID);
+
         Response<String> postResponse = http.post(endpoint, null, String.class);
 
-        Assert.assertEquals(expectedResponse, postResponse.statusLine.getStatusCode());
+        Assert.assertEquals( expectedResponse,postResponse.statusLine.getStatusCode());
         return postResponse.body == "true";
 
     }

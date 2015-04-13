@@ -2,6 +2,7 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -22,7 +23,7 @@ import static org.junit.Assert.fail;
 @DependsOn(Login.class)
 public class Collection {
 
-    static Endpoint collectionEndpoint = new Endpoint(Login.zebedeeHost, "collection");
+    static Endpoint collectionEndpoint = ZebedeeHost.collection;
 
     @Test
     public void whenCreatingACollection() throws IOException {
@@ -92,8 +93,7 @@ public class Collection {
 
     public static CollectionDescription create(CollectionDescription collection, int expectedResponse) throws IOException {
         Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        Http http = new Http();
-        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Http http = Sessions.get("admin");
         Response<String> createResponse = http.post(collectionEndpoint, collection, String.class);
 
 
@@ -117,9 +117,8 @@ public class Collection {
     }
 
     private CollectionDescription get(String name, int expectedResponse) throws IOException {
-        Http http = new Http();
-        http.addHeader("X-Florence-Token", Login.florenceToken);
-        Endpoint idUrl = new Endpoint(Login.zebedeeHost, "collection/" + name);
+        Http http = Sessions.get("admin");
+        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
 
 

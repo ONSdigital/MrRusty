@@ -51,12 +51,43 @@ public class Endpoint {
         parseUri(path);
     }
 
+    Endpoint(Endpoint source) {
+        host = source.host;
+        path = new ArrayList<>(source.path);
+        parameters = new HashMap<>(source.parameters);
+    }
+
+    /**
+     * Creates a new {@link Endpoint} instance with an additional GET parameter.
+     * <p>
+     *     Typical usage is to add a request-specific parameter to an endpoint, which is why this method returns a new instance, rather than modifying the existing one.
+     *     This allows you add different parameters/values at different times without affecting the original instance.
+     * @param name
+     * @param value
+     * @return
+     */
     public Endpoint setParameter(String name, Object value) {
-        Endpoint configured = new Endpoint(host, uriBuilder().getPath());
+        Endpoint configured = new Endpoint(this);
         if (StringUtils.isNotBlank(name) && value != null) {
-            parameters.put(name, value.toString());
+            configured.parameters.put(name, value.toString());
         }
-        return this;
+        return configured;
+    }
+
+    /**
+     * Creates a new {@link Endpoint} instance with an additional path segment.
+     * <p>
+     *     Typical usage is to add an ID to an endpoint path, which is why this method returns a new instance, rather than modifying the existing one.
+     *     This allows you add different ID at different times without affecting the original instance.
+     * @param segment The segment to be added.
+     * @return A copy of this instance, with the additional path segment.
+     */
+    public Endpoint addPathSegment(String segment) {
+        Endpoint configured = new Endpoint(this);
+        if (StringUtils.isNotBlank(segment)) {
+            configured.path.add(segment);
+        }
+        return configured;
     }
 
     private void parseUri(String uri) {

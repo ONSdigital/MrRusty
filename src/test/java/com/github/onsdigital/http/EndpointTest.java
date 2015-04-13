@@ -84,4 +84,72 @@ public class EndpointTest {
         assertEquals(value, parameters.get(0).getValue());
     }
 
+    @Test
+    public void shouldAddAnotherParameter() throws URISyntaxException {
+
+        // Given
+        String baseUrl = "http://beta.ons.gov.uk";
+        Host host = new Host(baseUrl);
+        String name1 = "cat";
+        String value1 = "Linux";
+        String name2 = "dog";
+        String value2 = "Mac";
+
+        // When
+        Endpoint endpoint = new Endpoint(host, "/").setParameter(name1, value1).setParameter(name2, value2);
+
+        // Then
+        System.out.println(endpoint);
+        URIBuilder builder = new URIBuilder(endpoint.toString());
+        List<NameValuePair> parameters = builder.getQueryParams();
+        assertEquals(1, parameters.size());
+        assertEquals(name1, parameters.get(0).getName());
+        assertEquals(value1, parameters.get(0).getValue());
+        assertEquals(name2, parameters.get(1).getName());
+        assertEquals(value2, parameters.get(1).getValue());
+    }
+
+    @Test
+    public void shouldAddPathSegment() throws URISyntaxException {
+
+        // Given
+        String baseUrl = "http://beta.ons.gov.uk";
+        Host host = new Host(baseUrl);
+        String pathSegment = "001";
+
+        // When
+        Endpoint endpoint = new Endpoint(host, "/").addPathSegment(pathSegment);
+
+        // Then
+        System.out.println(endpoint);
+        URIBuilder builder = new URIBuilder(endpoint.toString());
+        String path = builder.getPath();
+        assertEquals("/001", path);
+    }
+
+    @Test
+    public void shouldAddAnotherPathSegment() throws URISyntaxException {
+
+        // Given
+        String baseUrl = "http://beta.ons.gov.uk";
+        Host host = new Host(baseUrl);
+        String name1 = "cat";
+        String value1 = "Linux";
+        String name2 = "dog";
+        String value2 = "Mac";
+
+        // When
+        Endpoint endpoint = new Endpoint(host, "/").setParameter(name1, value1).setParameter(name2, value2);
+
+        // Then
+        System.out.println(endpoint);
+        URIBuilder builder = new URIBuilder(endpoint.toString());
+        List<NameValuePair> parameters = builder.getQueryParams();
+        assertEquals(1, parameters.size());
+        assertEquals(name1, parameters.get(0).getName());
+        assertEquals(value1, parameters.get(0).getValue());
+        assertEquals(name2, parameters.get(1).getName());
+        assertEquals(value2, parameters.get(1).getValue());
+    }
+
 }
