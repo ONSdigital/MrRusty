@@ -42,7 +42,7 @@ public class Sessions {
     public static Http get(String name) {
         Http http = https.get(name);
         if (http == null) {
-            https.put(name, new Http());
+            https.put(name, http = new Http());
         }
         return http;
     }

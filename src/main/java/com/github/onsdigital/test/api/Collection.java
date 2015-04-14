@@ -2,20 +2,18 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.http.Sessions;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
+import com.github.onsdigital.http.Sessions;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Created by kanemorgan on 30/03/2015.
@@ -23,7 +21,8 @@ import static org.junit.Assert.fail;
 @DependsOn(Login.class)
 public class Collection {
 
-    static Endpoint collectionEndpoint = ZebedeeHost.collection;
+    private static Http http = Sessions.get("admin");
+
 
     @Test
     public void whenCreatingACollection() throws IOException {
@@ -33,12 +32,12 @@ public class Collection {
         //roundabout.publishDate = new Date();
 
         // can create a collection
-        create(roundabout, 200);
+        create(roundabout, 200, http);
         // can't create a collection that already exist
-        create(roundabout, 409);
+        create(roundabout, 409, http);
         // can't create a collection without a name
         CollectionDescription anon = new CollectionDescription();
-        create(anon, 400);
+        create(anon, 400, http);
 
         //TODO This line has been commented out for temporary convenience
         //fail("Spurious");
@@ -54,7 +53,7 @@ public class Collection {
         //collection.publishDate = new Date();
 
 //    we can get the collection we just made
-        CollectionDescription serverCollection = create(collection, 200);
+        CollectionDescription serverCollection = create(collection, 200, http);
         get(serverCollection.name, 200);
         org.junit.Assert.assertEquals(collection.name, serverCollection.name);
 
@@ -67,7 +66,7 @@ public class Collection {
     public void collectionCanBeDeleted() throws IOException {
         // Given
         //...a collection
-        CollectionDescription collection = create();
+        CollectionDescription collection = create(http);
 
         // When
         //...we delete it
@@ -78,11 +77,8 @@ public class Collection {
         get(collection.name, HttpStatus.NOT_FOUND_404);
     }
 
-    private String delete(String name, int expectedResponse) throws IOException
-    {
-        Http http = new Http();
-        http.addHeader("X-Florence-Token", Login.florenceToken);
-        Endpoint endpoint = new Endpoint(Login.zebedeeHost, "collection/" + name);
+    private String delete(String name, int expectedResponse) throws IOException {
+        Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
         Response<String> deleteResponse = http.delete(endpoint, String.class);
 
 
@@ -91,10 +87,9 @@ public class Collection {
         return deleteResponse.body;
     }
 
-    public static CollectionDescription create(CollectionDescription collection, int expectedResponse) throws IOException {
+    public static CollectionDescription create(CollectionDescription collection, int expectedResponse, Http http) throws IOException {
         Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        Http http = Sessions.get("admin");
-        Response<String> createResponse = http.post(collectionEndpoint, collection, String.class);
+        Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);
 
 
         assertTrue(createResponse.statusLine.getStatusCode() == expectedResponse);
@@ -102,22 +97,21 @@ public class Collection {
     }
 
 
-    public static CollectionDescription create(int expectedResponse) throws IOException {
+    public static CollectionDescription create(int expectedResponse, Http http) throws IOException {
 
         CollectionDescription collection = new CollectionDescription();
         collection.name = Random.id();
 
         // TODO This line has been commented out for temporary convenience - to remove when dates fixed
         //collection.publishDate = new Date();
-        return create(collection, expectedResponse);
+        return create(collection, expectedResponse, http);
     }
 
-    public static CollectionDescription create() throws IOException {
-        return create(200);
+    public static CollectionDescription create(Http http) throws IOException {
+        return create(200, http);
     }
 
     private CollectionDescription get(String name, int expectedResponse) throws IOException {
-        Http http = Sessions.get("admin");
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
 
@@ -126,7 +120,6 @@ public class Collection {
 
         return getResponse.body;
     }
-
 
 
 }

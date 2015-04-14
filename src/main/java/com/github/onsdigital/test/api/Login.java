@@ -55,12 +55,12 @@ public class Login {
         // When
         // We attempt to log in
         Response<String> response = http.post(ZebedeeHost.login, credentials, String.class);
+        token = response.body;
 
         // Then
         // The request should succeed
         assertEquals(response.statusLine.getStatusCode(), 200);
         assertTrue(StringUtils.isNotBlank(response.body));
-        token = response.body;
     }
 
     /**
@@ -81,8 +81,7 @@ public class Login {
 
         // Then
         // We should get a bad request response
-        assertEquals(response.statusLine.getStatusCode(), 400);
-        assertTrue(StringUtils.isBlank(response.body));
+        assertEquals(400, response.statusLine.getStatusCode());
     }
 
     /**
@@ -95,7 +94,7 @@ public class Login {
 
         // Given
         // A missing email address in the credentials
-        Credentials credentials = credentials(null, "incorrect");
+        Credentials credentials = credentials("florence@magicroundabout.ons.gov.uk", "incorrect");
 
         // When
         // We attempt to log in
@@ -103,8 +102,7 @@ public class Login {
 
         // Then
         // We should get an unauthorised response
-        assertEquals(response.statusLine.getStatusCode(), 401);
-        assertTrue(StringUtils.isBlank(response.body));
+        assertEquals(401, response.statusLine.getStatusCode());
     }
 
     /**

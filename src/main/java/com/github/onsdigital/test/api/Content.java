@@ -19,12 +19,16 @@ import static org.junit.Assert.assertEquals;
 
 @DependsOn(Collection.class)
 public class Content {
+
+    Http http = Sessions.get("admin");
+
     //TODO
     @Test
     public void createSpec() throws IOException {
+        Http http = Sessions.get("admin");
         CollectionDescription thing1 = new CollectionDescription();
         thing1.name = Random.id();
-        Collection.create(thing1, 200);
+        Collection.create(thing1, 200, http);
 
         String fileName = Random.id() + ".json";
 
@@ -33,8 +37,8 @@ public class Content {
 
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
-        CollectionDescription collection_1 = Collection.create();
-        CollectionDescription collection_2 = Collection.create();
+        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_2 = Collection.create(http);
 
         String fileURI = Random.id() + ".json";
 
@@ -47,7 +51,7 @@ public class Content {
 
     @Test
     public void shouldUpdateContent() throws IOException {
-        CollectionDescription collection_1 = Collection.create();
+        CollectionDescription collection_1 = Collection.create(http);
         String fileUri = Random.id() + ".json";
 
         create(collection_1.name, "content", fileUri, 200);

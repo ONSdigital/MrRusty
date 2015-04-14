@@ -102,7 +102,7 @@ public class EndpointTest {
         System.out.println(endpoint);
         URIBuilder builder = new URIBuilder(endpoint.toString());
         List<NameValuePair> parameters = builder.getQueryParams();
-        assertEquals(1, parameters.size());
+        assertEquals(2, parameters.size());
         assertEquals(name1, parameters.get(0).getName());
         assertEquals(value1, parameters.get(0).getValue());
         assertEquals(name2, parameters.get(1).getName());
@@ -145,7 +145,7 @@ public class EndpointTest {
         System.out.println(endpoint);
         URIBuilder builder = new URIBuilder(endpoint.toString());
         List<NameValuePair> parameters = builder.getQueryParams();
-        assertEquals(1, parameters.size());
+        assertEquals(2, parameters.size());
         assertEquals(name1, parameters.get(0).getName());
         assertEquals(value1, parameters.get(0).getValue());
         assertEquals(name2, parameters.get(1).getName());

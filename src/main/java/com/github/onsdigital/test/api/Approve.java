@@ -21,9 +21,12 @@ import java.io.IOException;
 @Api
 @DependsOn(Content.class)
 public class Approve {
+
+    Http http = Sessions.get("admin");
+
     @Test
     public void approveACollection() throws IOException {
-        CollectionDescription collection = Collection.create();
+        CollectionDescription collection = Collection.create(http);
         approve(collection.name, 200);
 
     }
@@ -34,7 +37,7 @@ public class Approve {
     public void rejectsCollectionsThatHaveInProgressUris() throws IOException {
         // Given
         // ...a collection
-        CollectionDescription collection = Collection.create();
+        CollectionDescription collection = Collection.create(http);
         // When
         // ...we do nothing except create a resource
         String filename = Random.id() + ".json";

@@ -13,7 +13,7 @@ import java.util.*;
 public class Endpoint {
     Host host;
     List<String> path;
-    Map<String, String> parameters = new HashMap<>();
+    Map<String, String> parameters = new TreeMap<>();
 
     /**
      * Creates and endpoint for the given {@code host} and {@code path}.
@@ -54,14 +54,15 @@ public class Endpoint {
     Endpoint(Endpoint source) {
         host = source.host;
         path = new ArrayList<>(source.path);
-        parameters = new HashMap<>(source.parameters);
+        parameters = new TreeMap<>(source.parameters);
     }
 
     /**
      * Creates a new {@link Endpoint} instance with an additional GET parameter.
-     * <p>
-     *     Typical usage is to add a request-specific parameter to an endpoint, which is why this method returns a new instance, rather than modifying the existing one.
-     *     This allows you add different parameters/values at different times without affecting the original instance.
+     * <p/>
+     * Typical usage is to add a request-specific parameter to an endpoint, which is why this method returns a new instance, rather than modifying the existing one.
+     * This allows you add different parameters/values at different times without affecting the original instance.
+     *
      * @param name
      * @param value
      * @return
@@ -76,9 +77,10 @@ public class Endpoint {
 
     /**
      * Creates a new {@link Endpoint} instance with an additional path segment.
-     * <p>
-     *     Typical usage is to add an ID to an endpoint path, which is why this method returns a new instance, rather than modifying the existing one.
-     *     This allows you add different ID at different times without affecting the original instance.
+     * <p/>
+     * Typical usage is to add an ID to an endpoint path, which is why this method returns a new instance, rather than modifying the existing one.
+     * This allows you add different ID at different times without affecting the original instance.
+     *
      * @param segment The segment to be added.
      * @return A copy of this instance, with the additional path segment.
      */

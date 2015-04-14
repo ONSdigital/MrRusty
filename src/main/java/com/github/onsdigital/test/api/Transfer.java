@@ -18,10 +18,13 @@ import java.io.IOException;
 
 @DependsOn({Login.class, Collection.class, Content.class})
 public class Transfer {
+
+    Http http = Sessions.get("admin");
+
     @Test
     public void main() throws IOException {
-        CollectionDescription collection_1 = Collection.create();
-        CollectionDescription collection_2 = Collection.create();
+        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_2 = Collection.create(http);
         String fileUri = Random.id() + ".json";
         Content.create(collection_1.name, "content", fileUri, 200);
 
