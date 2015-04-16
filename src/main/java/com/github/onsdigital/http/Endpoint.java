@@ -59,9 +59,16 @@ public class Endpoint {
 
     /**
      * Creates a new {@link Endpoint} instance with an additional GET parameter.
+     * <<<<<<< Updated upstream
      * <p/>
      * Typical usage is to add a request-specific parameter to an endpoint, which is why this method returns a new instance, rather than modifying the existing one.
      * This allows you add different parameters/values at different times without affecting the original instance.
+     * <p/>
+     * =======
+     * <p/>
+     * Typical usage is to add a request-specific parameter to an endpoint, which is why this method returns a new instance, rather than modifying the existing one.
+     * This allows you add different parameters/values at different times without affecting the original instance.
+     * >>>>>>> Stashed changes
      *
      * @param name
      * @param value
@@ -77,9 +84,16 @@ public class Endpoint {
 
     /**
      * Creates a new {@link Endpoint} instance with an additional path segment.
+     * <<<<<<< Updated upstream
      * <p/>
      * Typical usage is to add an ID to an endpoint path, which is why this method returns a new instance, rather than modifying the existing one.
      * This allows you add different ID at different times without affecting the original instance.
+     * <p/>
+     * =======
+     * <p/>
+     * Typical usage is to add an ID to an endpoint path, which is why this method returns a new instance, rather than modifying the existing one.
+     * This allows you add different ID at different times without affecting the original instance.
+     * >>>>>>> Stashed changes
      *
      * @param segment The segment to be added.
      * @return A copy of this instance, with the additional path segment.

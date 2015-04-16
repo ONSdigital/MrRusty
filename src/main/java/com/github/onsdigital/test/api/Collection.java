@@ -15,6 +15,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
 
+
 /**
  * Created by kanemorgan on 30/03/2015.
  */
@@ -22,7 +23,6 @@ import static org.junit.Assert.assertTrue;
 public class Collection {
 
     private static Http http = Sessions.get("admin");
-
 
     @Test
     public void whenCreatingACollection() throws IOException {
@@ -54,11 +54,11 @@ public class Collection {
 
 //    we can get the collection we just made
         CollectionDescription serverCollection = create(collection, 200, http);
-        get(serverCollection.name, 200);
+        get(serverCollection.name, 200, http);
         org.junit.Assert.assertEquals(collection.name, serverCollection.name);
 
 //   we can't get a collection that's not there
-        get("unknown", 404);
+        get("unknown", 404, http);
 
     }
 
@@ -74,7 +74,7 @@ public class Collection {
 
         // We expect
         //...it to be entirely deleted
-        get(collection.name, HttpStatus.NOT_FOUND_404);
+        get(collection.name, HttpStatus.NOT_FOUND_404, http);
     }
 
     private String delete(String name, int expectedResponse) throws IOException {
@@ -90,8 +90,6 @@ public class Collection {
     public static CollectionDescription create(CollectionDescription collection, int expectedResponse, Http http) throws IOException {
         Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
         Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);
-
-
         assertTrue(createResponse.statusLine.getStatusCode() == expectedResponse);
         return collection;
     }
@@ -111,7 +109,7 @@ public class Collection {
         return create(200, http);
     }
 
-    private CollectionDescription get(String name, int expectedResponse) throws IOException {
+    private CollectionDescription get(String name, int expectedResponse, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
 

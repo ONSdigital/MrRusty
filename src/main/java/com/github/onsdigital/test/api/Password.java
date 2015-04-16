@@ -58,7 +58,7 @@ public class Password {
      */
     @POST
     @Test
-    public void shouldSetPassword() throws IOException {
+    public void shouldSetPasswordIfSessionIsAdmin() throws IOException {
 
         // Given
         // The user credentials
@@ -70,11 +70,6 @@ public class Password {
         // Then
         // The request should succeed
         assertEquals(response.body, 200, response.statusLine.getStatusCode());
-        // And we should be able to log in
-        Http http = Sessions.get("user");
-        Response<String> login = http.post(ZebedeeHost.login, credentials, String.class);
-        assertEquals("Seems we can't log in as a normal user?", 200, login.statusLine.getStatusCode());
-        http.addHeader("X-Florence-Token", login.body);
     }
 
 }
