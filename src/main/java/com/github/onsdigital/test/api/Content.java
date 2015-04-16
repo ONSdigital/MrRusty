@@ -2,16 +2,26 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Sessions;
+import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by kanemorgan on 31/03/2015.
@@ -32,7 +42,7 @@ public class Content {
 
         String fileName = Random.id() + ".json";
 
-        create(thing1.name, "{name:foo}", Random.id() + ".json", 200);
+        create(thing1.name, "{name:foo}", Random.id() + ".json", 200, http);
     }
 
     @Test
@@ -43,26 +53,150 @@ public class Content {
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        create(collection_1.name, "content", fileURI, 200);
+        create(collection_1.name, "content", fileURI, 200, http);
 
         // we can't create it in another collection
-        create(collection_2.name, "content", fileURI, 409);
+        create(collection_2.name, "content", fileURI, 409, http);
     }
 
     @Test
     public void shouldUpdateContent() throws IOException {
+        // Given
+        // A file created in a collection
         CollectionDescription collection_1 = Collection.create(http);
         String fileUri = Random.id() + ".json";
+        create(collection_1.name, "content", fileUri, 200, http);
 
-        create(collection_1.name, "content", fileUri, 200);
-        create(collection_1.name, "new content", fileUri, 200);
+        // When
+        // We overwrite it's content and retrieve the file contents
+        create(collection_1.name, "new content", fileUri, 200, http);
+        String serverResponse = get(collection_1.name, fileUri, 200, http);
 
-        String serverResponse = get(collection_1.name, fileUri, 200);
-        assertEquals("new content", serverResponse);
+        // We expect
+        // The content should be the overwritten version
+        assertEquals("new content", Serialiser.deserialise(serverResponse, String.class));
     }
 
-    public static void create(String collectionName, String content, String uri, int expectedResponse) throws IOException {
-        Http http = Sessions.get("admin");
+    @Test
+    public void shouldUploadFile() throws IOException {
+
+
+
+        // Given
+        // A file, a taxonomy node, and a collection
+        File file = new File("src/main/resources/snail.jpg");
+        CollectionDescription collection_1 = Collection.create(http);
+
+        String taxonomyNode = "economy/regionalaccounts/";
+        String filename = Random.id() + ".jpg";
+
+        // When
+        // We attempt to upload the file to the taxonomy
+        upload(collection_1.name, taxonomyNode, filename, file, 200, http);
+
+        // Then
+        // The file should be where we expect it to be and exist
+        download(collection_1.name, taxonomyNode, filename, true, http);
+    }
+
+    @Test
+    public void shouldDeleteFile() throws IOException {
+
+
+
+        // Given
+        // We upload a file
+        File file = new File("src/main/resources/snail.jpg");
+        CollectionDescription collection_1 = Collection.create(http);
+
+        String taxonomyNode = "economy/regionalaccounts/";
+        String filename = Random.id() + ".jpg";
+
+        upload(collection_1.name, taxonomyNode, filename, file, 200,http );
+
+        // When
+        // We attempt to delete the file from the taxonomy
+        delete(collection_1.name, taxonomyNode, filename, 200, http);
+
+        // Then
+        //... the file should not exist
+        download(collection_1.name, taxonomyNode, filename, false, http);
+    }
+
+    @Test
+    public void shouldNotListDeletedFile() throws IOException {
+
+
+
+        // Given
+        // We upload a file
+        File file = new File("src/main/resources/snail.jpg");
+        CollectionDescription collection_1 = Collection.create(http);
+
+        String taxonomyNode = "economy/regionalaccounts/";
+        String filename = Random.id() + ".jpg";
+
+        upload(collection_1.name, taxonomyNode, filename, file, 200, http);
+
+        // When
+        // We delete the file from the taxonomy
+        delete(collection_1.name, taxonomyNode, filename, 200, http);
+
+        // Then
+        //... the file should not appear in the collection GET method
+        CollectionDescription collection = Collection.get(collection_1.name, 200, http);
+        assertEquals(0, collection.inProgressUris.size());
+    }
+
+    @Test
+    public void shouldNotReturnDeletedVersionOfExistingWebsiteFile() throws IOException {
+
+
+
+
+        // Given
+        // A page file within a collection
+        CollectionDescription collection_1 = new CollectionDescription();
+        CollectionDescription collection_2 = null;
+
+        collection_1.name = "shouldNotReturnDeletedVersionOfExistingWebsiteFile";
+        try {
+            collection_2 = Collection.get(collection_1.name, http);
+        } finally {
+            if (collection_2 == null) {
+                collection_1 = Collection.create(collection_1, 200, http);
+            } else {
+                collection_1 = collection_2;
+            }
+
+        }
+
+
+        String taxonomyNode = "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49/";
+        String initialData = get(collection_1.name, taxonomyNode + "data.json", 200, http);
+
+        // When
+        // We create a new page and then delete it
+        create(collection_1.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", 200, http);
+        delete(collection_1.name, taxonomyNode, "data.json", 200, http);
+
+        // Then
+        //... the original file should be returned by Content GET
+        String response = get(collection_1.name, taxonomyNode + "data.json", 200, http);
+        assertEquals(initialData, response);
+    }
+
+    // Support methods
+    private static void delete(String collectionName, String taxonomyNode, String filename, int expectedResponse, Http http) throws IOException {
+
+        Endpoint contentEndpoint = ZebedeeHost.collection.addPathSegment(collectionName).setParameter("uri", taxonomyNode + filename);
+
+        Response<String> createResponse = http.delete(contentEndpoint, String.class);
+
+        assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
+    }
+
+    public static void create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
 
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
@@ -71,13 +205,37 @@ public class Content {
     }
 
 
-    public static String get(String collectionName, String uri, int expectedResponse) throws IOException {
-        Http http = Sessions.get("admin");
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
+    public static String get(String collectionName, String uri, int expectedResponse, Http http) throws IOException {
 
-        Response<String> getResponse = http.get(contentEndpoint, String.class);
-        assertEquals(getResponse.statusLine.getStatusCode(), expectedResponse);
-        return getResponse.body;
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
+        Response<Path> getResponse = http.get(contentEndpoint);
+        assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
+
+        return FileUtils.readFileToString(getResponse.body.toFile(),Charset.forName("UTF8"));
+    }
+
+    public static void upload(String collectionName, String node, String saveAsName, File file, int expectedResponse, Http http) throws IOException {
+
+        Endpoint contentEndpoint = ZebedeeHost.collection.addPathSegment(collectionName).setParameter("uri", node + saveAsName);
+
+        Response<String> uploadResponse = http.post(contentEndpoint, file, String.class);
+
+        assertEquals(expectedResponse, uploadResponse.statusLine.getStatusCode());
+
+    }
+
+    public static void download(String collectionName, String node, String saveAsName, boolean expectSuccess, Http http) throws IOException {
+
+        Endpoint contentEndpoint = ZebedeeHost.collection.addPathSegment(collectionName).setParameter("uri", node + saveAsName);
+
+
+        Response<Path> path = http.get(contentEndpoint);
+
+
+        assertEquals(expectSuccess, path != null); // Check a path has been returned
+        if (expectSuccess) {
+            assertTrue(Files.size(path.body) > 0);
+        } // Check it is not null
     }
 
 

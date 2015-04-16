@@ -63,7 +63,7 @@ public class Http implements AutoCloseable {
      * @throws IOException If an error occurs.
      * @see java.nio.file.Files#probeContentType(Path)
      */
-    public Path get(Endpoint endpoint, NameValuePair... headers) throws IOException {
+    public Response<Path>  get(Endpoint endpoint, NameValuePair... headers) throws IOException {
 
         // Create the request
         HttpGet get = new HttpGet(endpoint.url());
@@ -89,7 +89,7 @@ public class Http implements AutoCloseable {
                 }
             }
 
-            return tempFile;
+            return new Response<>(response.getStatusLine(), tempFile);
         }
     }
 

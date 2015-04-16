@@ -41,7 +41,8 @@ public class Approve {
         // When
         // ...we do nothing except create a resource
         String filename = Random.id() + ".json";
-        Content.create(collection.name, "foo", "/approve/" + filename, 200);
+        Content.create(collection.name, "foo", "/approve/" + filename, 200, http
+        );
 
         // We expect
         // ...the resource is in progress so the collection will not be approved

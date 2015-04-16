@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -54,35 +55,35 @@ public class Collection {
 
 //    we can get the collection we just made
         CollectionDescription serverCollection = create(collection, 200, http);
-        get(serverCollection.name, 200);
+        get(serverCollection.name, 200, http);
         org.junit.Assert.assertEquals(collection.name, serverCollection.name);
 
 //   we can't get a collection that's not there
-        get("unknown", 404);
+        get("unknown", 404, http);
 
     }
 
     @Test
-    public void collectionCanBeDeleted() throws IOException {
+    public void collectionShouldBeDeleted() throws IOException {
         // Given
         //...a collection
         CollectionDescription collection = create(http);
 
         // When
         //...we delete it
-        delete(collection.name, 200);
+        delete(collection.name, 200, http);
 
         // We expect
         //...it to be entirely deleted
-        get(collection.name, HttpStatus.NOT_FOUND_404);
+        get(collection.name, HttpStatus.NOT_FOUND_404, http);
     }
 
-    private String delete(String name, int expectedResponse) throws IOException {
+    private String delete(String name, int expectedResponse, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
         Response<String> deleteResponse = http.delete(endpoint, String.class);
 
 
-        assertTrue(deleteResponse.statusLine.getStatusCode() == expectedResponse);
+        assertEquals(expectedResponse, deleteResponse.statusLine.getStatusCode());
 
         return deleteResponse.body;
     }
@@ -92,7 +93,7 @@ public class Collection {
         Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);
 
 
-        assertTrue(createResponse.statusLine.getStatusCode() == expectedResponse);
+        assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
         return collection;
     }
 
@@ -100,7 +101,7 @@ public class Collection {
     public static CollectionDescription create(int expectedResponse, Http http) throws IOException {
 
         CollectionDescription collection = new CollectionDescription();
-        collection.name = Random.id();
+        collection.name = "Rusty_" + Random.id();
 
         // TODO This line has been commented out for temporary convenience - to remove when dates fixed
         //collection.publishDate = new Date();
@@ -111,15 +112,18 @@ public class Collection {
         return create(200, http);
     }
 
-    private CollectionDescription get(String name, int expectedResponse) throws IOException {
+
+    public static CollectionDescription get(String name, int expectedResponse, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
-
-
-        assertTrue(getResponse.statusLine.getStatusCode() == expectedResponse);
-
+        assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
         return getResponse.body;
     }
 
+    public static CollectionDescription get(String name, Http http) throws IOException {
+        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
+        Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
+        return getResponse.body;
+    }
 
 }

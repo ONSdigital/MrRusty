@@ -26,15 +26,14 @@ public class Transfer {
         CollectionDescription collection_1 = Collection.create(http);
         CollectionDescription collection_2 = Collection.create(http);
         String fileUri = Random.id() + ".json";
-        Content.create(collection_1.name, "content", fileUri, 200);
+        Content.create(collection_1.name, "content", fileUri, 200, http);
 
-        transfer(collection_1.name, collection_2.name, fileUri, 200);
+        transfer(collection_1.name, collection_2.name, fileUri, 200, http);
 
 
     }
 
-    public static void transfer(String source, String destination, String uri, int expectedResponse) throws IOException {
-        Http http = Sessions.get("admin");
+    public static void transfer(String source, String destination, String uri, int expectedResponse, Http http) throws IOException {
         Endpoint transferUrl = ZebedeeHost.transfer;
 
 //        Transfer
