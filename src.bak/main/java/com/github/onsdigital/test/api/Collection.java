@@ -2,28 +2,28 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.fail;
 
 /**
  * Created by kanemorgan on 30/03/2015.
  */
-@DependsOn(LoginAdmin.class)
+@DependsOn(Login.class)
 public class Collection {
 
-    private static Http http = Sessions.get("admin");
+    static Endpoint collectionEndpoint = new Endpoint(Login.zebedeeHost, "collection");
 
     @Test
     public void whenCreatingACollection() throws IOException {
@@ -33,12 +33,12 @@ public class Collection {
         //roundabout.publishDate = new Date();
 
         // can create a collection
-        create(roundabout, 200, http);
+        create(roundabout, 200);
         // can't create a collection that already exist
-        create(roundabout, 409, http);
+        create(roundabout, 409);
         // can't create a collection without a name
         CollectionDescription anon = new CollectionDescription();
-        create(anon, 400, http);
+        create(anon, 400);
 
         //TODO This line has been commented out for temporary convenience
         //fail("Spurious");
@@ -54,12 +54,12 @@ public class Collection {
         //collection.publishDate = new Date();
 
 //    we can get the collection we just made
-        CollectionDescription serverCollection = create(collection, 200, http);
-        get(serverCollection.name, 200, http);
+        CollectionDescription serverCollection = create(collection, 200);
+        get(serverCollection.name, 200);
         org.junit.Assert.assertEquals(collection.name, serverCollection.name);
 
 //   we can't get a collection that's not there
-        get("unknown", 404, http);
+        get("unknown", 404);
 
     }
 
@@ -67,19 +67,22 @@ public class Collection {
     public void collectionShouldBeDeleted() throws IOException {
         // Given
         //...a collection
-        CollectionDescription collection = create(http);
+        CollectionDescription collection = create();
 
         // When
         //...we delete it
-        delete(collection.name, 200, http);
+        delete(collection.name, 200);
 
         // We expect
         //...it to be entirely deleted
-        get(collection.name, HttpStatus.NOT_FOUND_404, http);
+        get(collection.name, HttpStatus.NOT_FOUND_404);
     }
 
-    private String delete(String name, int expectedResponse, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
+    private String delete(String name, int expectedResponse) throws IOException
+    {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint endpoint = new Endpoint(Login.zebedeeHost, "collection/" + name);
         Response<String> deleteResponse = http.delete(endpoint, String.class);
 
 
@@ -88,43 +91,50 @@ public class Collection {
         return deleteResponse.body;
     }
 
-    public static CollectionDescription create(CollectionDescription collection, int expectedResponse, Http http) throws IOException {
+    public static CollectionDescription create(CollectionDescription collection, int expectedResponse) throws IOException {
         Serialiser.getBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-        Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Response<String> createResponse = http.post(collectionEndpoint, collection, String.class);
+
 
         assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
-
         return collection;
     }
 
 
-    public static CollectionDescription create(int expectedResponse, Http http) throws IOException {
+    public static CollectionDescription create(int expectedResponse) throws IOException {
 
         CollectionDescription collection = new CollectionDescription();
         collection.name = "Rusty_" + Random.id();
 
         // TODO This line has been commented out for temporary convenience - to remove when dates fixed
         //collection.publishDate = new Date();
-        return create(collection, expectedResponse, http);
+        return create(collection, expectedResponse);
     }
 
-    public static CollectionDescription create(Http http) throws IOException {
-        return create(200, http);
+    public static CollectionDescription create() throws IOException {
+        return create(200);
     }
 
-
-    public static CollectionDescription get(String name, int expectedResponse, Http http) throws IOException {
-
-        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
+    public static CollectionDescription get(String name, int expectedResponse) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint idUrl = new Endpoint(Login.zebedeeHost, "collection/" + name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
+
+
         assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
+
         return getResponse.body;
     }
-
-    public static CollectionDescription get(String name, Http http) throws IOException {
-        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
+    public static CollectionDescription get(String name) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint idUrl = new Endpoint(Login.zebedeeHost, "collection/" + name);
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
         return getResponse.body;
     }
+
 
 }

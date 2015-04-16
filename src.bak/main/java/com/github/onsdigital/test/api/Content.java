@@ -1,7 +1,6 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.http.Sessions;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
@@ -14,9 +13,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,47 +26,44 @@ import static org.junit.Assert.*;
 @DependsOn(Collection.class)
 public class Content {
 
-    Http http = Sessions.get("admin");
-
-    //TODO
     @Test
     public void createSpec() throws IOException {
-        Http http = Sessions.get("admin");
         CollectionDescription thing1 = new CollectionDescription();
         thing1.name = Random.id();
-        Collection.create(thing1, 200, http);
+        Collection.create(thing1, 200);
 
         String fileName = Random.id() + ".json";
 
-        create(thing1.name, "{name:foo}", Random.id() + ".json", 200, http);
+        create(thing1.name, "{name:foo}", Random.id() + ".json", 200);
     }
 
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
-        CollectionDescription collection_1 = Collection.create(http);
-        CollectionDescription collection_2 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.create();
+        CollectionDescription collection_2 = Collection.create();
 
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        create(collection_1.name, "content", fileURI, 200, http);
+        create(collection_1.name, "content", fileURI, 200);
 
         // we can't create it in another collection
-        create(collection_2.name, "content", fileURI, 409, http);
+        create(collection_2.name, "content", fileURI, 409);
     }
 
     @Test
     public void shouldUpdateContent() throws IOException {
+
         // Given
         // A file created in a collection
-        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.create();
         String fileUri = Random.id() + ".json";
-        create(collection_1.name, "content", fileUri, 200, http);
+        create(collection_1.name, "content", fileUri, 200);
 
         // When
         // We overwrite it's content and retrieve the file contents
-        create(collection_1.name, "new content", fileUri, 200, http);
-        String serverResponse = get(collection_1.name, fileUri, 200, http);
+        create(collection_1.name, "new content", fileUri, 200);
+        String serverResponse = get(collection_1.name, fileUri, 200);
 
         // We expect
         // The content should be the overwritten version
@@ -79,92 +72,91 @@ public class Content {
 
     @Test
     public void shouldUploadFile() throws IOException {
-
-
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
 
         // Given
         // A file, a taxonomy node, and a collection
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.create();
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
         // When
         // We attempt to upload the file to the taxonomy
-        upload(collection_1.name, taxonomyNode, filename, file, 200, http);
+        upload(collection_1.name, taxonomyNode, filename, file, 200);
 
         // Then
         // The file should be where we expect it to be and exist
-        download(collection_1.name, taxonomyNode, filename, true, http);
+        download(collection_1.name, taxonomyNode, filename, true);
     }
 
     @Test
     public void shouldDeleteFile() throws IOException {
-
-
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
 
         // Given
         // We upload a file
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.create();
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
-        upload(collection_1.name, taxonomyNode, filename, file, 200,http );
+        upload(collection_1.name, taxonomyNode, filename, file, 200);
 
         // When
         // We attempt to delete the file from the taxonomy
-        delete(collection_1.name, taxonomyNode, filename, 200, http);
+        delete(collection_1.name, taxonomyNode, filename, 200);
 
         // Then
         //... the file should not exist
-        download(collection_1.name, taxonomyNode, filename, false, http);
+        download(collection_1.name, taxonomyNode, filename, false);
     }
 
     @Test
     public void shouldNotListDeletedFile() throws IOException {
-
-
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
 
         // Given
         // We upload a file
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.create();
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
-        upload(collection_1.name, taxonomyNode, filename, file, 200, http);
+        upload(collection_1.name, taxonomyNode, filename, file, 200);
 
         // When
         // We delete the file from the taxonomy
-        delete(collection_1.name, taxonomyNode, filename, 200, http);
+        delete(collection_1.name, taxonomyNode, filename, 200);
 
         // Then
         //... the file should not appear in the collection GET method
-        CollectionDescription collection = Collection.get(collection_1.name, 200, http);
+        CollectionDescription collection = Collection.get(collection_1.name, 200);
         assertEquals(0, collection.inProgressUris.size());
     }
 
     @Test
     public void shouldNotReturnDeletedVersionOfExistingWebsiteFile() throws IOException {
-
-
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
 
 
         // Given
         // A page file within a collection
         CollectionDescription collection_1 = new CollectionDescription();
         CollectionDescription collection_2 = null;
-
         collection_1.name = "shouldNotReturnDeletedVersionOfExistingWebsiteFile";
         try {
-            collection_2 = Collection.get(collection_1.name, http);
+            collection_2 = Collection.get(collection_1.name);
         } finally {
-            if (collection_2 == null) {
-                collection_1 = Collection.create(collection_1, 200, http);
+            if(collection_2 == null) {
+                collection_1 = Collection.create(collection_1, 200);
             } else {
                 collection_1 = collection_2;
             }
@@ -173,70 +165,70 @@ public class Content {
 
 
         String taxonomyNode = "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49/";
-        String initialData = get(collection_1.name, taxonomyNode + "data.json", 200, http);
+        String initialData = get(collection_1.name, taxonomyNode + "data.json", 200);
 
         // When
         // We create a new page and then delete it
-        create(collection_1.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", 200, http);
-        delete(collection_1.name, taxonomyNode, "data.json", 200, http);
+        create(collection_1.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", 200);
+        delete(collection_1.name, taxonomyNode, "data.json", 200);
 
         // Then
         //... the original file should be returned by Content GET
-        String response = get(collection_1.name, taxonomyNode + "data.json", 200, http);
+        String response = get(collection_1.name, taxonomyNode + "data.json", 200);
         assertEquals(initialData, response);
     }
-
     // Support methods
-    private static void delete(String collectionName, String taxonomyNode, String filename, int expectedResponse, Http http) throws IOException {
-
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", taxonomyNode + filename);
+    private void delete(String collectionName, String taxonomyNode, String filename, int expectedResponse) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", taxonomyNode + filename);
 
         Response<String> createResponse = http.delete(contentEndpoint, String.class);
 
         assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
     }
 
-    public static void create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
+    public static void create(String collectionName, String content, String uri, int expectedResponse) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", uri);
 
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
-        assertEquals(createResponse.statusLine.getStatusCode(), expectedResponse);
+        assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
 
     }
 
+    public static String get(String collectionName, String uri, int expectedResponse) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", uri);
 
-    public static String get(String collectionName, String uri, int expectedResponse, Http http) throws IOException {
-
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
         Response<Path> getResponse = http.get(contentEndpoint);
         assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
 
-        return FileUtils.readFileToString(getResponse.body.toFile(),Charset.forName("UTF8"));
+        return FileUtils.readFileToString(getResponse.body.toFile(), Charset.forName("UTF8"));
     }
 
-    public static void upload(String collectionName, String node, String saveAsName, File file, int expectedResponse, Http http) throws IOException {
-
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", node + saveAsName);
+    public static void upload(String collectionName, String node, String saveAsName, File file, int expectedResponse) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", node + saveAsName);
 
         Response<String> uploadResponse = http.post(contentEndpoint, file, String.class);
-
         assertEquals(expectedResponse, uploadResponse.statusLine.getStatusCode());
 
     }
 
-    public static void download(String collectionName, String node, String saveAsName, boolean expectSuccess, Http http) throws IOException {
-
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", node + saveAsName);
-
+    public static void download(String collectionName, String node, String saveAsName, boolean expectSuccess) throws IOException {
+        Http http = new Http();
+        http.addHeader("X-Florence-Token", Login.florenceToken);
+        Endpoint contentEndpoint = new Endpoint(Login.zebedeeHost, "content/" + collectionName).setParameter("uri", node + saveAsName);
 
         Response<Path> path = http.get(contentEndpoint);
 
 
         assertEquals(expectSuccess, path != null); // Check a path has been returned
-        if (expectSuccess) {
-            assertTrue(Files.size(path.body) > 0);
-        } // Check it is not null
+        if(expectSuccess) { assertTrue(Files.size(path.body) > 0); } // Check it is not null
     }
-
 
 }
