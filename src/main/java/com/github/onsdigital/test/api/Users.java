@@ -19,8 +19,10 @@ import static org.junit.Assert.assertEquals;
  */
 
 @Api
-@DependsOn(Login.class)
+@DependsOn(LoginAdmin.class)
 public class Users {
+
+    static User user;
 
     Http http = Sessions.get("admin");
 
@@ -35,7 +37,7 @@ public class Users {
 
         // Given
         // A valid user
-        User user = new User();
+        user = new User();
         user.email = "user." + Random.id() + "@example.com";
         user.name = "Hello World";
 

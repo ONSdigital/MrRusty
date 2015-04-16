@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.api;
 
+import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
@@ -10,6 +11,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
@@ -18,8 +20,9 @@ import static org.junit.Assert.assertTrue;
 /**
  * API tests for /login
  */
+@Api
 @DependsOn({})
-public class Login {
+public class LoginAdmin {
 
     private static Http http;
     private static String token;
@@ -45,6 +48,7 @@ public class Login {
      *
      * @throws IOException
      */
+    @POST
     @Test
     public void shouldLogInAsAdmin() throws IOException {
 
@@ -68,6 +72,7 @@ public class Login {
      *
      * @throws IOException
      */
+    @POST
     @Test
     public void shouldReturnBadRequestForNoEmailAddress() throws IOException {
 
@@ -89,6 +94,7 @@ public class Login {
      *
      * @throws IOException
      */
+    @POST
     @Test
     public void shouldReturnUnauthorizedForIncorrectPassword() throws IOException {
 

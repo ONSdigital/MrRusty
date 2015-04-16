@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by kanemorgan on 30/03/2015.
  */
-@DependsOn(Login.class)
+@DependsOn(LoginAdmin.class)
 public class Collection {
 
     private static Http http = Sessions.get("admin");

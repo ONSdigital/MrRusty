@@ -16,7 +16,7 @@ import java.io.IOException;
  * Created by kanemorgan on 31/03/2015.
  */
 
-@DependsOn({Login.class, Collection.class, Content.class})
+@DependsOn({LoginAdmin.class, Collection.class, Content.class})
 public class Transfer {
 
     Http http = Sessions.get("admin");

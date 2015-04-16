@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-@DependsOn({Login.class, Collection.class})
+@DependsOn({LoginAdmin.class, Collection.class})
 public class Collections {
     //TODO: depends on collection
     @Test
