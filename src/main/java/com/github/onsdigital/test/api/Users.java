@@ -6,7 +6,9 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.POST;
@@ -15,16 +17,20 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by kanemorgan on 02/04/2015.
+ * Test cases for the {@link com.github.onsdigital.zebedee.api.Users} API.
  */
-
 @Api
 @DependsOn(LoginAdmin.class)
 public class Users {
 
     static User user;
 
-    Http http = Sessions.get("admin");
+    private static Http http;
+
+    @BeforeClass
+    public static void getAdminSession() {
+        http = Sessions.get("admin");
+    }
 
     /**
      * Ensures we get a 200 OK when creating a valid user.
@@ -48,6 +54,33 @@ public class Users {
         // Then
         // We should get a conflict
         assertEquals(200, response.statusLine.getStatusCode());
+    }
+
+    /**
+     * A user account should inactive after creation and before the password is set.
+     *
+     * @throws IOException
+     */
+    @POST
+    @Test
+    public void shouldBeInactiveBeforePasswordIsSet() throws IOException {
+
+        // Given
+        // A new user
+        User inactive = new User();
+        inactive.email = "user." + Random.id() + "@example.com";
+        inactive.name = "I'm inactive";
+        http.post(ZebedeeHost.users, inactive, User.class);
+
+        // When
+        // We attempt to log in with that user
+        Credentials credentials = new Credentials();
+        credentials.email = inactive.email;
+        Response<String> response = http.post(ZebedeeHost.login, credentials, String.class);
+
+        // Then
+        // We should get unauthorized:
+        assertEquals(401, response.statusLine.getStatusCode());
     }
 
     /**
