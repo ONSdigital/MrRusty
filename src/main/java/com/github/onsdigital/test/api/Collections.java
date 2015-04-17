@@ -4,11 +4,11 @@ package com.github.onsdigital.test.api;
  * Created by kanemorgan on 30/03/2015.
  */
 
-import com.github.onsdigital.http.Sessions;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
+import com.github.onsdigital.http.Sessions;
+import com.github.onsdigital.junit.DependsOn;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,7 +17,6 @@ import java.util.List;
 
 @DependsOn({LoginAdmin.class, Collection.class})
 public class Collections {
-    //TODO: depends on collection
     @Test
     public void collectionsSpec() throws IOException {
         Http http = Sessions.get("admin");
