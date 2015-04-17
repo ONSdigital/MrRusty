@@ -19,7 +19,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by david on 25/03/2015.
@@ -48,7 +47,7 @@ public class Http implements AutoCloseable {
 
         // Send the request and process the response
         try (CloseableHttpResponse response = httpClient().execute(get)) {
-            System.out.println(response);
+            //System.out.println(response);
             T body = deserialiseResponseMessage(response, responseClass);
             return new Response<>(response.getStatusLine(), body);
         }
@@ -308,7 +307,7 @@ public class Http implements AutoCloseable {
             fullHeaders[i + this.headers.size()] = new BasicHeader(header.getName(), header.getValue());
         }
 
-        System.out.println(Arrays.toString(fullHeaders));
+        //System.out.println(Arrays.toString(fullHeaders));
         return fullHeaders;
     }
 
@@ -321,7 +320,7 @@ public class Http implements AutoCloseable {
             fullHeaders[i] = this.headers.get(i);
         }
 
-        System.out.println(Arrays.toString(fullHeaders));
+        //System.out.println(Arrays.toString(fullHeaders));
         return fullHeaders;
     }
 
