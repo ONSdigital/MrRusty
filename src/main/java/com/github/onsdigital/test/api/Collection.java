@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.api;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -86,8 +87,9 @@ public class Collection {
     }
 
     public static CollectionDescription createCollectionDescription() throws IOException {
-
-        CollectionDescription collection = createCollectionDescription();
+        CollectionDescription collection = new CollectionDescription();
+        collection.name = Random.id();
+        collection.publishDate = new Date();
         return collection;
     }
 
@@ -107,5 +109,4 @@ public class Collection {
         Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
         return getResponse.body;
     }
-
 }
