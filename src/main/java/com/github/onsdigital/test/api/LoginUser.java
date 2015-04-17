@@ -18,7 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * API tests for /login
+ * Test cases for the {@link com.github.onsdigital.zebedee.api.Login} API
+ * for logging in as users other than the system owner.
  */
 @Api
 @DependsOn({Password.class})
