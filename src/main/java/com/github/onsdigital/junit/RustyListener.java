@@ -37,20 +37,35 @@ public class RustyListener extends TextListener {
      * Called when all rounds have completed.
      *
      * @param blocked Classes that were unable to run because of failed dependencies.
+     * @param rounds
      */
-    public void testRunsAllFinished(Set<Class<?>> blocked, Set<Class<?>> passed) {
+    public void testRunsAllFinished(Set<Class<?>> blocked, Set<Class<?>> passed, List<Set<Class<?>>> rounds) {
 
         this.passed = passed;
         this.blocked = blocked;
         rustyResult.setBlocked(blocked);
-        printRounds();
+        printRounds(rounds);
         super.testRunFinished(rustyResult);
         printBlocked();
     }
 
-    private void printRounds() {
+    private void printRounds(List<Set<Class<?>>> rounds) {
         System.out.println();
-        System.out.println(rustyResult.getRounds() + " rounds of testing.");
+        System.out.println(rustyResult.getRounds() + " rounds of testing:");
+        for (Set<Class<?>> round : rounds) {
+            System.out.println(" - " + list(round));
+        }
+    }
+
+    private String list(Set<Class<?>> round) {
+        StringBuilder result = new StringBuilder();
+        for (Class<?> klass : round) {
+            if (result.length() > 0) {
+                result.append(", ");
+            }
+            result.append(klass.getSimpleName());
+        }
+        return result.toString();
     }
 
     private void printBlocked() {

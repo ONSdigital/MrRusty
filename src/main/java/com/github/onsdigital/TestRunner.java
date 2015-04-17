@@ -26,6 +26,7 @@ public class TestRunner {
     static Set<Class<?>> queue;
     static Set<Class<?>> ready;
     static Set<Class<?>> passed = new HashSet<>();
+    static List<Set<Class<?>>> rounds = new ArrayList<>();
 
     public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InitializationError {
 
@@ -49,17 +50,20 @@ public class TestRunner {
                 for (Failure failure : listener.rustyResult.getFailures()) {
                     failedClassNames.add(failure.getDescription().getClassName());
                 }
+                Set<Class<?>> round = new HashSet<>();
                 for (Class<?> klass : ready) {
                     if (!failedClassNames.contains(klass.getName())) {
                         passed.add(klass);
+                        round.add(klass);
                     }
                 }
+                rounds.add(round);
             }
 
         } while (readySize > 0);
 
         // Now trigger printing out the results:
-        listener.testRunsAllFinished(queue, passed);
+        listener.testRunsAllFinished(queue, passed, rounds);
     }
 
 
