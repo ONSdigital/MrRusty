@@ -10,7 +10,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Created by david on 31/03/2015.
+ * Provides a listener that collects results from each
+ * dependency round of testing and prints results to stdout.
  */
 public class RustyListener extends TextListener {
 
@@ -49,7 +50,7 @@ public class RustyListener extends TextListener {
 
     private void printRounds() {
         System.out.println();
-        System.out.println(rustyResult.getRounds() + " rounds of tests ran.");
+        System.out.println(rustyResult.getRounds() + " rounds of testing.");
     }
 
     private void printBlocked() {
