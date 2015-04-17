@@ -18,7 +18,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * API tests for /login
+ * Test cases for the {@link com.github.onsdigital.zebedee.api.Login} API
+ * for initially logging in as the system owner.
  */
 @Api
 @DependsOn({})
@@ -90,7 +91,7 @@ public class LoginAdmin {
     }
 
     /**
-     * Tests login without an email address.
+     * Tests login with an incorrect password.
      *
      * @throws IOException
      */
@@ -114,9 +115,9 @@ public class LoginAdmin {
     /**
      * Convenience method for generating login credentials.
      *
-     * @param email
-     * @param password
-     * @return
+     * @param email    The email address
+     * @param password The password
+     * @return A {@link Credentials} instance containing the given details.
      */
     private Credentials credentials(String email, String password) {
         Credentials credentials = new Credentials();
