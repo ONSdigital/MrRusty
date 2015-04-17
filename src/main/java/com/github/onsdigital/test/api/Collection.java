@@ -54,6 +54,19 @@ public class Collection {
     }
 
     @Test
+    public void shouldReturn409IfUpdateNameAlreadyExists() throws IOException {
+
+        // Given
+        // an existing collection
+        CollectionDescription description = create(http);
+        String existingName = description.name;
+
+        // When we try and create a collection with the same name
+        // Then we get a 409
+        create(description, HttpStatus.CONFLICT_409, http);
+    }
+
+    @Test
     public void collectionShouldBeDeleted() throws IOException {
         // Given
         //...a collection
@@ -86,7 +99,7 @@ public class Collection {
         return create(collectionDescription, expectedResponse, http);
     }
 
-    public static CollectionDescription createCollectionDescription() throws IOException {
+    public static CollectionDescription createCollectionDescription() {
         CollectionDescription collection = new CollectionDescription();
         collection.name = Random.id();
         collection.publishDate = new Date();
