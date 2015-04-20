@@ -24,17 +24,61 @@ public class Approve {
 
     Http http = Sessions.get("admin");
 
+    /**
+     * Complete
+     * @throws IOException
+     */
+    @POST
     @Test
-    public void approveACollection() throws IOException {
+    public void shouldRespondOkayWhenWeApproveACollection() throws IOException {
         CollectionDescription collection = Collection.create(http);
+
         approve(collection.name, 200);
+    }
+
+    /**
+     * TODO
+     */
+    @POST
+    @Test
+    public void shouldHaveApprovedCollectionAfterSuccessfulResponse() {
 
     }
 
-    //TODO Test for approve with in progress uris
+    /**
+     * TODO
+     */
     @POST
     @Test
-    public void rejectsCollectionsThatHaveInProgressUris() throws IOException {
+    public void shouldRespondBadRequestIfCredentialsAreNotProvided() {
+
+    }
+
+    /**
+     * TODO
+     */
+    @POST
+    @Test
+    public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() {
+
+    }
+
+    /**
+     * TODO
+     */
+    @POST
+    @Test
+    public void shouldRespondBadRequestIfCollectionDoesntExist() {
+
+    }
+
+    /**
+     * TODO
+     * @throws IOException
+     */
+    @POST
+    @Test
+    public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection
         CollectionDescription collection = Collection.create(http);
@@ -48,6 +92,9 @@ public class Approve {
         // ...the resource is in progress so the collection will not be approved
         approve(collection.name, 409);
     }
+
+
+
 
     public static boolean approve(String collectionID) throws IOException {
         return approve(collectionID, 200);
