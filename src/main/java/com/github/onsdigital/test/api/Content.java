@@ -1,48 +1,59 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.http.Sessions;
 import com.github.davidcarboni.restolino.json.Serialiser;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
+import com.github.onsdigital.http.Sessions;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
-import org.apache.http.message.BasicNameValuePair;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.Assert.*;
-
-/**
- * Created by kanemorgan on 31/03/2015.
- */
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @DependsOn(Collection.class)
 public class Content {
 
     Http http = Sessions.get("admin");
 
-    //TODO
     @Test
-    public void createSpec() throws IOException {
-        Http http = Sessions.get("admin");
-        CollectionDescription thing1 = new CollectionDescription();
-        thing1.name = Random.id();
-        Collection.create(thing1, 200, http);
+    public void shouldAddContent() throws IOException {
 
-        String fileName = Random.id() + ".json";
+        // Given - an existing collection
+        CollectionDescription collection = Collection.create(http);
 
-        create(thing1.name, "{name:foo}", Random.id() + ".json", 200, http);
+        // When - we create content
+        String content = "{name:foo}";
+        String uri = Random.id() + ".json";
+        create(collection.name, content, uri, HttpStatus.OK_200, http);
+
+        // Then - we get the content back when we get it
+        String getResponse = get(collection.name, uri, HttpStatus.OK_200, http);
+        assertEquals(content, getResponse);
+    }
+
+    @Test
+    public void shouldReturn400WhenNoUriIsSpecified() throws IOException {
+
+        // Given - an existing collection
+        CollectionDescription collection = Collection.create(http);
+
+        // When - content is added with no file url
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.name);
+        Response<String> createResponse = http.post(contentEndpoint, "", String.class);
+
+        // Then - a 400 response code is returned
+        assertEquals(createResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
     }
 
     @Test
@@ -53,10 +64,10 @@ public class Content {
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        create(collection_1.name, "content", fileURI, 200, http);
+        create(collection_1.name, "content", fileURI, HttpStatus.OK_200, http);
 
         // we can't create it in another collection
-        create(collection_2.name, "content", fileURI, 409, http);
+        create(collection_2.name, "content", fileURI, HttpStatus.CONFLICT_409, http);
     }
 
     @Test
@@ -198,10 +209,8 @@ public class Content {
 
     public static void create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
-
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
         assertEquals(createResponse.statusLine.getStatusCode(), expectedResponse);
-
     }
 
 
