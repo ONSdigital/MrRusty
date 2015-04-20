@@ -3,9 +3,6 @@ package com.github.onsdigital.test.api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Host;
 
-/**
- * Created by david on 13/04/2015.
- */
 public class ZebedeeHost {
 
     public static final Host host = new Host("http://localhost:8082");
@@ -19,5 +16,6 @@ public class ZebedeeHost {
     public static final Endpoint content = new Endpoint(host, "content");
     public static final Endpoint transfer = new Endpoint(host, "transfer");
     public static final Endpoint browse = new Endpoint(host, "browse");
-
+    public static final Endpoint complete = new Endpoint(host, "complete");
+    public static final Endpoint review = new Endpoint(host, "review");
 }
