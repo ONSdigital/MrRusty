@@ -210,7 +210,7 @@ public class Content {
     public static void create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
-        assertEquals(createResponse.statusLine.getStatusCode(), expectedResponse);
+        assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
     }
 
 

@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -64,7 +65,7 @@ public class LoginAdmin {
 
         // Then
         // The request should succeed
-        assertEquals(response.statusLine.getStatusCode(), 200);
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
         assertTrue(StringUtils.isNotBlank(response.body));
     }
 
