@@ -10,6 +10,7 @@ public class ZebedeeHost {
     public static final Endpoint login = new Endpoint(host, "login");
     public static final Endpoint users = new Endpoint(host, "users");
     public static final Endpoint password = new Endpoint(host, "password");
+    public static final Endpoint permission = new Endpoint(host, "permission");
     public static final Endpoint approve = new Endpoint(host, "approve");
     public static final Endpoint collections = new Endpoint(host, "collections");
     public static final Endpoint collection = new Endpoint(host, "collection");

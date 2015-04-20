@@ -1,14 +1,10 @@
 package com.github.onsdigital;
 
-import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.junit.RustyListener;
-import com.github.onsdigital.junit.RustyRequest;
+import com.github.onsdigital.junit.*;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.Failure;
-import org.junit.runners.model.InitializationError;
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -28,11 +24,15 @@ public class TestRunner {
     static Set<Class<?>> passed = new HashSet<>();
     static List<Set<Class<?>>> rounds = new ArrayList<>();
 
-    public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InitializationError {
+    static Reflections reflections = new Reflections("com.github.onsdigital");
+    ;
+
+    public static void main(String[] args) throws Exception {
 
         listener = new RustyListener();
         jUnitCore.addListener(listener);
 
+        setup();
         queue = getQueue();
 
         int readySize;
@@ -62,13 +62,31 @@ public class TestRunner {
 
         } while (readySize > 0);
 
+        teardown();
+
         // Now trigger printing out the results:
         listener.testRunsAllFinished(queue, passed, rounds);
     }
 
+    private static void setup() throws Exception {
+        Set<Class<? extends Setup>> setupClasses = reflections.getSubTypesOf(Setup.class);
+        for (Class<? extends Setup> setupClass : setupClasses) {
+            Setup setup = setupClass.newInstance();
+            setup.setup();
+        }
+    }
+
+    private static void teardown() throws Exception {
+        Set<Class<? extends Teardown>> setupClasses = reflections.getSubTypesOf(Teardown.class);
+        for (Class<? extends Teardown> setupClass : setupClasses) {
+            Teardown teardown = setupClass.newInstance();
+            teardown.teardown();
+        }
+    }
+
 
     static Set<Class<?>> getQueue() {
-        Reflections reflections = new Reflections("com.github.onsdigital");
+
         Set<Class<?>> annotated =
                 reflections.getTypesAnnotatedWith(DependsOn.class);
         System.out.println(annotated);
