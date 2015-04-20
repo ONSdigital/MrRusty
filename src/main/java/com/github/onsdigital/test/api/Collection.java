@@ -48,6 +48,7 @@ public class Collection {
         CollectionDescription serverCollection = create(collection, 200, http);
         get(serverCollection.name, 200, http);
         assertEquals(collection.name, serverCollection.name);
+        assertEquals(false, serverCollection.approvedStatus);
 
         //   we can't get a collection that's not there
         get("unknown", 404, http);
