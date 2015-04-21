@@ -18,7 +18,7 @@ import java.io.IOException;
 @DependsOn({Login.class, Collection.class, Content.class})
 public class Transfer {
 
-    Http http = Login.httpAdministrator;
+    Http http = Login.httpPublisher;
 
     @Test
     public void main() throws IOException {
