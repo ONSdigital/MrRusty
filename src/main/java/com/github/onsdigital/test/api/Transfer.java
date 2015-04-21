@@ -25,7 +25,7 @@ public class Transfer {
         CollectionDescription collection_1 = Collection.create(http);
         CollectionDescription collection_2 = Collection.create(http);
         String fileUri = Random.id() + ".json";
-        Content.create(collection_1.name, "content", fileUri, 200, http);
+        Content.create(collection_1.name, "content", fileUri, http);
 
         transfer(collection_1.name, collection_2.name, fileUri, 200, http);
 

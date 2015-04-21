@@ -141,14 +141,14 @@ public class Approve {
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.create(Login.httpPublisher);
 
         String filename = Random.id() + ".json";
-        Content.create(collection.name, "shouldReturnConflictForCollectionsThatHaveIncompleteItems", "/approve/" + filename, 200, http);
+        Content.create(collection.name, "shouldReturnConflictForCollectionsThatHaveIncompleteItems", "/approve/" + filename, Login.httpPublisher);
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.name, http);
+        Response<String> response = approve(collection.name, Login.httpPublisher);
 
         // We expect
         // ...the resource is in progress so the collection will not be approved

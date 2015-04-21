@@ -98,7 +98,7 @@ public class Browse {
         // admin login XXXXXXXX & a collection with a file in it
         CollectionDescription collection = Collection.create(http);
         String uri = "/shouldReturn400WhenURIisFileNotDirectory/" + Random.id() + ".json";
-        String content = Content.create(collection.name,"shouldReturn400WhenURIisFileNotDirectory",uri, 200, http);
+        Content.create(collection.name,"shouldReturn400WhenURIisFileNotDirectory",uri, Login.httpPublisher);
 
         // When
         // we call get

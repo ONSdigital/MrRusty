@@ -24,7 +24,7 @@ public class Review {
         // Given - an existing piece of content that is set to complete
         CollectionDescription collection = Collection.create(http);
         String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        Content.create(collection.name, "foo", filename, http);
         Complete.complete(collection.name, filename, http);
 
         // When - we call review on the content

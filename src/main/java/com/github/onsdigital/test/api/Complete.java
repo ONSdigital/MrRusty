@@ -30,7 +30,7 @@ public class Complete {
         // Given - an existing collection with some content
         CollectionDescription collection = Collection.create(http);
         String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        Content.create(collection.name, "foo", filename, http);
 
         // When - we call complete on the content
         int responseCode = complete(collection.name, filename, http);
@@ -54,7 +54,7 @@ public class Complete {
         // Given - an existing collection with some content
         CollectionDescription collection = Collection.create(http);
         String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        Content.create(collection.name, "foo", filename, http);
 
         // When - we call complete on the content
         int responseCode = complete(collection.name, filename, http);
@@ -90,7 +90,7 @@ public class Complete {
         CollectionDescription collection = Collection.create(http);
         String directory = "/foobarred/";
         String filename = directory + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        Content.create(collection.name, "foo", filename, http);
 
         // When - we call complete on the content
         int responseCode = complete(collection.name, directory, http);
@@ -105,7 +105,7 @@ public class Complete {
         // Given - a uri that is already set to complete.
         CollectionDescription collection = Collection.create(http);
         String filename = Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        Content.create(collection.name, "foo", filename, http);
         complete(collection.name, filename, http);
 
         // When - we call complete on the content
