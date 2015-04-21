@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -20,8 +21,8 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
+@Api
 @DependsOn(LoginAdmin.class)
-
 public class Collection {
 
     private static Http http = Sessions.get("admin");
@@ -33,24 +34,30 @@ public class Collection {
 
 
     /**
-     * TODO
+     * Test basic functionality
+     *
+     * Create with publisher permissions should return {@link HttpStatus#OK_200}
+     *
+     * TODO - Fix specific publisher permissions
      */
     @POST
     @Test
     public void canCreateCollectionWithPublisherPermissions() throws IOException {
-        // Given a
+        // Given
+        // a collection description
         CollectionDescription roundabout = createCollectionDescription();
 
-        // can create a collection
+        // When
+        // we post as a publisher
         create(roundabout, 200, http);
-        // can't create a collection that already exist
-        create(roundabout, 409, http);
-        // can't create a collection without a name
-        CollectionDescription anon = new CollectionDescription();
-        create(anon, 400, http);
+
+        // Expect
+        // a response of 200
     }
     /**
-     * TODO
+     * Creating an unnamed collection should return {@link HttpStatus#BAD_REQUEST_400}
+     *
+     * TODO - Fix specific publisher permissions
      */
     @POST
     @Test
@@ -61,41 +68,6 @@ public class Collection {
         // When we work
         create(anon, 400, http);
     }
-
-    /**
-     * TODO
-     */
-    @POST
-    @Test
-    public void cannotCreateCollectionWithoutPublisherPermissions() throws IOException {
-
-    }
-
-    /**
-     * TODO
-     */
-    @GET
-    @Test
-    public void canGetCollectionWithPublisherPermissions() throws IOException {
-
-    }
-    /**
-     * TODO
-     */
-    @GET
-    @Test
-    public void viewerCanOnlyGetCollectionWithTeamPermissions() throws IOException {
-
-    }
-    /**
-     * TODO
-     */
-    @GET
-    @Test
-    public void cannotGetCollectionWithAdminPermissions() throws IOException {
-
-    }
-
     /**
      * written
      */
@@ -115,7 +87,42 @@ public class Collection {
 
 
     /**
+     * Create without publisher permissions should return {@link HttpStatus#UNAUTHORIZED_401}
+     *
      * TODO
+     */
+    @POST
+    @Test
+    public void shouldReturn401WithoutPublisherPermissions() throws IOException {
+
+    }
+
+
+    /**
+     * Viewer permissions should return {@link HttpStatus#OK_200} for any permitted collection, {@link HttpStatus#UNAUTHORIZED_401} otherwise
+     *
+     * TODO
+     */
+    @GET
+    @Test
+    public void shouldReturn200ForViewerWithPermissionsOtherwise401() throws IOException {
+
+    }
+    /**
+     * Admins should return {@link HttpStatus#UNAUTHORIZED_401}
+     *
+     * TODO
+     */
+    @GET
+    @Test
+    public void shouldReturn401WithAdminPermissions() throws IOException {
+
+    }
+
+    /**
+     * Publisher permissions should return {@link HttpStatus#OK_200} for any collection
+     *
+     * TODO - Fix specific publisher permissions
      */
     @DELETE
     @Test
@@ -134,7 +141,9 @@ public class Collection {
     }
 
     /**
-     * TODO
+     * All other permissions should return {@link HttpStatus#UNAUTHORIZED_401} for any collection
+     *
+     * TODO - Fix permissions
      */
     @DELETE
     @Test
@@ -158,6 +167,8 @@ public class Collection {
         assertEquals(expectedResponse, deleteResponse.statusLine.getStatusCode());
         return deleteResponse.body;
     }
+
+
 
     public static CollectionDescription create(CollectionDescription collection, int expectedResponse, Http http) throws IOException {
         Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);

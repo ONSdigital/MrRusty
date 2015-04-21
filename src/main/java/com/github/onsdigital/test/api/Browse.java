@@ -1,5 +1,7 @@
 package com.github.onsdigital.test.api;
 
+import com.github.davidcarboni.cryptolite.Random;
+import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
@@ -16,13 +18,37 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-@DependsOn({LoginAdmin.class, Collection.class})
+@Api
+@DependsOn({LoginAdmin.class, Collection.class, Content.class})
 public class Browse {
 
     private static Http http = Sessions.get("admin");
     private static Endpoint browseEndpoint = ZebedeeHost.browse;
 
     /**
+     * Test basic functionality
+     *
+     * TODO Update with permissions
+     */
+    @GET
+    @Test
+    public void shouldReturn200WithValidCollectionName() throws IOException {
+        // Given
+        // admin login XXXXXXXX & a collection
+        CollectionDescription collection = Collection.create(http);
+
+        // When
+        // we call get
+        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name), DirectoryListing.class);
+
+        // Expect
+        // a correct call
+        Assert.assertEquals(getResponse.statusLine.getStatusCode(), 200);
+    }
+
+    /**
+     * Expect {@link HttpStatus#NOT_FOUND_404} if no collection is specified
+     *
      * TODO Update with permissions
      */
     @GET
@@ -41,10 +67,58 @@ public class Browse {
     }
 
     /**
+     * Expect {@link HttpStatus#NOT_FOUND_404} if URI does not exist
+     *
      * TODO Update with permissions
      */
+    @GET
     @Test
-    public void shouldReturn200WithValidCollectionName() throws IOException {
+    public void shouldReturn404WithInvalidURI() throws IOException {
+        // Given
+        // admin login XXXXXXXX & a collection
+        CollectionDescription collection = Collection.create(http);
+
+        // When
+        // we call get
+        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", "/shouldReturn404WithInvalidURI"), DirectoryListing.class);
+
+        // Expect
+        // a correct call
+        Assert.assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.NOT_FOUND_404);
+    }
+
+    /**
+     * Expect {@link HttpStatus#BAD_REQUEST_400} if URI does exist but is not a folder
+     *
+     * TODO Update with publisher permissions
+     */
+    @GET
+    @Test
+    public void shouldReturn400WhenURIisFileNotDirectory() throws IOException {
+        // Given
+        // admin login XXXXXXXX & a collection with a file in it
+        CollectionDescription collection = Collection.create(http);
+        String uri = "/shouldReturn400WhenURIisFileNotDirectory/" + Random.id() + ".json";
+        String content = Content.create(collection.name,"shouldReturn400WhenURIisFileNotDirectory",uri, 200, http);
+
+        // When
+        // we call get
+        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", uri), DirectoryListing.class);
+
+        // Expect
+        // a bad call
+        Assert.assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
+    }
+
+
+    /**
+     * Expect {@link HttpStatus#UNAUTHORIZED_401} for admin user
+     *
+     * TODO Update with permissions
+     */
+    @GET
+    @Test
+    public void shouldReturn401ForAdminUser() throws IOException {
         // Given
         // admin login XXXXXXXX & a collection
         CollectionDescription collection = Collection.create(http);
@@ -56,5 +130,16 @@ public class Browse {
         // Expect
         // a correct call
         Assert.assertEquals(getResponse.statusLine.getStatusCode(), 200);
+    }
+
+    /**
+     * Expect {@link HttpStatus#UNAUTHORIZED_401} for user with permissions. {@link HttpStatus#UNAUTHORIZED_401} otherwise
+     *
+     * TODO Update with permissions
+     */
+    @GET
+    @Test
+    public void shouldReturn200ForViewerWithPermissionsOtherwise401() throws IOException {
+
     }
 }

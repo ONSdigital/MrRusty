@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.davidcarboni.restolino.framework.Api;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -12,6 +13,9 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -21,13 +25,20 @@ import java.nio.file.Path;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Api
 @DependsOn(Collection.class)
 public class Content {
 
     Http http = Sessions.get("admin");
 
+    /**
+     * Test basic functionality for .json content
+     *
+     * TODO - Add permissions functionality
+     */
+    @POST
     @Test
-    public void shouldAddContent() throws IOException {
+    public void shouldAddContentIfAPublisher() throws IOException {
 
         // Given - an existing collection
         CollectionDescription collection = Collection.create(http);
@@ -42,6 +53,12 @@ public class Content {
         assertEquals(content, Serialiser.deserialise(getResponse, String.class));
     }
 
+    /**
+     * Test returns {@link HttpStatus#BAD_REQUEST_400} if no uri is specified
+     *
+     * TODO - Add permissions functionality
+     */
+    @POST
     @Test
     public void shouldReturn400WhenNoUriIsSpecified() throws IOException {
 
@@ -56,6 +73,12 @@ public class Content {
         assertEquals(createResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
     }
 
+    /**
+     * Test returns {@link HttpStatus#CONFLICT_409} if file is currently being edited in another collection
+     *
+     * TODO - Add permissions functionality
+     */
+    @POST
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
         CollectionDescription collection_1 = Collection.create(http);
@@ -70,6 +93,12 @@ public class Content {
         create(collection_2.name, "content", fileURI, HttpStatus.CONFLICT_409, http);
     }
 
+    /**
+     * Test basic update functionality for .json content
+     *
+     * TODO - Add permissions functionality
+     */
+    @POST
     @Test
     public void shouldUpdateContent() throws IOException {
         // Given
@@ -88,10 +117,14 @@ public class Content {
         assertEquals("new content", Serialiser.deserialise(serverResponse, String.class));
     }
 
+    /**
+     * Test basic functionality for dataset upload
+     *
+     * TODO - Add permissions functionality
+     */
+    @POST
     @Test
     public void shouldUploadFile() throws IOException {
-
-
 
         // Given
         // A file, a taxonomy node, and a collection
@@ -110,10 +143,14 @@ public class Content {
         download(collection_1.name, taxonomyNode, filename, true, http);
     }
 
+    /**
+     * Test basic functionality for file delete
+     *
+     * TODO - Add permissions functionality
+     */
+    @DELETE
     @Test
     public void shouldDeleteFile() throws IOException {
-
-
 
         // Given
         // We upload a file
@@ -134,10 +171,14 @@ public class Content {
         download(collection_1.name, taxonomyNode, filename, false, http);
     }
 
+    /**
+     * Test system does not list a deleted file in the Collection.get() details
+     *
+     * TODO - Add permissions functionality
+     */
+    @DELETE
     @Test
     public void shouldNotListDeletedFile() throws IOException {
-
-
 
         // Given
         // We upload a file
@@ -159,11 +200,15 @@ public class Content {
         assertEquals(0, collection.inProgressUris.size());
     }
 
+    /**
+     * Test that when a user starts editing a page then deletes their work when they
+     * next get content it will return the currently published page
+     *
+     * TODO - Add permissions functionality
+     */
+    @DELETE
     @Test
     public void shouldNotReturnDeletedVersionOfExistingWebsiteFile() throws IOException {
-
-
-
 
         // Given
         // A page file within a collection
@@ -207,12 +252,13 @@ public class Content {
         assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
     }
 
-    public static void create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
+    public static String create(String collectionName, String content, String uri, int expectedResponse, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
         Response<String> createResponse = http.post(contentEndpoint, content, String.class);
         assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
-    }
 
+        return createResponse.body;
+    }
 
     public static String get(String collectionName, String uri, int expectedResponse, Http http) throws IOException {
 

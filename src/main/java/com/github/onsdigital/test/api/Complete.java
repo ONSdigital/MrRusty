@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
+import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -20,8 +21,12 @@ public class Complete {
 
     Http http = Sessions.get("admin");
 
+    /**
+     * Test basic functionality
+     */
+    @POST
     @Test
-    public void shouldComplete() throws IOException {
+    public void shouldCompleteWithPublisherCredentials() throws IOException {
 
         // Given - an existing collection with some content
         CollectionDescription collection = Collection.create(http);
@@ -40,12 +45,37 @@ public class Complete {
         assertFalse(updatedCollection.inProgressUris.contains(filename));
     }
 
+    /**
+     * Test basic functionality
+     */
+    @POST
+    @Test
+    public void shouldReturn401WithoutPublisherCredentials() throws IOException {
+
+        // Given - an existing collection with some content
+        CollectionDescription collection = Collection.create(http);
+        String filename = "/" + Random.id() + ".json";
+        Content.create(collection.name, "foo", filename, 200, http);
+
+        // When - we call complete on the content
+        int responseCode = complete(collection.name, filename, http);
+
+        // Then - We get the expected response code
+        assertEquals(HttpStatus.OK_200, responseCode);
+
+        // and the content is listed under complete when we get the collection.
+        CollectionDescription updatedCollection = Collection.get(collection.name, http);
+        assertTrue(updatedCollection.completeUris.contains(filename));
+        assertFalse(updatedCollection.inProgressUris.contains(filename));
+    }
+
+    @POST
     @Test
     public void shouldReturn404IfNotInProgress() throws IOException {
 
         // Given - a file is not listed in progress
         CollectionDescription collection = Collection.create(http);
-        String filename = "/foobarred/" + Random.id() + ".json";
+        String filename = "/shouldReturn404IfNotInProgress/" + Random.id() + ".json";
 
         // When - we call complete on the content
         int responseCode = complete(collection.name, filename, http);
@@ -86,6 +116,14 @@ public class Complete {
         assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
     }
 
+    /**
+     *
+     * @param collectionName the name of the parent collection
+     * @param uri the filename within the collection
+     * @param http the session we are calling complete from
+     * @return the {@link HttpStatus} code for the response
+     * @throws IOException
+     */
     public static int complete(String collectionName, String uri, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.complete.addPathSegment(collectionName).setParameter("uri", uri);
         Response<JsonObject> createResponse = http.post(contentEndpoint, "", JsonObject.class);

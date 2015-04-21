@@ -8,6 +8,7 @@ import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -53,13 +54,26 @@ public class Users {
 
         // Then
         // We should get a conflict
-        assertEquals(200, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
     }
 
     /**
-     * A user account should inactive after creation and before the password is set.
+     * Ensures we get a 401 Unauthorized when a non-admin user tries to create.
      *
-     * @throws IOException
+     * TODO Update with permissions
+     *
+     */
+    @POST
+    @Test
+    public void shouldNotCreateUserIfNotAdmin() throws IOException {
+
+    }
+
+
+    /**
+     * A user account should be inactive after creation and before the password is set.
+     * Otherwise a 401 Unauthorised error
+     *
      */
     @POST
     @Test
@@ -80,7 +94,7 @@ public class Users {
 
         // Then
         // We should get unauthorized:
-        assertEquals(401, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
@@ -98,7 +112,7 @@ public class Users {
         user.email = "duplicate." + Random.id() + "@example.com";
         user.name = "Coming around again";
         Response<User> create = http.post(ZebedeeHost.users, user, User.class);
-        assertEquals(200, create.statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, create.statusLine.getStatusCode());
 
         // When
         // We attempt to create a duplicate user
@@ -106,7 +120,7 @@ public class Users {
 
         // Then
         // We should get a conflict
-        assertEquals(409, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
     /**
@@ -130,7 +144,7 @@ public class Users {
 
         // Then
         // We should get a bad request
-        assertEquals(400, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
     /**
@@ -154,7 +168,7 @@ public class Users {
 
         // Then
         // We should get a bad request
-        assertEquals(400, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
 }
