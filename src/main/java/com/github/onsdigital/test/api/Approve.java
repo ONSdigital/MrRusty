@@ -50,7 +50,7 @@ public class Approve {
 
     /**
      * Tests functionality of a successful call
-     *
+     * <p/>
      * written
      */
     @POST
@@ -74,7 +74,7 @@ public class Approve {
 
     /**
      * Tests that {@link HttpStatus#FORBIDDEN_403} is when credentials not provided
-     *
+     * <p/>
      * written
      */
     @POST
@@ -98,9 +98,9 @@ public class Approve {
      * Tests that {@link HttpStatus#UNAUTHORIZED_401} is returned when user doesn't have approve permission
      * <p/>
      * May be split into separate tests based on levels
-     *
+     * <p/>
      * TODO
-     *
+     * <p/>
      * incomplete
      */
     @POST
