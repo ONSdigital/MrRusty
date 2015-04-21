@@ -13,7 +13,6 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.File;
 import java.io.IOException;

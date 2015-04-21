@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 @DependsOn({Login.class, Collection.class})
 public class Browse {
 
-    private static Http http = Login.httpAdministrator;
+    private static Http http = Login.httpPublisher;
     private static Endpoint browseEndpoint = ZebedeeHost.browse;
 
     /**

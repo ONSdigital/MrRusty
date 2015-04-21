@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 @DependsOn(Content.class)
 public class Approve {
 
-    Http http = Login.httpAdministrator;
+    Http http = Login.httpPublisher;
 
     /**
      * Tests approval using simple collection setup and admin credentials
@@ -91,7 +91,7 @@ public class Approve {
 
         // Expect
         // a response of okay
-        assertEquals(HttpStatus.FORBIDDEN_403, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
