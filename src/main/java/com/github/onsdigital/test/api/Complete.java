@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 @DependsOn(Content.class)
 public class Complete {
 
-    Http http = Login.httpAdministrator;
+    Http http = Login.httpPublisher;
 
     /**
      * Test basic functionality
