@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.junit.AfterClass;
@@ -26,7 +25,7 @@ public class Password {
 
     static Credentials credentials;
 
-    Http http = Sessions.get("admin");
+    Http http = Login.httpAdministrator;
 
     /**
      * Set up a user's credentials for the test suite.

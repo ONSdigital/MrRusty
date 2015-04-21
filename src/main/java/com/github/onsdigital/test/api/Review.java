@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
@@ -12,12 +11,10 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class Review {
-    Http http = Sessions.get("admin");
+    Http http = Login.httpAdministrator;
 
     @Test
     public void shouldReview() throws IOException {

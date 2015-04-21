@@ -6,7 +6,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 @DependsOn(Collection.class)
 public class Content {
 
-    Http http = Sessions.get("admin");
+    Http http = Login.httpPublisher;
 
     /**
      * Test basic functionality for .json content
@@ -160,7 +159,7 @@ public class Content {
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
-        upload(collection_1.name, taxonomyNode, filename, file, 200,http );
+        upload(collection_1.name, taxonomyNode, filename, file, 200, http);
 
         // When
         // We attempt to delete the file from the taxonomy
@@ -266,7 +265,7 @@ public class Content {
         Response<Path> getResponse = http.get(contentEndpoint);
         assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
 
-        return FileUtils.readFileToString(getResponse.body.toFile(),Charset.forName("UTF8"));
+        return FileUtils.readFileToString(getResponse.body.toFile(), Charset.forName("UTF8"));
     }
 
     public static void upload(String collectionName, String node, String saveAsName, File file, int expectedResponse, Http http) throws IOException {

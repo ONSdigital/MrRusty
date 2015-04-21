@@ -8,7 +8,6 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
@@ -22,10 +21,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Api
-@DependsOn({LoginAdmin.class, Collection.class})
+@DependsOn({Login.class, Collection.class})
 public class Collections {
 
-    private static Http http = Sessions.get("admin");
+    private static Http http = Login.httpAdministrator;
 
     /**
      * Test basic functionality

@@ -1,6 +1,7 @@
 package com.github.onsdigital.http;
 
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -62,7 +63,7 @@ public class Http implements AutoCloseable {
      * @throws IOException If an error occurs.
      * @see java.nio.file.Files#probeContentType(Path)
      */
-    public Response<Path>  get(Endpoint endpoint, NameValuePair... headers) throws IOException {
+    public Response<Path> get(Endpoint endpoint, NameValuePair... headers) throws IOException {
 
         // Create the request
         HttpGet get = new HttpGet(endpoint.url());
@@ -358,7 +359,13 @@ public class Http implements AutoCloseable {
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             try (InputStream inputStream = entity.getContent()) {
-                body = Serialiser.deserialise(inputStream, responseClass);
+                try {
+                    body = Serialiser.deserialise(inputStream, responseClass);
+                } catch (JsonSyntaxException e) {
+                    // This can happen if an error HTTP code is received and the
+                    // body of the response doesn't contain the expected object:
+                    body = null;
+                }
             }
         } else {
             EntityUtils.consume(entity);

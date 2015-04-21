@@ -6,7 +6,6 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
@@ -21,11 +20,12 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
+
 @Api
-@DependsOn(LoginAdmin.class)
+@DependsOn(Login.class)
 public class Collection {
 
-    private static Http http = Sessions.get("admin");
+    private static Http http = Login.httpAdministrator;
 
     public Collection() {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()

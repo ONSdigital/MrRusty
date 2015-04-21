@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.junit.Assert;
@@ -16,10 +15,10 @@ import java.io.IOException;
  * Created by kanemorgan on 31/03/2015.
  */
 
-@DependsOn({LoginAdmin.class, Collection.class, Content.class})
+@DependsOn({Login.class, Collection.class, Content.class})
 public class Transfer {
 
-    Http http = Sessions.get("admin");
+    Http http = Login.httpAdministrator;
 
     @Test
     public void main() throws IOException {

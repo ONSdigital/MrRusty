@@ -8,11 +8,8 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import org.apache.http.protocol.HTTP;
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.eclipse.jetty.http.HttpStatus;
+import org.junit.Test;
 
 import javax.ws.rs.POST;
 import java.io.IOException;
@@ -27,11 +24,11 @@ import static org.junit.Assert.assertEquals;
 @DependsOn(Content.class)
 public class Approve {
 
-    Http http = Sessions.get("admin");
+    Http http = Login.httpAdministrator;
 
     /**
      * Tests approval using simple collection setup and admin credentials
-     *
+     * <p/>
      * written
      */
     @POST
@@ -99,7 +96,7 @@ public class Approve {
 
     /**
      * Tests that {@link HttpStatus#UNAUTHORIZED_401} is returned when user doesn't have approve permission
-     *
+     * <p/>
      * May be split into separate tests based on levels
      *
      * TODO
@@ -114,7 +111,7 @@ public class Approve {
 
     /**
      * Tests that {@link HttpStatus#BAD_REQUEST_400} is returned when the collection doesn't exist
-     *
+     * <p/>
      * written
      */
     @POST
@@ -136,7 +133,7 @@ public class Approve {
 
     /**
      * Tests that {@link HttpStatus#CONFLICT_409} is returned when the collection has
-     *
+     * <p/>
      * written
      */
     @POST

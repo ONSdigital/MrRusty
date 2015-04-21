@@ -5,7 +5,6 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
@@ -19,10 +18,10 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 @Api
-@DependsOn({LoginAdmin.class, Collection.class, Content.class})
+@DependsOn({Login.class, Collection.class})
 public class Browse {
 
-    private static Http http = Sessions.get("admin");
+    private static Http http = Login.httpAdministrator;
     private static Endpoint browseEndpoint = ZebedeeHost.browse;
 
     /**

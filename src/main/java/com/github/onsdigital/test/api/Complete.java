@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.google.gson.JsonObject;
@@ -19,7 +18,7 @@ import static org.junit.Assert.*;
 @DependsOn(Content.class)
 public class Complete {
 
-    Http http = Sessions.get("admin");
+    Http http = Login.httpAdministrator;
 
     /**
      * Test basic functionality

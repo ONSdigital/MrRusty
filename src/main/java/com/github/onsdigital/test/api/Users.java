@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.User;
@@ -21,7 +20,7 @@ import static org.junit.Assert.assertEquals;
  * Test cases for the {@link com.github.onsdigital.zebedee.api.Users} API.
  */
 @Api
-@DependsOn(LoginAdmin.class)
+@DependsOn(Login.class)
 public class Users {
 
     static User user;
@@ -30,7 +29,7 @@ public class Users {
 
     @BeforeClass
     public static void getAdminSession() {
-        http = Sessions.get("admin");
+        http = Login.httpAdministrator;
     }
 
     /**
