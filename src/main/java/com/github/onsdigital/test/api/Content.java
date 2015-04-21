@@ -39,7 +39,7 @@ public class Content {
 
         // Then - we get the content back when we get it
         String getResponse = get(collection.name, uri, HttpStatus.OK_200, http);
-        assertTrue(getResponse.contains(content));
+        assertEquals(content, Serialiser.deserialise(getResponse, String.class));
     }
 
     @Test

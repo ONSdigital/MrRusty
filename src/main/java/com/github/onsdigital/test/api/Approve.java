@@ -54,7 +54,7 @@ public class Approve {
     /**
      * Tests functionality of a successful call
      *
-     * incomplete
+     * written
      */
     @POST
     @Test
@@ -71,21 +71,21 @@ public class Approve {
 
         // Expect
         // the collection is now approved
-        // TODO: Code that tests whether a collection has been approved
-
+        CollectionDescription collectionDescription = Collection.get(collection.name, http);
+        assertEquals(true, collectionDescription.approvedStatus);
     }
 
     /**
-     * Tests that {@link HttpStatus#BAD_REQUEST_400} is when credentials not provided
+     * Tests that {@link HttpStatus#FORBIDDEN_403} is when credentials not provided
      *
-     * complete
+     * written
      */
     @POST
     @Test
-    public void shouldRespondBadRequestIfCredentialsAreNotProvided() throws IOException {
+    public void shouldRespondForbiddenIfCredentialsAreNotProvided() throws IOException {
         // Given
         // a session that has no credentials and a collection
-        Http httpNoCredentials = Sessions.get("shouldRespondBadRequestIfCredentialsAreNotProvided");
+        Http httpNoCredentials = Sessions.get("shouldRespondForbiddenIfCredentialsAreNotProvided");
         CollectionDescription collection = Collection.create(http);
 
         // When
@@ -94,13 +94,15 @@ public class Approve {
 
         // Expect
         // a response of okay
-        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN_403, response.statusLine.getStatusCode());
     }
 
     /**
      * Tests that {@link HttpStatus#UNAUTHORIZED_401} is returned when user doesn't have approve permission
      *
      * May be split into separate tests based on levels
+     *
+     * TODO
      *
      * incomplete
      */

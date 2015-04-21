@@ -12,6 +12,9 @@ import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import java.io.IOException;
 import java.util.Date;
 
@@ -28,8 +31,14 @@ public class Collection {
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
     }
 
+
+    /**
+     * TODO
+     */
+    @POST
     @Test
-    public void whenCreatingACollection() throws IOException {
+    public void canCreateCollectionWithPublisherPermissions() throws IOException {
+        // Given a
         CollectionDescription roundabout = createCollectionDescription();
 
         // can create a collection
@@ -40,22 +49,59 @@ public class Collection {
         CollectionDescription anon = new CollectionDescription();
         create(anon, 400, http);
     }
-
+    /**
+     * TODO
+     */
+    @POST
     @Test
-    public void getCollection() throws IOException {
+    public void shouldReturn400IfNoNameSpecifiedForCreateCollection() throws IOException {
+        // Given an incomplete collection description
+        CollectionDescription anon = new CollectionDescription();
 
-        CollectionDescription collection = createCollectionDescription();
-        CollectionDescription serverCollection = create(collection, 200, http);
-        get(serverCollection.name, 200, http);
-        assertEquals(collection.name, serverCollection.name);
-        assertEquals(false, serverCollection.approvedStatus);
-
-        //   we can't get a collection that's not there
-        get("unknown", 404, http);
+        // When we work
+        create(anon, 400, http);
     }
 
+    /**
+     * TODO
+     */
+    @POST
     @Test
-    public void shouldReturn409IfUpdateNameAlreadyExists() throws IOException {
+    public void cannotCreateCollectionWithoutPublisherPermissions() throws IOException {
+
+    }
+
+    /**
+     * TODO
+     */
+    @GET
+    @Test
+    public void canGetCollectionWithPublisherPermissions() throws IOException {
+
+    }
+    /**
+     * TODO
+     */
+    @GET
+    @Test
+    public void viewerCanOnlyGetCollectionWithTeamPermissions() throws IOException {
+
+    }
+    /**
+     * TODO
+     */
+    @GET
+    @Test
+    public void cannotGetCollectionWithAdminPermissions() throws IOException {
+
+    }
+
+    /**
+     * written
+     */
+    @POST
+    @Test
+    public void shouldReturn409IfCollectionNameAlreadyExists() throws IOException {
 
         // Given
         // an existing collection
@@ -67,8 +113,13 @@ public class Collection {
         create(description, HttpStatus.CONFLICT_409, http);
     }
 
+
+    /**
+     * TODO
+     */
+    @DELETE
     @Test
-    public void collectionShouldBeDeleted() throws IOException {
+    public void collectionShouldBeDeletedWithPublisherPermissions() throws IOException {
         // Given
         //...a collection
         CollectionDescription collection = create(http);
@@ -81,6 +132,25 @@ public class Collection {
         //...it to be entirely deleted
         get(collection.name, HttpStatus.NOT_FOUND_404, http);
     }
+
+    /**
+     * TODO
+     */
+    @DELETE
+    @Test
+    public void deleteShouldReturn400WithoutPublisherPermissions() throws IOException {
+
+    }
+
+
+
+
+
+
+
+
+
+
 
     private String delete(String name, int expectedResponse, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
@@ -100,13 +170,13 @@ public class Collection {
         return create(collectionDescription, expectedResponse, http);
     }
 
+
     public static CollectionDescription createCollectionDescription() {
         CollectionDescription collection = new CollectionDescription();
         collection.name = Random.id();
         collection.publishDate = new Date();
         return collection;
     }
-
     public static CollectionDescription create(Http http) throws IOException {
         return create(200, http);
     }
