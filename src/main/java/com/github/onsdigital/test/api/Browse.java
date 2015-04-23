@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
 import org.junit.Assert;
@@ -20,9 +21,6 @@ import static org.junit.Assert.assertEquals;
 @Api
 @DependsOn({Login.class, Collection.class})
 public class Browse {
-
-    private static Http http = Login.httpPublisher;
-    private static Endpoint browseEndpoint = ZebedeeHost.browse;
 
     /**
      * Test basic functionality
@@ -39,7 +37,7 @@ public class Browse {
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name), DirectoryListing.class);
+        Response<DirectoryListing> getResponse = browse(collection.name, Login.httpPublisher);
 
         // Expect
         // a correct call
@@ -59,7 +57,7 @@ public class Browse {
 
         // When
         // we call get without a collection specified
-        Response<DirectoryListing> getResponse = Login.httpPublisher.get(browseEndpoint, DirectoryListing.class);
+        Response<DirectoryListing> getResponse = Login.httpPublisher.get(ZebedeeHost.browse, DirectoryListing.class);
 
         // Expect
         // Response of {@link HttpStatus#NOT_FOUND_404}
@@ -75,12 +73,11 @@ public class Browse {
     public void shouldReturnNotFoundWithInvalidURI() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = Login.httpPublisher.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", "/shouldReturn404WithInvalidURI"), DirectoryListing.class);
+        Response<DirectoryListing> getResponse = browse(collection.name, "/invalidUri", Login.httpPublisher);
 
         // Expect
         // response of {@link HttpStatus#NOT_FOUND_404}
@@ -96,15 +93,12 @@ public class Browse {
     public void shouldReturnBadRequestWhenURIisFileNotDirectory() throws IOException {
         // Given
         // a collection with a file in it
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-
-        String uri = "/test/" + Random.id() + ".json";
-        Content.create(collection.name, "test", uri, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String uri = collection.inProgressUris.get(0);
 
         // When
         // we try to browse for a file not the directory
-        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", uri), DirectoryListing.class);
+        Response<DirectoryListing> getResponse = browse(collection.name, uri, Login.httpPublisher);
 
         // Then
         // we expect a bad request response
@@ -121,12 +115,11 @@ public class Browse {
     public void shouldReturn401ForAdminUser() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = Login.httpAdministrator.get(browseEndpoint.addPathSegment(collection.name), DirectoryListing.class);
+        Response<DirectoryListing> getResponse =  browse(collection.name, Login.httpAdministrator);
 
         // Expect
         // a correct call
@@ -142,5 +135,14 @@ public class Browse {
     @Test
     public void shouldReturn200ForViewerWithPermissionsOtherwise401() throws IOException {
 
+    }
+
+    private static Response<DirectoryListing> browse(String collectionID, String uri, Http http) throws IOException {
+        Endpoint endpoint = ZebedeeHost.browse.addPathSegment(collectionID).setParameter("uri", uri);
+        return http.get(endpoint, DirectoryListing.class);
+    }
+    private static Response<DirectoryListing> browse(String collectionID, Http http) throws IOException {
+        Endpoint endpoint = ZebedeeHost.browse.addPathSegment(collectionID);
+        return http.get(endpoint, DirectoryListing.class);
     }
 }

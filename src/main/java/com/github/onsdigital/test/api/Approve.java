@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -36,8 +37,7 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it using admin credentials
@@ -58,8 +58,7 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it using admin credentials and get an okay
@@ -81,12 +80,11 @@ public class Approve {
     public void shouldRespondUnauthorizedIfCredentialsAreNotProvided() throws IOException {
         // Given
         // a session that has no credentials and a collection
-        Http httpNoCredentials = Sessions.get("shouldRespondForbiddenIfCredentialsAreNotProvided");
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it without credentials
+        Http httpNoCredentials = Sessions.get("noCredentials");
         Response<String> response = approve(collection.name, httpNoCredentials);
 
         // Expect
@@ -102,24 +100,19 @@ public class Approve {
     @Test
     public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() throws IOException {
         // Given
-        // a session that has no credentials and a collection
-        // Given
         // a collection
-        CollectionDescription collection1 = Collection.createCollectionDescription();
-        CollectionDescription collection2 = Collection.createCollectionDescription();
-        CollectionDescription collection3 = Collection.createCollectionDescription();
-        Collection.post(collection1, Login.httpPublisher);
-        Collection.post(collection2, Login.httpPublisher);
-        Collection.post(collection3, Login.httpPublisher);
+        CollectionDescription collection1 = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
         // When
-        //...we delete it
+        //...we approve it with non publisher credentials
         Response<String> responseScallywag = approve(collection1.name, Login.httpScallywag);
-        Response<String> responseAdministrator = approve(collection1.name, Login.httpAdministrator);
-        Response<String> responseViewer = approve(collection1.name, Login.httpViewer);
+        Response<String> responseAdministrator = approve(collection2.name, Login.httpAdministrator);
+        Response<String> responseViewer = approve(collection3.name, Login.httpViewer);
 
         // Then
-        // delete should fail and the collections should still exist
+        // approve should fail and return Unauthorised
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdministrator.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
@@ -147,27 +140,21 @@ public class Approve {
 
 
     /**
-     * Tests that {@link HttpStatus#CONFLICT_409} is returned when the collection has
-     * <p/>
-     * written
+     * Tests that {@link HttpStatus#CONFLICT_409} is returned when the collection has incomplete content
      */
     @POST
     @Test
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-
-        String filename = Random.id() + ".json";
-        Content.create(collection.name, "shouldReturnConflictForCollectionsThatHaveIncompleteItems", "/approve/" + filename, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
 
         // When
-        // we approve it using admin credentials
+        // we try to approve it using appropriate credentials
         Response<String> response = approve(collection.name, Login.httpPublisher);
 
         // We expect
-        // ...the resource is in progress so the collection will not be approved
+        // the resource is in progress so the collection will not be approved
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 

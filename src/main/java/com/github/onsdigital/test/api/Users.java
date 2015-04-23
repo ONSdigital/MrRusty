@@ -184,40 +184,6 @@ public class Users {
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
-    public static Http userHttpSession(String name, String email) throws IOException {
-        // Given
-        // A user with no email address
-        User user = new User();
-        user.email = email;
-        user.name = name;
 
-        // Post the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
-
-        // Set their password
-        Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = Random.password(8);
-        Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
-        assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
-
-        // Create a session
-        Http http = Sessions.get(email);
-
-        // Log the user in
-        Response<String> responseLogin = http.post(ZebedeeHost.login, credentials, String.class);
-        assertEquals(HttpStatus.OK_200, responseLogin.statusLine.getStatusCode());
-        String token = responseLogin.body;
-
-        // Add their session token
-        http.addHeader("x-florence-token", token);
-
-        return http;
-    }
-
-    public static Http userHttpSession() throws IOException {
-        return userHttpSession("Rusty", "Rusty_" + Random.id() + "@example.com");
-    }
 
 }
