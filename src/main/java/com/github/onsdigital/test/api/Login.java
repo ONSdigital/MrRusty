@@ -16,9 +16,7 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test cases for the {@link com.github.onsdigital.zebedee.api.Login} API

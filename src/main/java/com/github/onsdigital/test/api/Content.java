@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -37,8 +38,7 @@ public class Content {
 
         // Given
         // an existing collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When - we create content
         String content = "{name:foo}";
@@ -56,15 +56,13 @@ public class Content {
     /**
      * Test returns {@link HttpStatus#BAD_REQUEST_400} if no uri is specified
      *
-     * TODO - Add permissions functionality
      */
     @POST
     @Test
     public void shouldReturn400WhenNoUriIsSpecified() throws IOException {
 
         // Given - an existing collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When - content is added with no file url
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.name);
@@ -77,7 +75,6 @@ public class Content {
     /**
      * Test returns {@link HttpStatus#CONFLICT_409} if file is currently being edited in another collection
      *
-     * TODO - Add permissions functionality
      */
     @POST
     @Test
@@ -152,8 +149,7 @@ public class Content {
 
     /**
      * Test basic functionality for file delete
-     *
-     * TODO - Add permissions functionality
+     *s
      */
     @DELETE
     @Test
@@ -161,22 +157,20 @@ public class Content {
 
         // Given
         // We upload a file
+        CollectionDescription collection = OneLineSetups.publishedCollection();
+
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        String uri = "economy/regionalaccounts/" +  Random.id() + ".jpg";
 
-        String taxonomyNode = "economy/regionalaccounts/";
-        String filename = Random.id() + ".jpg";
-
-        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.name, uri, file, Login.httpPublisher);
 
         // When
         // We attempt to delete the file from the taxonomy
-        delete(collection.name, taxonomyNode + filename, Login.httpPublisher);
+        delete(collection.name, uri, Login.httpPublisher);
 
         // Then
         //... the file should not exist
-        Response<Path> response = download(collection.name, taxonomyNode + filename, Login.httpPublisher);
+        Response<Path> response = download(collection.name, uri, Login.httpPublisher);
         assertNull(response);
     }
 
@@ -190,18 +184,12 @@ public class Content {
 
         // Given
         // We upload a file
-        File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-
-        String taxonomyNode = "economy/regionalaccounts/";
-        String filename = Random.id() + ".jpg";
-
-        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String uri = collection.inProgressUris.get(0);
 
         // When
         // We delete the file from the taxonomy
-        delete(collection.name, taxonomyNode + filename, Login.httpPublisher);
+        delete(collection.name, uri, Login.httpPublisher);
 
         // Then
         //... the file should not appear in the collection GET method
@@ -213,38 +201,30 @@ public class Content {
      * Test that when a user starts editing a page then deletes their work when they
      * next get content it will return the currently published page
      *
+     * WARNING: This needs to run with a genuine taxonomy node
+     *
      */
     @DELETE
     @Test
     public void shouldNotReturnDeletedVersionOfExistingWebsiteFile() throws IOException {
 
         // Given
-        // A page file within an existing collection
+        // A collection and a genuine website page
         //
-        CollectionDescription collection_1 = new CollectionDescription();
-        CollectionDescription collection_2 = null;
-        collection_1.name = "shouldNotReturnDeletedVersionOfExistingWebsiteFile";
-        try {
-            collection_2 = Collection.get(collection_1.name, Login.httpPublisher).body;
-        } finally {
-            if (collection_2 == null) {
-                collection_1 = Collection.createCollectionDescription();
-                Collection.post(collection_1, Login.httpPublisher);
-            } else {
-                collection_1 = collection_2;
-            }
-        }
+        String name = "Rusty_shouldNotReturnDeletedVersionOfExistingWebsiteFile";
+        CollectionDescription collection = OneLineSetups.emptyCollectionWithName(name);
+
         String taxonomyNode = "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49/";
-        String initialData = getBody( get(collection_1.name, taxonomyNode + "data.json", Login.httpPublisher) );
+        String initialData = getBody(get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
 
         // When
         // We create a new page and then delete it
-        create(collection_1.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", Login.httpPublisher);
-        delete(collection_1.name, taxonomyNode + "data.json", Login.httpPublisher);
+        create(collection.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", Login.httpPublisher);
+        delete(collection.name, taxonomyNode + "data.json", Login.httpPublisher);
 
         // Then
-        //... the original file should be returned by Content GET
-        String response = getBody( get(collection_1.name, taxonomyNode + "data.json", Login.httpPublisher));
+        // the original file should be returned by Content GET
+        String response = getBody( get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
         assertEquals(initialData, response);
     }
 
@@ -258,7 +238,7 @@ public class Content {
      * @return
      * @throws IOException
      */
-    private static Response<String>  delete(String collectionName, String uri, Http http) throws IOException {
+    public static Response<String>  delete(String collectionName, String uri, Http http) throws IOException {
 
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
 

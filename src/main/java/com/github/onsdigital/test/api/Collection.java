@@ -7,11 +7,11 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
-import sun.rmi.runtime.Log;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -83,12 +83,11 @@ public class Collection {
 
         // Given
         // an existing collection
-        CollectionDescription description = createCollectionDescription();
-        post(description, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we try and create an identical collection
-        Response<String> response = post(description, Login.httpPublisher);
+        Response<String> response = post(collection, Login.httpPublisher);
 
         // Expect
         // a reponse of 409 - Conflict
@@ -106,13 +105,13 @@ public class Collection {
 
         // Given
         // a collection description
-        CollectionDescription roundabout = createCollectionDescription();
+        CollectionDescription collection = createCollectionDescription();
 
         // When
-        // we post as a publisher
-        Response<String> responseAdmin = post(roundabout, Login.httpAdministrator);
-        Response<String> responseScallywag = post(roundabout, Login.httpScallywag);
-        Response<String> responseViewer = post(roundabout, Login.httpViewer);
+        // we post as anyone but a publisher
+        Response<String> responseAdmin = post(collection, Login.httpAdministrator);
+        Response<String> responseScallywag = post(collection, Login.httpScallywag);
+        Response<String> responseViewer = post(collection, Login.httpViewer);
 
         // Expect
         // a response of 401 - unauthorized
@@ -164,8 +163,7 @@ public class Collection {
     public void collectionShouldBeDeletedWithPublisherPermissions() throws IOException {
         // Given
         //...a collection
-        CollectionDescription collection = createCollectionDescription();
-        post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         //...we delete it
@@ -186,21 +184,19 @@ public class Collection {
     public void deleteShouldReturn401WithoutPublisherPermissions() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection1 = createCollectionDescription();
-        CollectionDescription collection2 = createCollectionDescription();
-        CollectionDescription collection3 = createCollectionDescription();
-        post(collection1, Login.httpPublisher);
-        post(collection2, Login.httpPublisher);
-        post(collection3, Login.httpPublisher);
+        CollectionDescription collection1 = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
         // When
-        //...we delete it
+        //...we we try and delete them delete it
         Response<String> deleteResponseScallywag = delete(collection1.name, Login.httpScallywag);
-        Response<String> deleteResponseAdministrator = delete(collection1.name, Login.httpAdministrator);
-        Response<String> deleteResponseViewer = delete(collection1.name, Login.httpViewer);
+        Response<String> deleteResponseAdministrator = delete(collection2.name, Login.httpAdministrator);
+        Response<String> deleteResponseViewer = delete(collection3.name, Login.httpViewer);
 
         // Then
-        // delete should fail and the collections should still exist
+        // delete should fail with unauthorized returned
+        // + the collections should still exist
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseScallywag.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseAdministrator.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseViewer.statusLine.getStatusCode());
@@ -210,7 +206,7 @@ public class Collection {
         assertEquals(HttpStatus.OK_200, get(collection3.name, Login.httpPublisher).statusLine.getStatusCode());
     }
 
-    private Response<String> delete(String name, Http http) throws IOException {
+    public static Response<String> delete(String name, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
         return http.delete(endpoint, String.class);
     }

@@ -7,7 +7,6 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

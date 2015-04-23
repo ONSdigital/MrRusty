@@ -1,6 +1,5 @@
 package com.github.onsdigital.test.api;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -9,9 +8,9 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.DirectoryListing;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
-import org.eclipse.jetty.http.HttpStatus;
 
 import javax.ws.rs.GET;
 import java.io.IOException;
@@ -31,12 +30,11 @@ public class Browse {
     @Test
     public void shouldReturn200WithValidCollectionName() throws IOException {
         // Given
-        // admin login XXXXXXXX & a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        // a collection
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
-        // we call get
+        // we call browse
         Response<DirectoryListing> getResponse = browse(collection.name, Login.httpPublisher);
 
         // Expect
@@ -47,7 +45,6 @@ public class Browse {
     /**
      * Expect {@link HttpStatus#NOT_FOUND_404} if no collection is specified
      *
-     * TODO Update with permissions
      */
     @GET
     @Test

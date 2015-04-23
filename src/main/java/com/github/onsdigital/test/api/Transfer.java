@@ -1,6 +1,5 @@
 package com.github.onsdigital.test.api;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -9,17 +8,12 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.Test;
 
-
 import javax.ws.rs.POST;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by kanemorgan on 31/03/2015.
