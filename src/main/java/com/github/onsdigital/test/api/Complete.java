@@ -33,10 +33,10 @@ public class Complete {
         Content.create(collection.name, "foo", filename, Login.httpPublisher);
 
         // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, Login.httpPublisher);
+        Response<String> complete = complete(collection.name, filename, Login.httpPublisher);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.OK_200, responseCode);
+        assertEquals(HttpStatus.OK_200, complete.statusLine.getStatusCode());
 
         // and the content is listed under complete when we get the collection.
         CollectionDescription updatedCollection = Collection.get(collection.name, Login.httpPublisher).body;
@@ -45,7 +45,7 @@ public class Complete {
     }
 
     /**
-     * Test
+     * Test should return Unauthorised without publisher credentials
      */
     @POST
     @Test
@@ -64,15 +64,15 @@ public class Complete {
 
         // When
         // We call complete on the content
-        int responseCode1 = complete(collection.name, filename1, Login.httpAdministrator);
-        int responseCode2 = complete(collection.name, filename2, Login.httpViewer);
-        int responseCode3 = complete(collection.name, filename3, Login.httpScallywag);
+        Response<String> complete1 = complete(collection.name, filename1, Login.httpAdministrator);
+        Response<String> complete2 = complete(collection.name, filename2, Login.httpViewer);
+        Response<String> complete3 = complete(collection.name, filename3, Login.httpScallywag);
 
         // Then
         // We expect unauthorised responses
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode1);
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode2);
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode3);
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete1.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete2.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete3.statusLine.getStatusCode());
 
         // and also
         // the content has not been moved
@@ -85,6 +85,9 @@ public class Complete {
         assertTrue(updatedCollection.inProgressUris.contains(filename3));
     }
 
+    /**
+     * Test returns Unauthorised without publisher credentials
+     */
     @POST
     @Test
     public void shouldReturnNotFoundIfUriIsNotInProgress() throws IOException {
@@ -95,12 +98,15 @@ public class Complete {
         String filename = "/shouldReturn404/" + Random.id() + ".json";
 
         // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, Login.httpPublisher);
+        Response<String> complete = complete(collection.name, filename, Login.httpPublisher);
 
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
+        // Then - we should be rejected with a Not Found response code
+        assertEquals(HttpStatus.NOT_FOUND_404, complete.statusLine.getStatusCode());
     }
 
+    /**
+     * Test should return Unauthorised without publisher credentials
+     */
     @Test
     public void shouldReturnBadRequestIfGivenUriIsADirectory() throws IOException {
 
@@ -112,40 +118,42 @@ public class Complete {
         Content.create(collection.name, "shouldReturn400", filename, Login.httpPublisher);
 
         // When - we call complete on the content
-        int responseCode = complete(collection.name, directory, Login.httpPublisher);
+        Response<String> complete = complete(collection.name, directory, Login.httpPublisher);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
+        assertEquals(HttpStatus.BAD_REQUEST_400, complete.statusLine.getStatusCode());
     }
 
     @Test
     public void shouldReturnNotFoundIfUriIsAlreadyComplete() throws IOException {
 
-        // Given - a uri that is already set to complete.
+        // Given
+        // a uri that is already set to complete.
         CollectionDescription collection = Collection.createCollectionDescription();
         Collection.post(collection, Login.httpPublisher);
         String filename = Random.id() + ".json";
         Content.create(collection.name, "shouldReturn400", filename, Login.httpPublisher);
         complete(collection.name, filename, Login.httpPublisher);
 
-        // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, Login.httpPublisher);
+        // When
+        // we call complete on the content
+        Response<String> complete = complete(collection.name, filename, Login.httpPublisher);
 
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
+        // Then
+        // We get the expected response code
+        assertEquals(HttpStatus.NOT_FOUND_404, complete.statusLine.getStatusCode());
     }
 
     /**
-     *
-     * @param collectionName the name of the parent collection
-     * @param uri the filename within the collection
-     * @param http the session we are calling complete from
-     * @return the {@link HttpStatus} code for the response
+     * Convenience method to
+     * @param collectionName
+     * @param uri
+     * @param http
+     * @return
      * @throws IOException
      */
-    public static int complete(String collectionName, String uri, Http http) throws IOException {
+    public static Response<String> complete(String collectionName, String uri, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.complete.addPathSegment(collectionName).setParameter("uri", uri);
-        Response<String> createResponse = http.post(contentEndpoint, "", String.class);
-        return createResponse.statusLine.getStatusCode();
+        return http.post(contentEndpoint, "", String.class);
     }
 }

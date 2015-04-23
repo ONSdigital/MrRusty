@@ -215,6 +215,7 @@ public class Users {
 
         return http;
     }
+
     public static Http userHttpSession() throws IOException {
         return userHttpSession("Rusty", "Rusty_" + Random.id() + "@example.com");
     }
