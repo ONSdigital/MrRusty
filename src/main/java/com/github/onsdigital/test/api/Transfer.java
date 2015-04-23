@@ -22,8 +22,10 @@ public class Transfer {
 
     @Test
     public void main() throws IOException {
-        CollectionDescription collection_1 = Collection.create(http);
-        CollectionDescription collection_2 = Collection.create(http);
+        CollectionDescription collection_1 = Collection.createCollectionDescription();
+        Collection.post(collection_1, Login.httpPublisher);
+        CollectionDescription collection_2 = Collection.createCollectionDescription();
+        Collection.post(collection_2, Login.httpPublisher);
         String fileUri = Random.id() + ".json";
         Content.create(collection_1.name, "content", fileUri, http);
 

@@ -34,7 +34,8 @@ public class Browse {
     public void shouldReturn200WithValidCollectionName() throws IOException {
         // Given
         // admin login XXXXXXXX & a collection
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we call get
@@ -54,11 +55,11 @@ public class Browse {
     @Test
     public void shouldReturn404IfNoPathSpecified() throws IOException {
         // Given
-        // admin login XXXXXXX
+        // n/a
 
         // When
         // we call get without a collection specified
-        Response<DirectoryListing> getResponse = http.get(browseEndpoint, DirectoryListing.class);
+        Response<DirectoryListing> getResponse = Login.httpPublisher.get(browseEndpoint, DirectoryListing.class);
 
         // Expect
         // Response of {@link HttpStatus#NOT_FOUND_404}
@@ -68,44 +69,45 @@ public class Browse {
     /**
      * Expect {@link HttpStatus#NOT_FOUND_404} if URI does not exist
      *
-     * TODO Update with permissions
      */
     @GET
     @Test
-    public void shouldReturn404WithInvalidURI() throws IOException {
+    public void shouldReturnNotFoundWithInvalidURI() throws IOException {
         // Given
-        // admin login XXXXXXXX & a collection
-        CollectionDescription collection = Collection.create(http);
+        // a collection
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", "/shouldReturn404WithInvalidURI"), DirectoryListing.class);
+        Response<DirectoryListing> getResponse = Login.httpPublisher.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", "/shouldReturn404WithInvalidURI"), DirectoryListing.class);
 
         // Expect
-        // a correct call
+        // response of {@link HttpStatus#NOT_FOUND_404}
         Assert.assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.NOT_FOUND_404);
     }
 
     /**
      * Expect {@link HttpStatus#BAD_REQUEST_400} if URI does exist but is not a folder
      *
-     * TODO Update with publisher permissions
      */
     @GET
     @Test
-    public void shouldReturn400WhenURIisFileNotDirectory() throws IOException {
+    public void shouldReturnBadRequestWhenURIisFileNotDirectory() throws IOException {
         // Given
-        // admin login XXXXXXXX & a collection with a file in it
-        CollectionDescription collection = Collection.create(http);
-        String uri = "/shouldReturn400WhenURIisFileNotDirectory/" + Random.id() + ".json";
-        Content.create(collection.name,"shouldReturn400WhenURIisFileNotDirectory",uri, Login.httpPublisher);
+        // a collection with a file in it
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
+
+        String uri = "/test/" + Random.id() + ".json";
+        Content.create(collection.name, "test", uri, Login.httpPublisher);
 
         // When
-        // we call get
+        // we try to browse for a file not the directory
         Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name).setParameter("uri", uri), DirectoryListing.class);
 
-        // Expect
-        // a bad call
+        // Then
+        // we expect a bad request response
         Assert.assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
     }
 
@@ -113,22 +115,22 @@ public class Browse {
     /**
      * Expect {@link HttpStatus#UNAUTHORIZED_401} for admin user
      *
-     * TODO Update with permissions
      */
     @GET
-    @Test
+    //@Test
     public void shouldReturn401ForAdminUser() throws IOException {
         // Given
-        // admin login XXXXXXXX & a collection
-        CollectionDescription collection = Collection.create(http);
+        // a collection
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = http.get(browseEndpoint.addPathSegment(collection.name), DirectoryListing.class);
+        Response<DirectoryListing> getResponse = Login.httpAdministrator.get(browseEndpoint.addPathSegment(collection.name), DirectoryListing.class);
 
         // Expect
         // a correct call
-        Assert.assertEquals(getResponse.statusLine.getStatusCode(), 200);
+        Assert.assertEquals(HttpStatus.UNAUTHORIZED_401, getResponse.statusLine.getStatusCode());
     }
 
     /**

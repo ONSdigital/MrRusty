@@ -30,7 +30,6 @@ public class Content {
     /**
      * Test basic functionality for .json content
      *
-     * TODO - Add permissions functionality
      */
     @POST
     @Test
@@ -38,7 +37,8 @@ public class Content {
 
         // Given
         // an existing collection
-        CollectionDescription collection = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When - we create content
         String content = "{name:foo}";
@@ -63,7 +63,8 @@ public class Content {
     public void shouldReturn400WhenNoUriIsSpecified() throws IOException {
 
         // Given - an existing collection
-        CollectionDescription collection = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When - content is added with no file url
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.name);
@@ -81,17 +82,19 @@ public class Content {
     @POST
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
-        CollectionDescription collection_1 = Collection.create(Login.httpPublisher);
-        CollectionDescription collection_2 = Collection.create(Login.httpPublisher);
+        CollectionDescription collection1 = Collection.createCollectionDescription();
+        Collection.post(collection1, Login.httpPublisher);
+        CollectionDescription collection2 = Collection.createCollectionDescription();
+        Collection.post(collection2, Login.httpPublisher);
 
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        Response<String> response1 = create(collection_1.name, "content", fileURI, Login.httpPublisher);
+        Response<String> response1 = create(collection1.name, "content", fileURI, Login.httpPublisher);
         assertEquals(HttpStatus.OK_200, response1.statusLine.getStatusCode());
 
         // we can't create it in another collection
-        Response<String> response = create(collection_2.name, "content", fileURI, Login.httpPublisher);
+        Response<String> response = create(collection2.name, "content", fileURI, Login.httpPublisher);
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
@@ -104,14 +107,15 @@ public class Content {
     public void shouldUpdateContent() throws IOException {
         // Given
         // A file created in a collection
-        CollectionDescription collection_1 = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
         String fileUri = Random.id() + ".json";
-        create(collection_1.name, "content", fileUri, Login.httpPublisher);
+        create(collection.name, "content", fileUri, Login.httpPublisher);
 
         // When
         // We overwrite it's content and retrieve the file contents
-        create(collection_1.name, "new content", fileUri, Login.httpPublisher);
-        Response<Path> pathResponse = get(collection_1.name, fileUri, Login.httpPublisher);
+        create(collection.name, "new content", fileUri, Login.httpPublisher);
+        Response<Path> pathResponse = get(collection.name, fileUri, Login.httpPublisher);
 
         // We expect
         // The content should be the overwritten version
@@ -129,18 +133,19 @@ public class Content {
         // Given
         // A file, a taxonomy node, and a collection
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
         // When
         // We attempt to upload the file to the taxonomy
-        upload(collection_1.name, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
 
         // Then
         // The file should be where we expect it to be and exist
-        Response<Path> response = download(collection_1.name, taxonomyNode + filename, Login.httpPublisher);
+        Response<Path> response = download(collection.name, taxonomyNode + filename, Login.httpPublisher);
         assertNotNull(response.body);
         assertTrue(Files.size(response.body) > 0);
     }
@@ -157,20 +162,21 @@ public class Content {
         // Given
         // We upload a file
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
-        upload(collection_1.name, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
 
         // When
         // We attempt to delete the file from the taxonomy
-        delete(collection_1.name, taxonomyNode + filename, Login.httpPublisher);
+        delete(collection.name, taxonomyNode + filename, Login.httpPublisher);
 
         // Then
         //... the file should not exist
-        Response<Path> response = download(collection_1.name, taxonomyNode + filename, Login.httpPublisher);
+        Response<Path> response = download(collection.name, taxonomyNode + filename, Login.httpPublisher);
         assertNull(response);
     }
 
@@ -185,21 +191,22 @@ public class Content {
         // Given
         // We upload a file
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection_1 = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
-        upload(collection_1.name, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
 
         // When
         // We delete the file from the taxonomy
-        delete(collection_1.name, taxonomyNode + filename, Login.httpPublisher);
+        delete(collection.name, taxonomyNode + filename, Login.httpPublisher);
 
         // Then
         //... the file should not appear in the collection GET method
-        CollectionDescription collection = Collection.get(collection_1.name, 200, Login.httpPublisher);
-        assertEquals(0, collection.inProgressUris.size());
+        Response<CollectionDescription> response = Collection.get(collection.name, Login.httpPublisher);
+        assertEquals(0, response.body.inProgressUris.size());
     }
 
     /**
@@ -218,10 +225,11 @@ public class Content {
         CollectionDescription collection_2 = null;
         collection_1.name = "shouldNotReturnDeletedVersionOfExistingWebsiteFile";
         try {
-            collection_2 = Collection.get(collection_1.name, Login.httpPublisher);
+            collection_2 = Collection.get(collection_1.name, Login.httpPublisher).body;
         } finally {
             if (collection_2 == null) {
-                collection_1 = Collection.create(collection_1, 200, Login.httpPublisher);
+                collection_1 = Collection.createCollectionDescription();
+                Collection.post(collection_1, Login.httpPublisher);
             } else {
                 collection_1 = collection_2;
             }
@@ -244,7 +252,7 @@ public class Content {
 
     /**
      *
-     * @param collectionName the parent collection file
+     * @param collectionName the parent collection folder
      * @param uri the file uri
      * @param http the session
      * @return
@@ -260,7 +268,7 @@ public class Content {
     /**
      * Create content using a simple string
      *
-     * @param collectionName
+     * @param collectionName the parent collection folder
      * @param content string content to save
      * @param uri uri to save as
      * @param http session
@@ -274,12 +282,30 @@ public class Content {
         return http.post(contentEndpoint, content, String.class);
     }
 
+    /**
+     * Response from a get request
+     *
+     * To get body content as a string pair with getBody()
+     *
+     * @param collectionName the parent collection folder
+     * @param uri uri of the content
+     * @param http session
+     * @return
+     * @throws IOException
+     */
     public static Response<Path> get(String collectionName, String uri, Http http) throws IOException {
 
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
         return http.get(contentEndpoint);
     }
 
+    /**
+     * Extracts the contents of a (generally temporary) path to a string
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
     public static String getBody(Response<Path> path) throws IOException {
         return FileUtils.readFileToString(path.body.toFile(), Charset.forName("UTF8"));
     }

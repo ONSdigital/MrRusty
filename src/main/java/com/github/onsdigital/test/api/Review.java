@@ -22,7 +22,8 @@ public class Review {
     public void shouldReviewWithPublisherCredentials() throws IOException {
 
         // Given - an existing piece of content that is set to complete
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
         String filename = "/" + Random.id() + ".json";
         Content.create(collection.name, "foo", filename, http);
         Complete.complete(collection.name, filename, http);
@@ -34,7 +35,7 @@ public class Review {
         assertEquals(HttpStatus.OK_200, responseCode);
 
         // and the content is listed under review when we get the collection.
-        CollectionDescription updatedCollection = Collection.get(collection.name, http);
+        CollectionDescription updatedCollection = Collection.get(collection.name, http).body;
         assertTrue(updatedCollection.reviewedUris.contains(filename));
         assertFalse(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));

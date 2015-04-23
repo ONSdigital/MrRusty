@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.zebedee.json.Credentials;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,19 +39,6 @@ public class Password {
     }
 
     /**
-     * Log in as the user so that other tests can use the session.
-     */
-    @AfterClass
-    public static void userLogin() throws IOException {
-
-//        Http http = Sessions.get("user");
-//        Response<String> response = http.post(ZebedeeHost.login, credentials, String.class);
-//        if (response.statusLine.getStatusCode() != 200) {
-//            throw new RuntimeException("Seems we can't log in as a normal user?");
-//        }
-    }
-
-    /**
      * Ensures we get a 200 OK when creating a valid user.
      *
      * @throws IOException
@@ -60,15 +48,41 @@ public class Password {
     public void shouldSetPasswordIfSessionIsAdmin() throws IOException {
 
         // Given
-        // The user credentials
+        // A user with credentials
 
         // When
         // We attempt to create a duplicate user
-        Response<String> response = http.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> response = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
 
         // Then
         // The request should succeed
-        assertEquals(response.body, 200, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+    }
+
+    /**
+     * Ensures we get a 200 OK when creating a valid user.
+     *
+     * @throws IOException
+     */
+    @POST
+    @Test
+    public void shouldReturnUnauthorizedIfSessionIsNotAdmin() throws IOException {
+
+        // Given
+        // A set of user credentials
+
+        // When
+        // We attempt to create a duplicate user
+        Response<String> response1 = Login.httpViewer.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> response2 = Login.httpPublisher.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> response3 = Login.httpScallywag.post(ZebedeeHost.password, credentials, String.class);
+
+        // Then
+        // Each request should fail
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }
 
 }

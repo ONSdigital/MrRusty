@@ -28,8 +28,7 @@ public class Approve {
 
     /**
      * Tests approval using simple collection setup and admin credentials
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
@@ -37,7 +36,8 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we approve it using admin credentials
@@ -51,7 +51,6 @@ public class Approve {
     /**
      * Tests functionality of a successful call
      *
-     * written
      */
     @POST
     @Test
@@ -59,7 +58,8 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we approve it using admin credentials and get an okay
@@ -68,51 +68,66 @@ public class Approve {
 
         // Expect
         // the collection is now approved
-        CollectionDescription collectionDescription = Collection.get(collection.name, http);
+        CollectionDescription collectionDescription = Collection.get(collection.name, http).body;
         assertEquals(true, collectionDescription.approvedStatus);
     }
 
     /**
      * Tests that {@link HttpStatus#FORBIDDEN_403} is when credentials not provided
      *
-     * written
      */
     @POST
     @Test
-    public void shouldRespondForbiddenIfCredentialsAreNotProvided() throws IOException {
+    public void shouldRespondUnauthorizedIfCredentialsAreNotProvided() throws IOException {
         // Given
         // a session that has no credentials and a collection
         Http httpNoCredentials = Sessions.get("shouldRespondForbiddenIfCredentialsAreNotProvided");
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         // When
         // we approve it without credentials
         Response<String> response = approve(collection.name, httpNoCredentials);
 
         // Expect
-        // a response of okay
+        // a response of forbidden
         assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
      * Tests that {@link HttpStatus#UNAUTHORIZED_401} is returned when user doesn't have approve permission
-     * <p/>
-     * May be split into separate tests based on levels
      *
-     * TODO
-     *
-     * incomplete
      */
     @POST
     @Test
-    public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() {
+    public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() throws IOException {
+        // Given
+        // a session that has no credentials and a collection
+        // Given
+        // a collection
+        CollectionDescription collection1 = Collection.createCollectionDescription();
+        CollectionDescription collection2 = Collection.createCollectionDescription();
+        CollectionDescription collection3 = Collection.createCollectionDescription();
+        Collection.post(collection1, Login.httpPublisher);
+        Collection.post(collection2, Login.httpPublisher);
+        Collection.post(collection3, Login.httpPublisher);
 
+        // When
+        //...we delete it
+        Response<String> responseScallywag = approve(collection1.name, Login.httpScallywag);
+        Response<String> responseAdministrator = approve(collection1.name, Login.httpAdministrator);
+        Response<String> responseViewer = approve(collection1.name, Login.httpViewer);
+
+        // Then
+        // delete should fail and the collections should still exist
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdministrator.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
     }
 
     /**
      * Tests that {@link HttpStatus#BAD_REQUEST_400} is returned when the collection doesn't exist
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
@@ -141,7 +156,8 @@ public class Approve {
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = Collection.create(Login.httpPublisher);
+        CollectionDescription collection = Collection.createCollectionDescription();
+        Collection.post(collection, Login.httpPublisher);
 
         String filename = Random.id() + ".json";
         Content.create(collection.name, "shouldReturnConflictForCollectionsThatHaveIncompleteItems", "/approve/" + filename, Login.httpPublisher);
