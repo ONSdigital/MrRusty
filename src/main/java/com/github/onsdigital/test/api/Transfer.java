@@ -120,10 +120,13 @@ public class Transfer {
     @Test
     public void shouldReturnConflictIfFileWithNameAlreadyExistsInDestination() throws IOException {
         // Given
-        // Two collections - one with items of content
+        // Two collections with an identically named item of content
+        // (if content is working you won't be able to do this but let us write the test anyway)
         CollectionDescription collection_1 = OneLineSetups.publishedCollectionWithContent(1);
-        CollectionDescription collection_2 = Collection.createCollectionDescription();
-        Content.create(collection_2.name, "content", collection_1.inProgressUris.get(0), Login.httpPublisher);
+        CollectionDescription collection_2 = OneLineSetups.publishedCollection();
+
+        Response<String> response1 = Content.create(collection_2.name, "content", collection_1.inProgressUris.get(0), Login.httpPublisher);
+        if(response1.statusLine.getStatusCode() != HttpStatus.OK_200) { return; } // Quit if this doesn't work
 
         // When
         // we try to transfer those items using non publisher accounts

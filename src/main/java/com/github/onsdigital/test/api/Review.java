@@ -5,6 +5,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -24,17 +25,19 @@ public class Review {
     @Test
     public void shouldReviewWithPublisherCredentials() throws IOException {
 
-        // Given - an existing piece of content that is set to complete
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-        String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "shouldReviewWithPublisherCredentials", filename, Login.httpPublisher);
+        // Given
+        // an existing piece of content that is set to complete
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String filename = collection.inProgressUris.get(0);
+
         Complete.complete(collection.name, filename, Login.httpPublisher);
 
-        // When - we call review on the content
+        // When
+        // we call review on the content
         int responseCode = review(collection.name, filename, Login.httpPublisher);
 
-        // Then - We get the expected response code
+        // Then
+        // We get the okay response code
         assertEquals(HttpStatus.OK_200, responseCode);
 
         // and the content is listed under review when we get the collection.
@@ -53,21 +56,16 @@ public class Review {
 
         // Given
         // content that is set to complete
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-        String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "shouldReviewWithPublisherCredentials", "/Administrator" + filename, Login.httpPublisher);
-        Content.create(collection.name, "shouldReviewWithPublisherCredentials", "/Viewer" + filename, Login.httpPublisher);
-        Content.create(collection.name, "shouldReviewWithPublisherCredentials", "/Scallywag" + filename, Login.httpPublisher);
-        Complete.complete(collection.name, "/Administrator" +filename, Login.httpPublisher);
-        Complete.complete(collection.name, "/Viewer" + filename, Login.httpPublisher);
-        Complete.complete(collection.name, "/Scallywag" +filename, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(3);
+        Complete.complete(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
+        Complete.complete(collection.name, collection.inProgressUris.get(1), Login.httpPublisher);
+        Complete.complete(collection.name, collection.inProgressUris.get(2), Login.httpPublisher);
 
         // When
         // we call review on the content with different users
-        int responseCode1 = review(collection.name, "/Administrator" + filename, Login.httpAdministrator);
-        int responseCode2 = review(collection.name, "/Viewer" + filename, Login.httpViewer);
-        int responseCode3 = review(collection.name, "/Scallywag" + filename, Login.httpScallywag);
+        int responseCode1 = review(collection.name, collection.inProgressUris.get(0), Login.httpAdministrator);
+        int responseCode2 = review(collection.name, collection.inProgressUris.get(1), Login.httpViewer);
+        int responseCode3 = review(collection.name, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode1);
@@ -83,8 +81,7 @@ public class Review {
     public void shouldReturnNotFoundIfNoSuchFile() throws IOException {
 
         // Given - a collection + a random file name
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         String filename = "/shouldReturnNotFoundIfNoSuchFile/" + Random.id() + ".json";
 
@@ -102,15 +99,13 @@ public class Review {
     @Test
     public void shouldReturnBadRequestIfNotComplete() throws IOException {
 
-        // Given - a file is not listed in progress
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        // Given
+        // a collection with a file not listed as complete
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
 
-        String filename = "/shouldReturn400IfNotInProgress/" + Random.id() + ".json";
-        Content.create(collection.name, "shouldReturn400", filename, Login.httpPublisher);
-
-        // When - we call review on the content
-        int responseCode = review(collection.name, filename, Login.httpPublisher);
+        // When
+        // we call review on the content
+        int responseCode = review(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
@@ -123,19 +118,17 @@ public class Review {
     @Test
     public void shouldReturnBadRequestIfGivenUriIsADirectory() throws IOException {
 
-        // Given - a directory that exists in progress
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        // Given
+        // a collection that has complete content in a directory
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
+        Complete.complete(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
 
-        String directory = "/shouldReturnBadRequest/";
-        String filename = directory + Random.id() + ".json";
-        Content.create(collection.name, "shouldReturnBadRequest", filename, Login.httpPublisher);
-        Complete.complete(collection.name, filename, Login.httpPublisher);
+        // When
+        // we call review on the directory alone
+        int responseCode = review(collection.name, "/directory/", Login.httpPublisher);
 
-        // When - we call review on the content
-        int responseCode = review(collection.name, directory, Login.httpPublisher);
-
-        // Then - We get the expected response code
+        // Then
+        // We get a bad request error code
         assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
     }
 
@@ -145,18 +138,20 @@ public class Review {
     @Test
     public void shouldReturnBadRequestIfUriIsAlreadyReviewed() throws IOException {
 
-        // Given - a uri that is already set to review.
-        CollectionDescription collection = Collection.createCollectionDescription(); // Create collection
-        Collection.post(collection, Login.httpPublisher);
-        String filename = Random.id() + ".json"; // Add content
-        Content.create(collection.name, "shouldReturnNotFound", filename, Login.httpPublisher);
-        Complete.complete(collection.name, filename, Login.httpPublisher); // Complete
-        review(collection.name, filename, Login.httpPublisher); // Review
+        // Given
+        // a uri that is already set to review.
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
+        String uri = collection.inProgressUris.get(0);
 
-        // When - we call review on the content
-        int responseCode = review(collection.name, filename, Login.httpPublisher);
+        Complete.complete(collection.name, uri, Login.httpPublisher);
+        review(collection.name, uri, Login.httpPublisher); // Review
 
-        // Then - We get the expected response code
+        // When
+        // we call review on the content
+        int responseCode = review(collection.name, uri, Login.httpPublisher);
+
+        // Then
+        // We get a bad request error code
         assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
     }
 

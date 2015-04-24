@@ -209,7 +209,7 @@ public class Content {
     public void shouldNotReturnDeletedVersionOfExistingWebsiteFile() throws IOException {
 
         // Given
-        // A collection and a genuine website page
+        // A specific collection for this test and a genuine website page
         //
         String name = "Rusty_shouldNotReturnDeletedVersionOfExistingWebsiteFile";
         CollectionDescription collection = OneLineSetups.emptyCollectionWithName(name);
