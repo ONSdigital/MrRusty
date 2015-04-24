@@ -30,7 +30,6 @@ public class Content {
 
     /**
      * Test basic functionality for .json content
-     *
      */
     @POST
     @Test
@@ -55,7 +54,6 @@ public class Content {
 
     /**
      * Test returns {@link HttpStatus#BAD_REQUEST_400} if no uri is specified
-     *
      */
     @POST
     @Test
@@ -74,7 +72,6 @@ public class Content {
 
     /**
      * Test returns {@link HttpStatus#CONFLICT_409} if file is currently being edited in another collection
-     *
      */
     @POST
     @Test
@@ -97,7 +94,6 @@ public class Content {
 
     /**
      * Test basic update functionality for .json content
-     *
      */
     @POST
     @Test
@@ -121,7 +117,6 @@ public class Content {
 
     /**
      * Test basic functionality for dataset upload
-     *
      */
     @POST
     @Test
@@ -148,8 +143,7 @@ public class Content {
     }
 
     /**
-     * Test basic functionality for file delete
-     *s
+     * Test basic functionality for file deletes
      */
     @DELETE
     @Test
@@ -160,7 +154,7 @@ public class Content {
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
         File file = new File("src/main/resources/snail.jpg");
-        String uri = "economy/regionalaccounts/" +  Random.id() + ".jpg";
+        String uri = "economy/regionalaccounts/" + Random.id() + ".jpg";
 
         upload(collection.name, uri, file, Login.httpPublisher);
 
@@ -175,8 +169,37 @@ public class Content {
     }
 
     /**
+     * Test that given a directory the delete method deletes all files
+     * in that directory.
+     */
+    @DELETE
+    @Test
+    public void shouldDeleteFilesInDirectory() throws IOException {
+
+        // Given
+        // We have a collection with content and an uploaded file
+        CollectionDescription collection = OneLineSetups.publishedCollection();
+        String directory = "economy/regionalaccounts/";
+        String jsonUri = directory + Random.id() + ".json";
+        Content.create(collection.name, "thisisContent", jsonUri, Login.httpPublisher);
+
+        File file = new File("src/main/resources/snail.jpg");
+        String jpgUri = "economy/regionalaccounts/" + Random.id() + ".jpg";
+        upload(collection.name, jpgUri, file, Login.httpPublisher);
+
+        // When we attempt to delete the directory
+        delete(collection.name, directory, Login.httpPublisher);
+
+        // Then the files should not exist
+        Response<Path> jsonResponse = download(collection.name, jsonUri, Login.httpPublisher);
+        assertNull(jsonResponse);
+
+        Response<Path> jpgResponse = download(collection.name, jpgUri, Login.httpPublisher);
+        assertNull(jpgResponse);
+    }
+
+    /**
      * Test system does not list a deleted file in the Collection.get() details
-     *
      */
     @DELETE
     @Test
@@ -200,9 +223,8 @@ public class Content {
     /**
      * Test that when a user starts editing a page then deletes their work when they
      * next get content it will return the currently published page
-     *
+     * <p/>
      * WARNING: This needs to run with a genuine taxonomy node
-     *
      */
     @DELETE
     @Test
@@ -224,21 +246,20 @@ public class Content {
 
         // Then
         // the original file should be returned by Content GET
-        String response = getBody( get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
+        String response = getBody(get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
         assertEquals(initialData, response);
     }
 
     // Support methods ___________________________________________
 
     /**
-     *
      * @param collectionName the parent collection folder
-     * @param uri the file uri
-     * @param http the session
+     * @param uri            the file uri
+     * @param http           the session
      * @return
      * @throws IOException
      */
-    public static Response<String>  delete(String collectionName, String uri, Http http) throws IOException {
+    public static Response<String> delete(String collectionName, String uri, Http http) throws IOException {
 
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
 
@@ -249,9 +270,9 @@ public class Content {
      * Create content using a simple string
      *
      * @param collectionName the parent collection folder
-     * @param content string content to save
-     * @param uri uri to save as
-     * @param http session
+     * @param content        string content to save
+     * @param uri            uri to save as
+     * @param http           session
      * @return
      * @throws IOException
      */
@@ -264,12 +285,12 @@ public class Content {
 
     /**
      * Response from a get request
-     *
+     * <p/>
      * To get body content as a string pair with getBody()
      *
      * @param collectionName the parent collection folder
-     * @param uri uri of the content
-     * @param http session
+     * @param uri            uri of the content
+     * @param http           session
      * @return
      * @throws IOException
      */
