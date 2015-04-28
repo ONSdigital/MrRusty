@@ -10,6 +10,7 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @Api
@@ -49,12 +51,16 @@ public class Collection {
 
         // When
         // we post as a publisher
-        Response<String> response = post(roundabout, Login.httpPublisher);
+        Response<CollectionDescription> response = post(roundabout, Login.httpPublisher);
 
         // Expect
         // a response of 200 - success
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+        assertEquals(roundabout.name, response.body.name);
+        assertEquals(roundabout.publishDate, response.body.publishDate);
+        assertTrue(StringUtils.isNotBlank(response.body.id));
     }
+
     /**
      * Creating an unnamed collection should return {@link HttpStatus#BAD_REQUEST_400}
      *
@@ -68,7 +74,7 @@ public class Collection {
 
         // When
         // we post using valid credentials
-        Response<String> response = post(anon, Login.httpPublisher);
+        Response<CollectionDescription> response = post(anon, Login.httpPublisher);
 
         // Expect
         // a response of 400 - Bad request
@@ -87,7 +93,7 @@ public class Collection {
 
         // When
         // we try and create an identical collection
-        Response<String> response = post(collection, Login.httpPublisher);
+        Response<CollectionDescription> response = post(collection, Login.httpPublisher);
 
         // Expect
         // a reponse of 409 - Conflict
@@ -109,9 +115,9 @@ public class Collection {
 
         // When
         // we post as anyone but a publisher
-        Response<String> responseAdmin = post(collection, Login.httpAdministrator);
-        Response<String> responseScallywag = post(collection, Login.httpScallywag);
-        Response<String> responseViewer = post(collection, Login.httpViewer);
+        Response<CollectionDescription> responseAdmin = post(collection, Login.httpAdministrator);
+        Response<CollectionDescription> responseScallywag = post(collection, Login.httpScallywag);
+        Response<CollectionDescription> responseViewer = post(collection, Login.httpViewer);
 
         // Expect
         // a response of 401 - unauthorized
@@ -211,8 +217,8 @@ public class Collection {
         return http.delete(endpoint, String.class);
     }
 
-    public static Response<String> post(CollectionDescription collection, Http http) throws IOException {
-        return http.post(ZebedeeHost.collection, collection, String.class);
+    public static Response<CollectionDescription> post(CollectionDescription collection, Http http) throws IOException {
+        return http.post(ZebedeeHost.collection, collection, CollectionDescription.class);
     }
 
     public static CollectionDescription createCollectionDescription() {
