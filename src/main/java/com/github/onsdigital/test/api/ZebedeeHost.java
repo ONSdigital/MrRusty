@@ -19,4 +19,5 @@ public class ZebedeeHost {
     public static final Endpoint browse = new Endpoint(host, "browse");
     public static final Endpoint complete = new Endpoint(host, "complete");
     public static final Endpoint review = new Endpoint(host, "review");
+    public static final Endpoint teams = new Endpoint(host, "teams");
 }
