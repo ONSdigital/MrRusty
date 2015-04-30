@@ -1,5 +1,6 @@
 package com.github.onsdigital.selenium;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
@@ -25,7 +26,13 @@ public class Drivers {
     public static DriverFactory driverFactory = new DriverFactory() {
         @Override
         public WebDriver newDriver() {
-            return new HtmlUnitDriver(true);
+//            return new HtmlUnitDriver(false);
+//            return new FirefoxDriver();
+           //return new ChromeDriver();
+
+            HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.INTERNET_EXPLORER_11);
+            driver.setJavascriptEnabled(true);
+            return driver;
         }
     };
 
