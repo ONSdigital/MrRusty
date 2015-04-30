@@ -11,9 +11,6 @@ import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.User;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by david on 17/04/2015.
@@ -83,7 +80,6 @@ public class SetupBeforeTesting implements Setup {
         permissionDefinition.email = user.email;
         permissionDefinition.admin = admin;
         permissionDefinition.editor = editor;
-        permissionDefinition.teamName = teamName;
         return permissionDefinition;
     }
 
