@@ -28,10 +28,12 @@ public class Login {
 
     public static Http httpAdministrator;
     public static Http httpPublisher;
+    public static Http httpSecondSetOfEyes;
     public static Http httpViewer;
     public static Http httpScallywag;
     private static String tokenAdministrator;
     private static String tokenPublisher;
+    private static String tokenSecondSetOfEyes;
     private static String tokenViewer;
 
     /**
@@ -41,6 +43,7 @@ public class Login {
     public static void getHttp() {
         httpAdministrator = Sessions.get("administrator");
         httpPublisher = Sessions.get("publisher");
+        httpSecondSetOfEyes = Sessions.get("secondSetOfEyes");
         httpViewer = Sessions.get("viewer");
         httpScallywag = Sessions.get("scallywag");
     }
@@ -52,6 +55,7 @@ public class Login {
     public static void setToken() {
         httpAdministrator.addHeader("x-florence-token", tokenAdministrator);
         httpPublisher.addHeader("x-florence-token", tokenPublisher);
+        httpSecondSetOfEyes.addHeader("x-florence-token", tokenSecondSetOfEyes);
         httpViewer.addHeader("x-florence-token", tokenViewer);
     }
 
@@ -101,6 +105,10 @@ public class Login {
         // The request should succeed
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
         assertTrue(StringUtils.isNotBlank(response.body));
+
+        // ----------------------- Setup second set of eyes
+        credentials = SetupBeforeTesting.publisherCredentials;
+        tokenSecondSetOfEyes = httpAdministrator.post(ZebedeeHost.login, credentials, String.class).body;
     }
 
     /**

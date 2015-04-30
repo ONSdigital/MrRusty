@@ -33,12 +33,12 @@ public class Review {
 
 
         Http httpPublisherAlice = OneLineSetups.newSessionWithPublisherPermissions();
-        Response<String> complete = Complete.complete(collection.name, filename, httpPublisherAlice);
+        Response<String> complete = Complete.complete(collection.id, filename, httpPublisherAlice);
 
         // When
         // publisher Bob calls review on the content
         Http httpPublisherBob = OneLineSetups.newSessionWithPublisherPermissions();
-        Response<String> response = review(collection.name, filename, httpPublisherBob);
+        Response<String> response = review(collection.id, filename, httpPublisherBob);
 
         // Then
         // We get the okay response code
@@ -65,11 +65,11 @@ public class Review {
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
         String filename = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.name, filename, Login.httpPublisher);
+        Complete.complete(collection.id, filename, Login.httpPublisher);
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.name, filename, Login.httpPublisher);
+        Response<String> response = review(collection.id, filename, Login.httpPublisher);
 
         // Then
         // We get the okay response code
@@ -93,9 +93,9 @@ public class Review {
         // When
         // we call review on the content with different users
 
-        Response<String> response1 = review(collection.name, collection.inProgressUris.get(0), Login.httpAdministrator);
-        Response<String> response2 = review(collection.name, collection.inProgressUris.get(1), Login.httpViewer);
-        Response<String> response3 = review(collection.name, collection.inProgressUris.get(2), Login.httpScallywag);
+        Response<String> response1 = review(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
+        Response<String> response2 = review(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
+        Response<String> response3 = review(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
@@ -135,7 +135,7 @@ public class Review {
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
+        Response<String> response = review(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
@@ -155,7 +155,7 @@ public class Review {
 
         // When
         // we call review on the directory alone
-        Response<String> response = review(collection.name, "/directory/", Login.httpPublisher);
+        Response<String> response = review(collection.id, "/directory/", Login.httpPublisher);
 
 
         // Then
@@ -180,15 +180,15 @@ public class Review {
         // When
         // we call review on the content
 
-        Response<String> response = review(collection.name, uri, Login.httpPublisher);
+        Response<String> response = review(collection.id, uri, Login.httpPublisher);
 
         // Then
         // We get a bad request error code
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
-    public static Response<String> review(String collectionName, String uri, Http http) throws IOException {
-        Endpoint contentEndpoint = ZebedeeHost.review.addPathSegment(collectionName).setParameter("uri", uri);
+    public static Response<String> review(String collectionID, String uri, Http http) throws IOException {
+        Endpoint contentEndpoint = ZebedeeHost.review.addPathSegment(collectionID).setParameter("uri", uri);
         return http.post(contentEndpoint, "", String.class);
     }
 }

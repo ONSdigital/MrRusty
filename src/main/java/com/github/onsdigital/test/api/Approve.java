@@ -33,7 +33,7 @@ public class Approve {
      */
     @POST
     @Test
-    public void shouldRespondOkayWhenWeApproveACollectionAsAdmin() throws IOException {
+    public void shouldRespondOkayWhenWeApproveACollectionAsPublisher() throws IOException {
 
         // Given
         // a collection
@@ -41,7 +41,7 @@ public class Approve {
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.name, Login.httpPublisher);
+        Response<String> response = approve(collection.id, Login.httpPublisher);
 
         // Expect
         // a response of okay
@@ -62,12 +62,12 @@ public class Approve {
 
         // When
         // we approve it using admin credentials and get an okay
-        Response<String> response = approve(collection.id, http);
+        Response<String> response = approve(collection.id, Login.httpPublisher);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Expect
         // the collection is now approved
-        CollectionDescription collectionDescription = Collection.get(collection.id, http).body;
+        CollectionDescription collectionDescription = Collection.get(collection.id, Login.httpPublisher).body;
         assertEquals(true, collectionDescription.approvedStatus);
     }
 
