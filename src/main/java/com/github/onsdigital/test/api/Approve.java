@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -28,8 +29,7 @@ public class Approve {
 
     /**
      * Tests approval using simple collection setup and admin credentials
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
@@ -37,11 +37,11 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.name, http);
+        Response<String> response = approve(collection.id, http);
 
         // Expect
         // a response of okay
@@ -50,8 +50,7 @@ public class Approve {
 
     /**
      * Tests functionality of a successful call
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
@@ -59,60 +58,69 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it using admin credentials and get an okay
-        Response<String> response = approve(collection.name, http);
+        Response<String> response = approve(collection.id, http);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Expect
         // the collection is now approved
-        CollectionDescription collectionDescription = Collection.get(collection.name, http);
+        CollectionDescription collectionDescription = Collection.get(collection.id, http).body;
         assertEquals(true, collectionDescription.approvedStatus);
     }
 
     /**
      * Tests that {@link HttpStatus#FORBIDDEN_403} is when credentials not provided
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
-    public void shouldRespondForbiddenIfCredentialsAreNotProvided() throws IOException {
+    public void shouldRespondUnauthorizedIfCredentialsAreNotProvided() throws IOException {
         // Given
         // a session that has no credentials and a collection
-        Http httpNoCredentials = Sessions.get("shouldRespondForbiddenIfCredentialsAreNotProvided");
-        CollectionDescription collection = Collection.create(http);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         // we approve it without credentials
-        Response<String> response = approve(collection.name, httpNoCredentials);
+        Http httpNoCredentials = Sessions.get("noCredentials");
+        Response<String> response = approve(collection.id, httpNoCredentials);
 
         // Expect
-        // a response of okay
+        // a response of forbidden
         assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
      * Tests that {@link HttpStatus#UNAUTHORIZED_401} is returned when user doesn't have approve permission
-     * <p/>
-     * May be split into separate tests based on levels
-     * <p/>
-     * TODO
-     * <p/>
-     * incomplete
+     *
      */
     @POST
     @Test
-    public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() {
+    public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() throws IOException {
+        // Given
+        // a collection
+        CollectionDescription collection1 = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
+        // When
+        //...we approve it with non publisher credentials
+        Response<String> responseScallywag = approve(collection1.id, Login.httpScallywag);
+        Response<String> responseAdministrator = approve(collection2.id, Login.httpAdministrator);
+        Response<String> responseViewer = approve(collection3.id, Login.httpViewer);
+
+        // Then
+        // approve should fail and return Unauthorised
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdministrator.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
     }
 
     /**
      * Tests that {@link HttpStatus#BAD_REQUEST_400} is returned when the collection doesn't exist
-     * <p/>
-     * written
+     *
      */
     @POST
     @Test
@@ -132,26 +140,21 @@ public class Approve {
 
 
     /**
-     * Tests that {@link HttpStatus#CONFLICT_409} is returned when the collection has
-     * <p/>
-     * written
+     * Tests that {@link HttpStatus#CONFLICT_409} is returned when the collection has incomplete content
      */
     @POST
     @Test
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = Collection.create(http);
-
-        String filename = Random.id() + ".json";
-        Content.create(collection.name, "shouldReturnConflictForCollectionsThatHaveIncompleteItems", "/approve/" + filename, 200, http);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
 
         // When
-        // we approve it using admin credentials
-        Response<String> response = approve(collection.name, http);
+        // we try to approve it using appropriate credentials
+        Response<String> response = approve(collection.id, Login.httpPublisher);
 
         // We expect
-        // ...the resource is in progress so the collection will not be approved
+        // the resource is in progress so the collection will not be approved
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 

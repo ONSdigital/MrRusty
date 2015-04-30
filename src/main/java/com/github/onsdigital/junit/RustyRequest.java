@@ -29,7 +29,7 @@ public class RustyRequest extends Request {
         runner = new Suite(new RunnerBuilder() {
             @Override
             public Runner runnerForClass(Class<?> testClass) throws Throwable {
-                System.out.println("Instantiating runner for "+testClass.getSimpleName());
+                //System.out.println("Instantiating runner for "+testClass.getSimpleName());
                 return new BlockJUnit4ClassRunner(testClass);
             }
         }, classes);

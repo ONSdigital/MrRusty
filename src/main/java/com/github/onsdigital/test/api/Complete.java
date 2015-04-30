@@ -5,8 +5,8 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
@@ -18,7 +18,6 @@ import static org.junit.Assert.*;
 @DependsOn(Content.class)
 public class Complete {
 
-    Http http = Login.httpPublisher;
 
     /**
      * Test basic functionality
@@ -28,104 +27,124 @@ public class Complete {
     public void shouldCompleteWithPublisherCredentials() throws IOException {
 
         // Given - an existing collection with some content
-        CollectionDescription collection = Collection.create(http);
-        String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String filename = collection.inProgressUris.get(0);
 
         // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, http);
+        Response<String> complete = complete(collection.id, filename, Login.httpPublisher);
 
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.OK_200, responseCode);
-
+        // Then
+        // We get the expected response code
         // and the content is listed under complete when we get the collection.
-        CollectionDescription updatedCollection = Collection.get(collection.name, http);
+        assertEquals(HttpStatus.OK_200, complete.statusLine.getStatusCode());
+
+        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertTrue(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));
     }
 
     /**
-     * Test basic functionality
+     * Test should return Unauthorised without publisher credentials
      */
     @POST
     @Test
-    public void shouldReturn401WithoutPublisherCredentials() throws IOException {
+    public void shouldReturnUnauthorizedWithoutPublisherCredentials() throws IOException {
 
-        // Given - an existing collection with some content
-        CollectionDescription collection = Collection.create(http);
-        String filename = "/" + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
+        // Given
+        // An existing collection with some content
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(3);
 
-        // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, http);
+        // When
+        // We call complete on the content
+        Response<String> complete1 = complete(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
+        Response<String> complete2 = complete(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
+        Response<String> complete3 = complete(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
 
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.OK_200, responseCode);
+        // Then
+        // We expect unauthorised responses
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete1.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete2.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, complete3.statusLine.getStatusCode());
 
-        // and the content is listed under complete when we get the collection.
-        CollectionDescription updatedCollection = Collection.get(collection.name, http);
-        assertTrue(updatedCollection.completeUris.contains(filename));
-        assertFalse(updatedCollection.inProgressUris.contains(filename));
+        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
+        assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(0)));
+        assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(1)));
+        assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(2)));
+
+        assertTrue(updatedCollection.inProgressUris.contains(collection.inProgressUris.get(0)));
+        assertTrue(updatedCollection.inProgressUris.contains(collection.inProgressUris.get(1)));
+        assertTrue(updatedCollection.inProgressUris.contains(collection.inProgressUris.get(2)));
     }
 
+    /**
+     * Test returns Unauthorised without publisher credentials
+     */
     @POST
     @Test
-    public void shouldReturn404IfNotInProgress() throws IOException {
+    public void shouldReturnNotFoundIfUriIsNotInProgress() throws IOException {
 
         // Given - a file is not listed in progress
-        CollectionDescription collection = Collection.create(http);
-        String filename = "/shouldReturn404IfNotInProgress/" + Random.id() + ".json";
+        CollectionDescription collection = OneLineSetups.publishedCollection();
+        String filename = "/shouldReturn404/" + Random.id() + ".json";
 
         // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, http);
+        Response<String> complete = complete(collection.id, filename, Login.httpPublisher);
 
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
-    }
-
-    @Test
-    public void shouldReturn400IfGivenUriIsADirectory() throws IOException {
-
-        // Given - a directory that exists in progress
-        CollectionDescription collection = Collection.create(http);
-        String directory = "/foobarred/";
-        String filename = directory + Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
-
-        // When - we call complete on the content
-        int responseCode = complete(collection.name, directory, http);
-
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
-    }
-
-    @Test
-    public void shouldReturn404IfUriIsAlreadyComplete() throws IOException {
-
-        // Given - a uri that is already set to complete.
-        CollectionDescription collection = Collection.create(http);
-        String filename = Random.id() + ".json";
-        Content.create(collection.name, "foo", filename, 200, http);
-        complete(collection.name, filename, http);
-
-        // When - we call complete on the content
-        int responseCode = complete(collection.name, filename, http);
-
-        // Then - We get the expected response code
-        assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
+        // Then - we should be rejected with a Not Found response code
+        assertEquals(HttpStatus.NOT_FOUND_404, complete.statusLine.getStatusCode());
     }
 
     /**
-     *
-     * @param collectionName the name of the parent collection
-     * @param uri the filename within the collection
-     * @param http the session we are calling complete from
-     * @return the {@link HttpStatus} code for the response
+     * Test should return Unauthorised without publisher credentials
+     */
+    @Test
+    public void shouldReturnBadRequestIfGivenUriIsADirectory() throws IOException {
+
+        // Given
+        // a collection with content in a directory
+        String directory = "/directory/";
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(directory, 1);
+
+        // When
+        // we call complete on the directory not the file
+        Response<String> complete = complete(collection.id, directory, Login.httpPublisher);
+
+        // Then
+        // we expect a Bad Request response code
+        assertEquals(HttpStatus.BAD_REQUEST_400, complete.statusLine.getStatusCode());
+    }
+
+    /**
+     * Test should return Not Found if already complete
+     */
+    @Test
+    public void shouldReturnNotFoundIfUriIsAlreadyComplete() throws IOException {
+
+        // Given
+        // a collection with content that is set to complete.
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String fileUri = collection.inProgressUris.get(0);
+        complete(collection.id, fileUri, Login.httpPublisher);
+
+        // When
+        // we call complete on the content
+        Response<String> complete = complete(collection.id, fileUri, Login.httpPublisher);
+
+        // Then
+        // We get the expected response code
+        assertEquals(HttpStatus.NOT_FOUND_404, complete.statusLine.getStatusCode());
+    }
+
+    /**
+     * Convenience method to complete content in one line
+     * @param collectionName
+     * @param uri
+     * @param http
+     * @return
      * @throws IOException
      */
-    public static int complete(String collectionName, String uri, Http http) throws IOException {
+    public static Response<String> complete(String collectionName, String uri, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.complete.addPathSegment(collectionName).setParameter("uri", uri);
-        Response<JsonObject> createResponse = http.post(contentEndpoint, "", JsonObject.class);
-        return createResponse.statusLine.getStatusCode();
+        return http.post(contentEndpoint, "", String.class);
     }
 }

@@ -7,8 +7,10 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 @Api
@@ -38,7 +41,6 @@ public class Collection {
      *
      * Create with publisher permissions should return {@link HttpStatus#OK_200}
      *
-     * TODO - Fix specific publisher permissions
      */
     @POST
     @Test
@@ -49,24 +51,34 @@ public class Collection {
 
         // When
         // we post as a publisher
-        create(roundabout, 200, http);
+        Response<CollectionDescription> response = post(roundabout, Login.httpPublisher);
 
         // Expect
-        // a response of 200
+        // a response of 200 - success
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+        assertEquals(roundabout.name, response.body.name);
+        assertEquals(roundabout.publishDate, response.body.publishDate);
+        assertTrue(StringUtils.isNotBlank(response.body.id));
     }
+
     /**
      * Creating an unnamed collection should return {@link HttpStatus#BAD_REQUEST_400}
      *
-     * TODO - Fix specific publisher permissions
      */
     @POST
     @Test
     public void shouldReturn400IfNoNameSpecifiedForCreateCollection() throws IOException {
-        // Given an incomplete collection description
+        // Given
+        // an incomplete collection description
         CollectionDescription anon = new CollectionDescription();
 
-        // When we work
-        create(anon, 400, http);
+        // When
+        // we post using valid credentials
+        Response<CollectionDescription> response = post(anon, Login.httpPublisher);
+
+        // Expect
+        // a response of 400 - Bad request
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
     /**
      * written
@@ -77,31 +89,48 @@ public class Collection {
 
         // Given
         // an existing collection
-        CollectionDescription description = create(http);
-        String existingName = description.name;
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
-        // When we try and create a collection with the same name
-        // Then we get a 409
-        create(description, HttpStatus.CONFLICT_409, http);
+        // When
+        // we try and create an identical collection
+        Response<CollectionDescription> response = post(collection, Login.httpPublisher);
+
+        // Expect
+        // a reponse of 409 - Conflict
+        assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
 
     /**
      * Create without publisher permissions should return {@link HttpStatus#UNAUTHORIZED_401}
      *
-     * TODO
      */
     @POST
     @Test
     public void shouldReturn401WithoutPublisherPermissions() throws IOException {
 
-    }
+        // Given
+        // a collection description
+        CollectionDescription collection = createCollectionDescription();
 
+        // When
+        // we post as anyone but a publisher
+        Response<CollectionDescription> responseAdmin = post(collection, Login.httpAdministrator);
+        Response<CollectionDescription> responseScallywag = post(collection, Login.httpScallywag);
+        Response<CollectionDescription> responseViewer = post(collection, Login.httpViewer);
+
+        // Expect
+        // a response of 401 - unauthorized
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdmin.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
+    }
 
     /**
      * Viewer permissions should return {@link HttpStatus#OK_200} for any permitted collection, {@link HttpStatus#UNAUTHORIZED_401} otherwise
      *
-     * TODO
+     * TODO implement once we have mapping from user to collection access
+     *
      */
     @GET
     @Test
@@ -111,97 +140,97 @@ public class Collection {
     /**
      * Admins should return {@link HttpStatus#UNAUTHORIZED_401}
      *
-     * TODO
+     * TODO implement once we have mapping from user to collection access
+     *
      */
     @GET
-    @Test
+//    @Test
     public void shouldReturn401WithAdminPermissions() throws IOException {
+        // Given
+        // a collection
+        CollectionDescription collection = createCollectionDescription();
+        post(collection, Login.httpPublisher);
 
+        // When
+        // we attempt to retrieve it as an admin
+        Response<CollectionDescription> response = get(collection.id, Login.httpAdministrator);
+
+        // We expect
+        // a response of 401 - unauthorized
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
      * Publisher permissions should return {@link HttpStatus#OK_200} for any collection
      *
-     * TODO - Fix specific publisher permissions
      */
     @DELETE
     @Test
     public void collectionShouldBeDeletedWithPublisherPermissions() throws IOException {
         // Given
         //...a collection
-        CollectionDescription collection = create(http);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When
         //...we delete it
-        delete(collection.name, 200, http);
+        delete(collection.id, Login.httpPublisher);
 
         // We expect
         //...it to be entirely deleted
-        get(collection.name, HttpStatus.NOT_FOUND_404, http);
+        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
+        assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
     }
 
     /**
      * All other permissions should return {@link HttpStatus#UNAUTHORIZED_401} for any collection
      *
-     * TODO - Fix permissions
      */
     @DELETE
     @Test
-    public void deleteShouldReturn400WithoutPublisherPermissions() throws IOException {
+    public void deleteShouldReturn401WithoutPublisherPermissions() throws IOException {
+        // Given
+        // a collection
+        CollectionDescription collection1 = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
+        // When
+        //...we we try and delete them delete it
+        Response<String> deleteResponseScallywag = delete(collection1.id, Login.httpScallywag);
+        Response<String> deleteResponseAdministrator = delete(collection2.id, Login.httpAdministrator);
+        Response<String> deleteResponseViewer = delete(collection3.id, Login.httpViewer);
+
+        // Then
+        // delete should fail with unauthorized returned
+        // + the collections should still exist
+        assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseScallywag.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseAdministrator.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseViewer.statusLine.getStatusCode());
+
+        assertEquals(HttpStatus.OK_200, get(collection1.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection2.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection3.id, Login.httpPublisher).statusLine.getStatusCode());
     }
 
-
-
-
-
-
-
-
-
-
-
-    private String delete(String name, int expectedResponse, Http http) throws IOException {
+    public static Response<String> delete(String name, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.collection.addPathSegment(name);
-        Response<String> deleteResponse = http.delete(endpoint, String.class);
-        assertEquals(expectedResponse, deleteResponse.statusLine.getStatusCode());
-        return deleteResponse.body;
+        return http.delete(endpoint, String.class);
     }
 
-
-
-    public static CollectionDescription create(CollectionDescription collection, int expectedResponse, Http http) throws IOException {
-        Response<String> createResponse = http.post(ZebedeeHost.collection, collection, String.class);
-        assertEquals(expectedResponse, createResponse.statusLine.getStatusCode());
-        return collection;
+    public static Response<CollectionDescription> post(CollectionDescription collection, Http http) throws IOException {
+        return http.post(ZebedeeHost.collection, collection, CollectionDescription.class);
     }
-
-    public static CollectionDescription create(int expectedResponse, Http http) throws IOException {
-        CollectionDescription collectionDescription = createCollectionDescription();
-        return create(collectionDescription, expectedResponse, http);
-    }
-
 
     public static CollectionDescription createCollectionDescription() {
         CollectionDescription collection = new CollectionDescription();
-        collection.name = Random.id();
+        collection.name = "Rusty_" + Random.id();
         collection.publishDate = new Date();
         return collection;
     }
-    public static CollectionDescription create(Http http) throws IOException {
-        return create(200, http);
-    }
 
-    public static CollectionDescription get(String name, int expectedResponse, Http http) throws IOException {
+    public static Response<CollectionDescription> get(String name, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
-        Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
-        assertEquals(expectedResponse, getResponse.statusLine.getStatusCode());
-        return getResponse.body;
-    }
+        return http.get(idUrl, CollectionDescription.class);
 
-    public static CollectionDescription get(String name, Http http) throws IOException {
-        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
-        Response<CollectionDescription> getResponse = http.get(idUrl, CollectionDescription.class);
-        return getResponse.body;
     }
 }

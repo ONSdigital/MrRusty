@@ -77,16 +77,13 @@ public class SetupBeforeTesting implements Setup {
         }
     }
 
-    private PermissionDefinition permission(User user, boolean admin, boolean editor, String... paths) {
+    private PermissionDefinition permission(User user, boolean admin, boolean editor, String teamName) {
 
         PermissionDefinition permissionDefinition = new PermissionDefinition();
         permissionDefinition.email = user.email;
         permissionDefinition.admin = admin;
         permissionDefinition.editor = editor;
-        if (paths.length > 0) {
-            Set<String> contentOwnerPaths = new HashSet<String>(Arrays.asList(paths));
-            permissionDefinition.contentOwnerPaths = contentOwnerPaths;
-        }
+        permissionDefinition.teamName = teamName;
         return permissionDefinition;
     }
 
@@ -105,20 +102,26 @@ public class SetupBeforeTesting implements Setup {
         checkOk(contentOwner, "Unable to set password for content owner user.");
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     private void setPermissions() throws IOException {
 
         // Admin
-        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false);
+        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false, null);
         Response<String> adminPermission = systemSession.post(ZebedeeHost.permission, adminPermissionDefinition, String.class);
         checkOk(adminPermission, "Unable to set admin permission for " + adminUser);
 
         // Publisher
-        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true);
+        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true, null);
         Response<String> publisherPermission = systemSession.post(ZebedeeHost.permission, publisherPermissionDefinition, String.class);
         checkOk(publisherPermission, "Unable to set editor permission for " + publisherUser);
 
         // Content Owner
-        PermissionDefinition contentOwnerPermissionDefinition = permission(contentOwnerUser, false, false, "/economy");
+        Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
+
+        PermissionDefinition contentOwnerPermissionDefinition = permission(contentOwnerUser, false, false, "economy");
         Response<String> contentOwnerPermission = systemSession.post(ZebedeeHost.permission, contentOwnerPermissionDefinition, String.class);
         checkOk(contentOwnerPermission, "Unable to set /economy permission for " + contentOwnerUser);
     }
