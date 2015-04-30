@@ -28,7 +28,7 @@ public class Approve {
     Http http = Login.httpPublisher;
 
     /**
-     * Tests approval using simple collection setup and admin credentials
+     * Tests approval using simple collection setup and publisher credentials
      *
      */
     @POST
@@ -41,7 +41,7 @@ public class Approve {
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.id, http);
+        Response<String> response = approve(collection.name, Login.httpPublisher);
 
         // Expect
         // a response of okay

@@ -74,7 +74,7 @@ public class SetupBeforeTesting implements Setup {
         }
     }
 
-    private PermissionDefinition permission(User user, boolean admin, boolean editor, String teamName) {
+    private PermissionDefinition permission(User user, boolean admin, boolean editor) {
 
         PermissionDefinition permissionDefinition = new PermissionDefinition();
         permissionDefinition.email = user.email;
@@ -105,21 +105,21 @@ public class SetupBeforeTesting implements Setup {
     private void setPermissions() throws IOException {
 
         // Admin
-        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false, null);
+        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false);
         Response<String> adminPermission = systemSession.post(ZebedeeHost.permission, adminPermissionDefinition, String.class);
         checkOk(adminPermission, "Unable to set admin permission for " + adminUser);
 
         // Publisher
-        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true, null);
+        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true);
         Response<String> publisherPermission = systemSession.post(ZebedeeHost.permission, publisherPermissionDefinition, String.class);
         checkOk(publisherPermission, "Unable to set editor permission for " + publisherUser);
 
         // Content Owner
-        Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
 
-        PermissionDefinition contentOwnerPermissionDefinition = permission(contentOwnerUser, false, false, "economy");
-        Response<String> contentOwnerPermission = systemSession.post(ZebedeeHost.permission, contentOwnerPermissionDefinition, String.class);
-        checkOk(contentOwnerPermission, "Unable to set /economy permission for " + contentOwnerUser);
+        // Add content user to the economy team
+        Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
+        Response<Boolean> addUser = systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", contentOwnerUser.email), "", Boolean.class);
+
     }
 
     /**

@@ -19,32 +19,61 @@ import static org.junit.Assert.*;
 public class Review {
 
     /**
+     *
      * Test basic functionality
      */
     @POST
     @Test
-    public void shouldReviewWithPublisherCredentials() throws IOException {
+    public void shouldReturnOkayOnReview() throws IOException {
 
         // Given
-        // an existing piece of content that is set to complete
+        // an existing piece of content that is set to complete by publisher Alice
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
         String filename = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.id, filename, Login.httpPublisher);
+
+        Http httpPublisherAlice = OneLineSetups.newSessionWithPublisherPermissions();
+        Response<String> complete = Complete.complete(collection.name, filename, httpPublisherAlice);
 
         // When
-        // we call review on the content
-        int responseCode = review(collection.id, filename, Login.httpPublisher);
+        // publisher Bob calls review on the content
+        Http httpPublisherBob = OneLineSetups.newSessionWithPublisherPermissions();
+        Response<String> response = review(collection.name, filename, httpPublisherBob);
 
         // Then
         // We get the okay response code
-        assertEquals(HttpStatus.OK_200, responseCode);
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // and the content is listed under review when we get the collection.
         CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertTrue(updatedCollection.reviewedUris.contains(filename));
         assertFalse(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));
+    }
+
+    /**
+     * Second set of eyes functionality
+     *
+     * Users that send work from 'in progress' to 'complete' are not allowed to send from 'complete' to 'reviewed'
+     */
+    @POST
+    @Test
+    public void shouldReturnUnauthorizedWhenCompleterAttemptsReview() throws IOException {
+
+        // Given
+        // an existing piece of content that is set to complete
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        String filename = collection.inProgressUris.get(0);
+
+        Complete.complete(collection.name, filename, Login.httpPublisher);
+
+        // When
+        // we call review on the content
+        Response<String> response = review(collection.name, filename, Login.httpPublisher);
+
+        // Then
+        // We get the okay response code
+        assertEquals(HttpStatus.UNAUTHORIZED_401,  response.statusLine.getStatusCode());
     }
 
     /**
@@ -63,14 +92,15 @@ public class Review {
 
         // When
         // we call review on the content with different users
-        int responseCode1 = review(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
-        int responseCode2 = review(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
-        int responseCode3 = review(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
+
+        Response<String> response1 = review(collection.name, collection.inProgressUris.get(0), Login.httpAdministrator);
+        Response<String> response2 = review(collection.name, collection.inProgressUris.get(1), Login.httpViewer);
+        Response<String> response3 = review(collection.name, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode1);
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode2);
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode3);
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }
 
     /**
@@ -86,10 +116,10 @@ public class Review {
         String filename = "/shouldReturnNotFoundIfNoSuchFile/" + Random.id() + ".json";
 
         // When - we call review on the content
-        int responseCode = review(collection.id, filename, Login.httpPublisher);
+        Response<String> response = review(collection.name, filename, Login.httpPublisher);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
+        assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
     }
 
     /**
@@ -105,10 +135,10 @@ public class Review {
 
         // When
         // we call review on the content
-        int responseCode = review(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
+        Response<String> response = review(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
     /**
@@ -125,11 +155,12 @@ public class Review {
 
         // When
         // we call review on the directory alone
-        int responseCode = review(collection.id, "/directory/", Login.httpPublisher);
+        Response<String> response = review(collection.name, "/directory/", Login.httpPublisher);
+
 
         // Then
         // We get a bad request error code
-        assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
     /**
@@ -148,16 +179,16 @@ public class Review {
 
         // When
         // we call review on the content
-        int responseCode = review(collection.id, uri, Login.httpPublisher);
+
+        Response<String> response = review(collection.name, uri, Login.httpPublisher);
 
         // Then
         // We get a bad request error code
-        assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
-    public static int review(String collectionName, String uri, Http http) throws IOException {
+    public static Response<String> review(String collectionName, String uri, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.review.addPathSegment(collectionName).setParameter("uri", uri);
-        Response<String> createResponse = http.post(contentEndpoint, "", String.class);
-        return createResponse.statusLine.getStatusCode();
+        return http.post(contentEndpoint, "", String.class);
     }
 }

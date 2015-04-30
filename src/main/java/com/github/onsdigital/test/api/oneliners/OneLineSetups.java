@@ -5,10 +5,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.api.*;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.zebedee.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -99,6 +96,49 @@ public class OneLineSetups {
         http.addHeader("x-florence-token", token);
 
         return http;
+    }
+
+
+    public static Http newSessionWithPublisherPermissions(String name, String email) throws IOException {
+        // Given
+        // A user with no email address
+        User user = new User();
+        user.email = email;
+        user.name = name;
+
+        // Post the user
+        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+        // Set their password
+        Credentials credentials = new Credentials();
+        credentials.email = user.email;
+        credentials.password = Random.password(8);
+        Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
+        assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
+
+        // Assign them publisher permissions
+        PermissionDefinition definition = new PermissionDefinition();
+        definition.email = user.email;
+        definition.editor = true;
+        Response<String> permissionResponse = Login.httpAdministrator.post(ZebedeeHost.permission, definition, String.class);
+        assertEquals(HttpStatus.OK_200, permissionResponse.statusLine.getStatusCode());
+
+        // Create a session
+        Http http = Sessions.get(email);
+
+        // Log the user in
+        Response<String> responseLogin = http.post(ZebedeeHost.login, credentials, String.class);
+        assertEquals(HttpStatus.OK_200, responseLogin.statusLine.getStatusCode());
+        String token = responseLogin.body;
+
+        // Add their session token
+        http.addHeader("x-florence-token", token);
+
+        return http;
+    }
+    public static Http newSessionWithPublisherPermissions() throws IOException {
+        return newSessionWithPublisherPermissions("Rusty", "Rusty_" + Random.id() + "@example.com");
     }
 
     public static User newActiveUserWithViewerPermissions(String name, String email) throws IOException {

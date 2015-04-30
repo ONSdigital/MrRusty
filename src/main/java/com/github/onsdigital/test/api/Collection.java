@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @Api
-@DependsOn(Login.class)
+@DependsOn(Permissions.class)
 public class Collection {
 
     private static Http http = Login.httpAdministrator;
@@ -228,8 +228,8 @@ public class Collection {
         return collection;
     }
 
-    public static Response<CollectionDescription> get(String name, Http http) throws IOException {
-        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(name);
+    public static Response<CollectionDescription> get(String id, Http http) throws IOException {
+        Endpoint idUrl = ZebedeeHost.collection.addPathSegment(id);
         return http.get(idUrl, CollectionDescription.class);
 
     }
