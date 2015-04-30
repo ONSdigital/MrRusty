@@ -12,8 +12,6 @@ import com.github.onsdigital.zebedee.json.User;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -30,9 +28,7 @@ public class OneLineSetups {
      */
     public static CollectionDescription publishedCollection() throws IOException {
         CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
-
-        return collection;
+        return Collection.post(collection, Login.httpPublisher).body;
     }
 
     /**
@@ -58,7 +54,7 @@ public class OneLineSetups {
      */
     public static CollectionDescription publishedCollectionWithContent(String directory, int fileCount) throws IOException {
         CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        collection = Collection.post(collection, Login.httpPublisher).body;
 
         for(int i = 0; i < fileCount; i++) {
             String uri = "";
@@ -67,40 +63,10 @@ public class OneLineSetups {
             } else {
                 uri = directory + Random.id() + ".json";
             }
-            Content.create(collection.name, uri, uri, Login.httpPublisher);
+            Content.create(collection.id, uri, uri, Login.httpPublisher);
         }
 
-        return Collection.get(collection.name, Login.httpPublisher).body;
-    }
-
-    /**
-     * Publishes a collection with the name given
-     *
-     * <p>If such a name already exists it empties the collection</p>
-     *
-     * @param name
-     * @return
-     * @throws IOException
-     */
-    public static CollectionDescription emptyCollectionWithName(String name) throws IOException {
-
-        Response<CollectionDescription> response = Collection.get(name, Login.httpPublisher);
-
-        if(response.statusLine.getStatusCode() == 200) {
-            CollectionDescription collection = response.body;
-            List<String> uris = new ArrayList<>();
-            uris.addAll(collection.completeUris);
-            uris.addAll(collection.inProgressUris);
-            uris.addAll(collection.reviewedUris);
-            for (String uri : uris) {
-                Content.delete(collection.name, uri, Login.httpPublisher);
-            }
-        } else {
-            CollectionDescription collection = new CollectionDescription();
-            collection.name = name;
-            Collection.post(collection, Login.httpPublisher);
-        }
-        return Collection.get(name, Login.httpPublisher).body;
+        return Collection.get(collection.id, Login.httpPublisher).body;
     }
 
     public static Http newSessionWithViewerPermissions(String name, String email) throws IOException {

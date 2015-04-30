@@ -1,7 +1,7 @@
 package com.github.onsdigital.selenium;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
 import java.util.Map;
@@ -27,12 +27,12 @@ public class Drivers {
         @Override
         public WebDriver newDriver() {
 //            return new HtmlUnitDriver(false);
-//            return new FirefoxDriver();
+            return new FirefoxDriver();
            //return new ChromeDriver();
 
-            HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.INTERNET_EXPLORER_11);
-            driver.setJavascriptEnabled(true);
-            return driver;
+//            HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.INTERNET_EXPLORER_11);
+//            driver.setJavascriptEnabled(true);
+//            return driver;
         }
     };
 

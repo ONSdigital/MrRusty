@@ -153,7 +153,7 @@ public class Collection {
 
         // When
         // we attempt to retrieve it as an admin
-        Response<CollectionDescription> response = get(collection.name, Login.httpAdministrator);
+        Response<CollectionDescription> response = get(collection.id, Login.httpAdministrator);
 
         // We expect
         // a response of 401 - unauthorized
@@ -173,11 +173,11 @@ public class Collection {
 
         // When
         //...we delete it
-        delete(collection.name, Login.httpPublisher);
+        delete(collection.id, Login.httpPublisher);
 
         // We expect
         //...it to be entirely deleted
-        Response<CollectionDescription> response = get(collection.name, Login.httpPublisher);
+        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
     }
 
@@ -196,9 +196,9 @@ public class Collection {
 
         // When
         //...we we try and delete them delete it
-        Response<String> deleteResponseScallywag = delete(collection1.name, Login.httpScallywag);
-        Response<String> deleteResponseAdministrator = delete(collection2.name, Login.httpAdministrator);
-        Response<String> deleteResponseViewer = delete(collection3.name, Login.httpViewer);
+        Response<String> deleteResponseScallywag = delete(collection1.id, Login.httpScallywag);
+        Response<String> deleteResponseAdministrator = delete(collection2.id, Login.httpAdministrator);
+        Response<String> deleteResponseViewer = delete(collection3.id, Login.httpViewer);
 
         // Then
         // delete should fail with unauthorized returned
@@ -207,9 +207,9 @@ public class Collection {
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseAdministrator.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseViewer.statusLine.getStatusCode());
 
-        assertEquals(HttpStatus.OK_200, get(collection1.name, Login.httpPublisher).statusLine.getStatusCode());
-        assertEquals(HttpStatus.OK_200, get(collection2.name, Login.httpPublisher).statusLine.getStatusCode());
-        assertEquals(HttpStatus.OK_200, get(collection3.name, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection1.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection2.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection3.id, Login.httpPublisher).statusLine.getStatusCode());
     }
 
     public static Response<String> delete(String name, Http http) throws IOException {

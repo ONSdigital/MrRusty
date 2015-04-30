@@ -30,18 +30,18 @@ public class Review {
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
         String filename = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.name, filename, Login.httpPublisher);
+        Complete.complete(collection.id, filename, Login.httpPublisher);
 
         // When
         // we call review on the content
-        int responseCode = review(collection.name, filename, Login.httpPublisher);
+        int responseCode = review(collection.id, filename, Login.httpPublisher);
 
         // Then
         // We get the okay response code
         assertEquals(HttpStatus.OK_200, responseCode);
 
         // and the content is listed under review when we get the collection.
-        CollectionDescription updatedCollection = Collection.get(collection.name, Login.httpPublisher).body;
+        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertTrue(updatedCollection.reviewedUris.contains(filename));
         assertFalse(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));
@@ -57,15 +57,15 @@ public class Review {
         // Given
         // content that is set to complete
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(3);
-        Complete.complete(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
-        Complete.complete(collection.name, collection.inProgressUris.get(1), Login.httpPublisher);
-        Complete.complete(collection.name, collection.inProgressUris.get(2), Login.httpPublisher);
+        Complete.complete(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
+        Complete.complete(collection.id, collection.inProgressUris.get(1), Login.httpPublisher);
+        Complete.complete(collection.id, collection.inProgressUris.get(2), Login.httpPublisher);
 
         // When
         // we call review on the content with different users
-        int responseCode1 = review(collection.name, collection.inProgressUris.get(0), Login.httpAdministrator);
-        int responseCode2 = review(collection.name, collection.inProgressUris.get(1), Login.httpViewer);
-        int responseCode3 = review(collection.name, collection.inProgressUris.get(2), Login.httpScallywag);
+        int responseCode1 = review(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
+        int responseCode2 = review(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
+        int responseCode3 = review(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseCode1);
@@ -86,7 +86,7 @@ public class Review {
         String filename = "/shouldReturnNotFoundIfNoSuchFile/" + Random.id() + ".json";
 
         // When - we call review on the content
-        int responseCode = review(collection.name, filename, Login.httpPublisher);
+        int responseCode = review(collection.id, filename, Login.httpPublisher);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.NOT_FOUND_404, responseCode);
@@ -105,7 +105,7 @@ public class Review {
 
         // When
         // we call review on the content
-        int responseCode = review(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
+        int responseCode = review(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.BAD_REQUEST_400, responseCode);
@@ -121,11 +121,11 @@ public class Review {
         // Given
         // a collection that has complete content in a directory
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
-        Complete.complete(collection.name, collection.inProgressUris.get(0), Login.httpPublisher);
+        Complete.complete(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
 
         // When
         // we call review on the directory alone
-        int responseCode = review(collection.name, "/directory/", Login.httpPublisher);
+        int responseCode = review(collection.id, "/directory/", Login.httpPublisher);
 
         // Then
         // We get a bad request error code
@@ -143,12 +143,12 @@ public class Review {
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
         String uri = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.name, uri, Login.httpPublisher);
-        review(collection.name, uri, Login.httpPublisher); // Review
+        Complete.complete(collection.id, uri, Login.httpPublisher);
+        review(collection.id, uri, Login.httpPublisher); // Review
 
         // When
         // we call review on the content
-        int responseCode = review(collection.name, uri, Login.httpPublisher);
+        int responseCode = review(collection.id, uri, Login.httpPublisher);
 
         // Then
         // We get a bad request error code

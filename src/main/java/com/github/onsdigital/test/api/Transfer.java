@@ -36,15 +36,15 @@ public class Transfer {
 
         // When
         // we transfer that item
-        Response<String> response = transfer(collection_1.name, collection_2.name, fileUri, Login.httpPublisher);
+        Response<String> response = transfer(collection_1.id, collection_2.id, fileUri, Login.httpPublisher);
 
         // Then
         // We expect a response of OK
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // + the file has moved
-        collection_1 = Collection.get(collection_1.name, Login.httpPublisher).body;
-        collection_2 = Collection.get(collection_2.name, Login.httpPublisher).body;
+        collection_1 = Collection.get(collection_1.id, Login.httpPublisher).body;
+        collection_2 = Collection.get(collection_2.id, Login.httpPublisher).body;
         assertFalse(collection_1.inProgressUris.contains(fileUri));
         assertTrue(collection_2.inProgressUris.contains(fileUri));
     }

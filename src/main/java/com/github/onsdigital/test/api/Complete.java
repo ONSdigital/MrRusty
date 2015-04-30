@@ -31,14 +31,14 @@ public class Complete {
         String filename = collection.inProgressUris.get(0);
 
         // When - we call complete on the content
-        Response<String> complete = complete(collection.name, filename, Login.httpPublisher);
+        Response<String> complete = complete(collection.id, filename, Login.httpPublisher);
 
         // Then
         // We get the expected response code
         // and the content is listed under complete when we get the collection.
         assertEquals(HttpStatus.OK_200, complete.statusLine.getStatusCode());
 
-        CollectionDescription updatedCollection = Collection.get(collection.name, Login.httpPublisher).body;
+        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertTrue(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));
     }
@@ -56,9 +56,9 @@ public class Complete {
 
         // When
         // We call complete on the content
-        Response<String> complete1 = complete(collection.name, collection.inProgressUris.get(0), Login.httpAdministrator);
-        Response<String> complete2 = complete(collection.name, collection.inProgressUris.get(1), Login.httpViewer);
-        Response<String> complete3 = complete(collection.name, collection.inProgressUris.get(2), Login.httpScallywag);
+        Response<String> complete1 = complete(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
+        Response<String> complete2 = complete(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
+        Response<String> complete3 = complete(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then
         // We expect unauthorised responses
@@ -66,7 +66,7 @@ public class Complete {
         assertEquals(HttpStatus.UNAUTHORIZED_401, complete2.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, complete3.statusLine.getStatusCode());
 
-        CollectionDescription updatedCollection = Collection.get(collection.name, Login.httpPublisher).body;
+        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(0)));
         assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(1)));
         assertFalse(updatedCollection.completeUris.contains(collection.inProgressUris.get(2)));
@@ -88,7 +88,7 @@ public class Complete {
         String filename = "/shouldReturn404/" + Random.id() + ".json";
 
         // When - we call complete on the content
-        Response<String> complete = complete(collection.name, filename, Login.httpPublisher);
+        Response<String> complete = complete(collection.id, filename, Login.httpPublisher);
 
         // Then - we should be rejected with a Not Found response code
         assertEquals(HttpStatus.NOT_FOUND_404, complete.statusLine.getStatusCode());
@@ -107,7 +107,7 @@ public class Complete {
 
         // When
         // we call complete on the directory not the file
-        Response<String> complete = complete(collection.name, directory, Login.httpPublisher);
+        Response<String> complete = complete(collection.id, directory, Login.httpPublisher);
 
         // Then
         // we expect a Bad Request response code
@@ -124,11 +124,11 @@ public class Complete {
         // a collection with content that is set to complete.
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
         String fileUri = collection.inProgressUris.get(0);
-        complete(collection.name, fileUri, Login.httpPublisher);
+        complete(collection.id, fileUri, Login.httpPublisher);
 
         // When
         // we call complete on the content
-        Response<String> complete = complete(collection.name, fileUri, Login.httpPublisher);
+        Response<String> complete = complete(collection.id, fileUri, Login.httpPublisher);
 
         // Then
         // We get the expected response code

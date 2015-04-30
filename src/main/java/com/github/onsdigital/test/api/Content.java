@@ -42,11 +42,11 @@ public class Content {
         // When - we create content
         String content = "{name:foo}";
         String uri = Random.id() + ".json";
-        create(collection.name, content, uri, Login.httpPublisher);
+        create(collection.id, content, uri, Login.httpPublisher);
 
         // Then
         // When we retrieve content we expect a 200 status and identical content
-        Response<Path> response = get(collection.name, uri, Login.httpPublisher);
+        Response<Path> response = get(collection.id, uri, Login.httpPublisher);
 
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode()); // check status
         assertEquals(content, Serialiser.deserialise(getBody(response), String.class)); // check the content
@@ -63,7 +63,7 @@ public class Content {
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
         // When - content is added with no file url
-        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.name);
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.id);
         Response<String> createResponse = Login.httpPublisher.post(contentEndpoint, "", String.class);
 
         // Then - a 400 response code is returned
@@ -76,19 +76,16 @@ public class Content {
     @POST
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
-        CollectionDescription collection1 = Collection.createCollectionDescription();
-        Collection.post(collection1, Login.httpPublisher);
-        CollectionDescription collection2 = Collection.createCollectionDescription();
-        Collection.post(collection2, Login.httpPublisher);
-
+        CollectionDescription collection1 = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        Response<String> response1 = create(collection1.name, "content", fileURI, Login.httpPublisher);
+        Response<String> response1 = create(collection1.id, "content", fileURI, Login.httpPublisher);
         assertEquals(HttpStatus.OK_200, response1.statusLine.getStatusCode());
 
         // we can't create it in another collection
-        Response<String> response = create(collection2.name, "content", fileURI, Login.httpPublisher);
+        Response<String> response = create(collection2.id, "content", fileURI, Login.httpPublisher);
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
@@ -100,15 +97,14 @@ public class Content {
     public void shouldUpdateContent() throws IOException {
         // Given
         // A file created in a collection
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
         String fileUri = Random.id() + ".json";
-        create(collection.name, "content", fileUri, Login.httpPublisher);
+        create(collection.id, "content", fileUri, Login.httpPublisher);
 
         // When
         // We overwrite it's content and retrieve the file contents
-        create(collection.name, "new content", fileUri, Login.httpPublisher);
-        Response<Path> pathResponse = get(collection.name, fileUri, Login.httpPublisher);
+        create(collection.id, "new content", fileUri, Login.httpPublisher);
+        Response<Path> pathResponse = get(collection.id, fileUri, Login.httpPublisher);
 
         // We expect
         // The content should be the overwritten version
@@ -125,19 +121,18 @@ public class Content {
         // Given
         // A file, a taxonomy node, and a collection
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection = Collection.createCollectionDescription();
-        Collection.post(collection, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
         // When
         // We attempt to upload the file to the taxonomy
-        upload(collection.name, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.id, taxonomyNode + filename, file, Login.httpPublisher);
 
         // Then
         // The file should be where we expect it to be and exist
-        Response<Path> response = download(collection.name, taxonomyNode + filename, Login.httpPublisher);
+        Response<Path> response = download(collection.id, taxonomyNode + filename, Login.httpPublisher);
         assertNotNull(response.body);
         assertTrue(Files.size(response.body) > 0);
     }
@@ -156,15 +151,15 @@ public class Content {
         File file = new File("src/main/resources/snail.jpg");
         String uri = "economy/regionalaccounts/" + Random.id() + ".jpg";
 
-        upload(collection.name, uri, file, Login.httpPublisher);
+        upload(collection.id, uri, file, Login.httpPublisher);
 
         // When
         // We attempt to delete the file from the taxonomy
-        delete(collection.name, uri, Login.httpPublisher);
+        delete(collection.id, uri, Login.httpPublisher);
 
         // Then
         //... the file should not exist
-        Response<Path> response = download(collection.name, uri, Login.httpPublisher);
+        Response<Path> response = download(collection.id, uri, Login.httpPublisher);
         assertNull(response);
     }
 
@@ -181,20 +176,20 @@ public class Content {
         CollectionDescription collection = OneLineSetups.publishedCollection();
         String directory = "economy/regionalaccounts/";
         String jsonUri = directory + Random.id() + ".json";
-        Content.create(collection.name, "thisisContent", jsonUri, Login.httpPublisher);
+        Content.create(collection.id, "thisisContent", jsonUri, Login.httpPublisher);
 
         File file = new File("src/main/resources/snail.jpg");
         String jpgUri = "economy/regionalaccounts/" + Random.id() + ".jpg";
-        upload(collection.name, jpgUri, file, Login.httpPublisher);
+        upload(collection.id, jpgUri, file, Login.httpPublisher);
 
         // When we attempt to delete the directory
-        delete(collection.name, directory, Login.httpPublisher);
+        delete(collection.id, directory, Login.httpPublisher);
 
         // Then the files should not exist
-        Response<Path> jsonResponse = download(collection.name, jsonUri, Login.httpPublisher);
+        Response<Path> jsonResponse = download(collection.id, jsonUri, Login.httpPublisher);
         assertNull(jsonResponse);
 
-        Response<Path> jpgResponse = download(collection.name, jpgUri, Login.httpPublisher);
+        Response<Path> jpgResponse = download(collection.id, jpgUri, Login.httpPublisher);
         assertNull(jpgResponse);
     }
 
@@ -212,11 +207,11 @@ public class Content {
 
         // When
         // We delete the file from the taxonomy
-        delete(collection.name, uri, Login.httpPublisher);
+        delete(collection.id, uri, Login.httpPublisher);
 
         // Then
         //... the file should not appear in the collection GET method
-        Response<CollectionDescription> response = Collection.get(collection.name, Login.httpPublisher);
+        Response<CollectionDescription> response = Collection.get(collection.id, Login.httpPublisher);
         assertEquals(0, response.body.inProgressUris.size());
     }
 
@@ -233,20 +228,19 @@ public class Content {
         // Given
         // A specific collection for this test and a genuine website page
         //
-        String name = "Rusty_shouldNotReturnDeletedVersionOfExistingWebsiteFile";
-        CollectionDescription collection = OneLineSetups.emptyCollectionWithName(name);
+        CollectionDescription collection = OneLineSetups.publishedCollection();
 
         String taxonomyNode = "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49/";
-        String initialData = getBody(get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
+        String initialData = getBody(get(collection.id, taxonomyNode + "data.json", Login.httpPublisher));
 
         // When
         // We create a new page and then delete it
-        create(collection.name, "{'data': 'Dummy data'}", taxonomyNode + "data.json", Login.httpPublisher);
-        delete(collection.name, taxonomyNode + "data.json", Login.httpPublisher);
+        create(collection.id, "{'data': 'Dummy data'}", taxonomyNode + "data.json", Login.httpPublisher);
+        delete(collection.id, taxonomyNode + "data.json", Login.httpPublisher);
 
         // Then
         // the original file should be returned by Content GET
-        String response = getBody(get(collection.name, taxonomyNode + "data.json", Login.httpPublisher));
+        String response = getBody(get(collection.id, taxonomyNode + "data.json", Login.httpPublisher));
         assertEquals(initialData, response);
     }
 

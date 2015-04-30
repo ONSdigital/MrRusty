@@ -28,9 +28,17 @@ public class LoginPage extends FlorencePage {
      */
     protected LoginPage initialisePage() {
 
+        super.initialisePage();
+
+        // if we cannot find the login form, logout
+        try {
+            usernameInput = find(usernameLocator);
+        } catch (NoSuchElementException exception) {
+            logout();
+        }
 
         try {
-            super.initialisePage();
+
             usernameInput = waitAndFind(usernameLocator);
             passwordInput = find(passwordLocator);
             loginButton = find(loginButtonLocator);
@@ -46,8 +54,8 @@ public class LoginPage extends FlorencePage {
      * @param password
      */
     public CollectionsPage login(String username, String password) {
-        typeUsername(username);
-        typePassword(password);
+        //typeUsername(username);
+        //typePassword(password);
         return clickLogin();
     }
 

@@ -35,7 +35,7 @@ public class Browse {
 
         // When
         // we call browse
-        Response<DirectoryListing> getResponse = browse(collection.name, Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, Login.httpPublisher);
 
         // Expect
         // a correct call
@@ -74,7 +74,7 @@ public class Browse {
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = browse(collection.name, "/invalidUri", Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, "/invalidUri", Login.httpPublisher);
 
         // Expect
         // response of {@link HttpStatus#NOT_FOUND_404}
@@ -95,7 +95,7 @@ public class Browse {
 
         // When
         // we try to browse for a file not the directory
-        Response<DirectoryListing> getResponse = browse(collection.name, uri, Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, uri, Login.httpPublisher);
 
         // Then
         // we expect a bad request response
@@ -116,7 +116,7 @@ public class Browse {
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse =  browse(collection.name, Login.httpAdministrator);
+        Response<DirectoryListing> getResponse =  browse(collection.id, Login.httpAdministrator);
 
         // Expect
         // a correct call

@@ -41,7 +41,7 @@ public class Approve {
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.name, http);
+        Response<String> response = approve(collection.id, http);
 
         // Expect
         // a response of okay
@@ -62,12 +62,12 @@ public class Approve {
 
         // When
         // we approve it using admin credentials and get an okay
-        Response<String> response = approve(collection.name, http);
+        Response<String> response = approve(collection.id, http);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Expect
         // the collection is now approved
-        CollectionDescription collectionDescription = Collection.get(collection.name, http).body;
+        CollectionDescription collectionDescription = Collection.get(collection.id, http).body;
         assertEquals(true, collectionDescription.approvedStatus);
     }
 
@@ -85,7 +85,7 @@ public class Approve {
         // When
         // we approve it without credentials
         Http httpNoCredentials = Sessions.get("noCredentials");
-        Response<String> response = approve(collection.name, httpNoCredentials);
+        Response<String> response = approve(collection.id, httpNoCredentials);
 
         // Expect
         // a response of forbidden
@@ -107,9 +107,9 @@ public class Approve {
 
         // When
         //...we approve it with non publisher credentials
-        Response<String> responseScallywag = approve(collection1.name, Login.httpScallywag);
-        Response<String> responseAdministrator = approve(collection2.name, Login.httpAdministrator);
-        Response<String> responseViewer = approve(collection3.name, Login.httpViewer);
+        Response<String> responseScallywag = approve(collection1.id, Login.httpScallywag);
+        Response<String> responseAdministrator = approve(collection2.id, Login.httpAdministrator);
+        Response<String> responseViewer = approve(collection3.id, Login.httpViewer);
 
         // Then
         // approve should fail and return Unauthorised
@@ -151,7 +151,7 @@ public class Approve {
 
         // When
         // we try to approve it using appropriate credentials
-        Response<String> response = approve(collection.name, Login.httpPublisher);
+        Response<String> response = approve(collection.id, Login.httpPublisher);
 
         // We expect
         // the resource is in progress so the collection will not be approved

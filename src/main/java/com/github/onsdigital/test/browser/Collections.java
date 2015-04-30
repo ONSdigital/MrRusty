@@ -13,15 +13,21 @@ import java.io.IOException;
 @DependsOn({Login.class})
 public class Collections {
 
-    Credentials publisher = SetupBeforeTesting.scallywagCredentials;
+    Credentials publisher = SetupBeforeTesting.publisherCredentials;
 
 
     @POST
     @Test
     public void shouldAddNewCollection() throws IOException {
 
+        // Given the collections page after logging in
         CollectionsPage collectionsPage = new LoginPage().login(publisher.email, publisher.password);
+        collectionsPage.populateFormWithDefaults();
+        collectionsPage.clickCreateCollection();
 
+        // When the create collection form is filled in and submitted.
+
+        // Then the collection is created and
 
     }
 }
