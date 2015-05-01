@@ -120,7 +120,8 @@ public class Permissions {
 
         // When
         // admin revokes permissions
-        Response<String> response = postPermission(permission(user.email, null, Boolean.FALSE), Login.httpAdministrator);
+        PermissionDefinition permission = permission(user.email, null, Boolean.FALSE);
+        Response<String> response = postPermission(permission, Login.httpAdministrator);
 
         // Expect
         // a response of 200 - success and they have admin permissions
