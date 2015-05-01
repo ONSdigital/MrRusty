@@ -172,11 +172,10 @@ public class Review {
         String uri = collection.inProgressUris.get(0);
 
         Complete.complete(collection.id, uri, Login.httpPublisher);
-        review(collection.id, uri, Login.httpPublisher); // Review
+        review(collection.id, uri, Login.httpSecondSetOfEyes); // Review
 
         // When
         // we call review on the content
-
         Response<String> response = review(collection.id, uri, Login.httpPublisher);
 
         // Then
