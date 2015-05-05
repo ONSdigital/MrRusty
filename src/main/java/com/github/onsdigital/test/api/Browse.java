@@ -43,12 +43,12 @@ public class Browse {
     }
 
     /**
-     * Expect {@link HttpStatus#NOT_FOUND_404} if no collection is specified
+     * Expect {@link HttpStatus#BAD_REQUEST_400} if no collection is specified
      *
      */
     @GET
     @Test
-    public void shouldReturn404IfNoPathSpecified() throws IOException {
+    public void shouldReturn400IfNoCollectionsSpecified() throws IOException {
         // Given
         // n/a
 
@@ -58,7 +58,7 @@ public class Browse {
 
         // Expect
         // Response of {@link HttpStatus#NOT_FOUND_404}
-        assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.NOT_FOUND_404);
+        assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
     }
 
     /**

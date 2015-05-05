@@ -107,7 +107,7 @@ public class Login {
         assertTrue(StringUtils.isNotBlank(response.body));
 
         // ----------------------- Setup second set of eyes
-        credentials = SetupBeforeTesting.publisherCredentials;
+        credentials = SetupBeforeTesting.secondSetOfEyesCredentials;
         tokenSecondSetOfEyes = httpAdministrator.post(ZebedeeHost.login, credentials, String.class).body;
     }
 

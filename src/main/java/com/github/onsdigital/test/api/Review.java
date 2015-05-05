@@ -176,7 +176,7 @@ public class Review {
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.id, uri, Login.httpPublisher);
+        Response<String> response = review(collection.id, uri, Login.httpSecondSetOfEyes);
 
         // Then
         // We get a bad request error code
