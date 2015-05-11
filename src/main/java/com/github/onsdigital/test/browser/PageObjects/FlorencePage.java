@@ -71,4 +71,9 @@ public class FlorencePage extends PageObject {
         }
         return this;
     }
+
+    public CollectionsPage clickCollectionsMenuLink() {
+        this.collectionsMenuLink.click();
+        return new CollectionsPage(driver);
+    }
 }

@@ -55,6 +55,16 @@ public class CollectionsPage extends FlorencePage {
     }
 
     /**
+     * Helper method to compose populating the form and submitting
+     * @param name
+     * @return
+     */
+    public BrowsePage createCollection(String name) {
+        populateFormWithDefaults(name);
+        return clickCreateCollection();
+    }
+
+    /**
      * Populate all fields to create a collection with defaults and a random name.
      *
      * @return
@@ -180,8 +190,13 @@ public class CollectionsPage extends FlorencePage {
      * Click the create collection button on the create collection form.
      * @return
      */
-    public CollectionsPage clickCreateCollection() {
+    public CollectionsPage clickCreateCollectionExpectingError() {
         createCollectionButton.click();
         return this;
+    }
+
+    public BrowsePage clickCreateCollection() {
+        createCollectionButton.click();
+        return new BrowsePage(driver);
     }
 }

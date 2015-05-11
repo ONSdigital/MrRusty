@@ -2,10 +2,7 @@ package com.github.onsdigital.selenium;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -43,6 +40,29 @@ public class PageObject {
             System.out.println(driver.getPageSource());
             throw timeoutException;
         }
+    }
+
+    /**
+     * Helper method for waiting for an element to be present before finding.
+     * @param selector
+     * @return
+     */
+    public WebElement waitForVisibleAndFind(By selector) {
+        try {
+            return (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(selector)));
+        } catch (TimeoutException timeoutException) {
+            System.out.println(driver.getPageSource());
+            throw timeoutException;
+        }
+    }
+
+    /**
+     * Scroll to the given element selector.
+     * @return
+     */
+    public void scrollTo(String selector) {
+        String js = "$('" + selector + "')[0].scrollIntoView()";
+        ((JavascriptExecutor)driver).executeScript(js);
     }
 
     protected void openIfNecessary(String url) {
