@@ -35,7 +35,7 @@ public class DataServices {
      */
     @POST
     @Test
-    public void shouldUploadFile() throws IOException {
+    public void shouldUploadChartToCSV() throws IOException {
 
         // Given
         // A chart file
@@ -44,6 +44,28 @@ public class DataServices {
         // When
         // We attempt to upload the file and download
         Response<Path> response = upload(file, "chart", "csv");
+
+
+        // Then
+        // A filepath to a temporary file should be returned
+        assertNotNull(response.body);
+        assertTrue(Files.size(response.body) > 0);
+    }
+
+    /**
+     * Test basic functionality for a ChartObject file
+     */
+    @POST
+    @Test
+    public void shouldUploadChartToXLSX() throws IOException {
+
+        // Given
+        // A chart file
+        File file = new File("src/main/resources/dummy_chart.json");
+
+        // When
+        // We attempt to upload the file and download
+        Response<Path> response = upload(file, "chart", "xlsx");
 
 
         // Then
