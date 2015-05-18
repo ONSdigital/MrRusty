@@ -228,6 +228,54 @@ public class Http implements AutoCloseable {
     }
 
     /**
+     * Sends a POST request with a file and returns the response.
+     *
+     * @param endpoint      The endpoint to send the request to.
+     * @param file          The file to upload
+     * @param responseClass The class to deserialise the Json response to. Can be null if no response message is expected.
+     * @param <T>           The type to deserialise the response to.
+     * @return A {@link Response} containing the deserialised body, if any.
+     * @throws IOException If an error occurs.
+     * @see MultipartEntityBuilder
+     */
+    public Response<Path> postAndReturn(Endpoint endpoint, Object requestMessage, NameValuePair... headers) throws IOException {
+        Path tempFile = null;
+
+        if (requestMessage == null) {
+            return null;
+        } // deal with null case
+
+        // Create the request
+        HttpPost post = new HttpPost(endpoint.url());
+        post.setHeaders(combineHeaders(headers));
+
+        // Add the request message if there is one
+        post.setEntity(serialiseRequestMessage(requestMessage));
+
+       // Send the request and process the response
+        try (CloseableHttpResponse response = httpClient().execute(post)) {
+
+            if (response.getStatusLine().getStatusCode() != HttpStatus.OK_200) {
+                return null;
+            } // If bad response return null
+
+            // Request the content
+            HttpEntity entity = response.getEntity();
+
+            // Download the content to a temporary file
+            if (entity != null) {
+                tempFile = Files.createTempFile("download", "file");
+                try (InputStream input = entity.getContent();
+                     OutputStream output = Files.newOutputStream(tempFile)) {
+                    IOUtils.copy(input, output);
+                }
+            }
+
+            return new Response<>(response.getStatusLine(), tempFile);
+        }
+    }
+
+    /**
      * Sends a POST request and returns the response.
      *
      * @param endpoint       The endpoint to send the request to.
