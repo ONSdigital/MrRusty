@@ -24,7 +24,7 @@ public class Browse {
     /**
      * Test basic functionality
      *
-     * TODO Update with permissions
+     *
      */
     @GET
     @Test
@@ -48,7 +48,7 @@ public class Browse {
      */
     @GET
     @Test
-    public void shouldReturn400IfNoCollectionsSpecified() throws IOException {
+    public void shouldReturnBadRequestIfNoPathSpecified() throws IOException {
         // Given
         // n/a
 
@@ -57,8 +57,8 @@ public class Browse {
         Response<DirectoryListing> getResponse = Login.httpPublisher.get(ZebedeeHost.browse, DirectoryListing.class);
 
         // Expect
-        // Response of {@link HttpStatus#NOT_FOUND_404}
-        assertEquals(getResponse.statusLine.getStatusCode(), HttpStatus.BAD_REQUEST_400);
+        // Response of {@link HttpStatus#BAD_REQUEST_400}
+        assertEquals(HttpStatus.BAD_REQUEST_400, getResponse.statusLine.getStatusCode());
     }
 
     /**

@@ -110,10 +110,10 @@ public class Review {
         // Given - a collection + a random file name
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
-        String filename = "/shouldReturnNotFoundIfNoSuchFile/" + Random.id() + ".json";
+        String filename = Random.id() + ".json";
 
         // When - we call review on the content
-        Response<String> response = review(collection.id, filename, Login.httpPublisher);
+        Response<String> response = review(collection.name, filename, Login.httpSecondSetOfEyes);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
@@ -132,7 +132,7 @@ public class Review {
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
+        Response<String> response = review(collection.id, collection.inProgressUris.get(0), Login.httpSecondSetOfEyes);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
@@ -152,7 +152,7 @@ public class Review {
 
         // When
         // we call review on the directory alone
-        Response<String> response = review(collection.id, "/directory/", Login.httpPublisher);
+        Response<String> response = review(collection.id, "/directory/", Login.httpSecondSetOfEyes);
 
 
         // Then
@@ -175,8 +175,8 @@ public class Review {
         review(collection.id, uri, Login.httpSecondSetOfEyes); // Review
 
         // When
-        // we call review on the content
-        Response<String> response = review(collection.id, uri, Login.httpSecondSetOfEyes);
+        // we call review on the content again
+        Response<String> response = review(collection.id, uri, Login.httpThirdSetOfEyes);
 
         // Then
         // We get a bad request error code

@@ -31,6 +31,9 @@ public class SetupBeforeTesting implements Setup {
     public static User secondSetOfEyesUser = user("Myfanwy Morgan", "mm@magicroundabout.ons.gov.uk");
     public static Credentials secondSetOfEyesCredentials = credentials(secondSetOfEyesUser.email, Random.password(8));
 
+    public static User thirdSetOfEyesUser = user("Dai Griffiths", "dg@magicroundabout.ons.gov.uk");
+    public static Credentials thirdSetOfEyesCredentials = credentials(thirdSetOfEyesUser.email, Random.password(8));
+
     public static User contentOwnerUser = user("Stacy To", "statto@magicroundabout.ons.gov.uk");
     public static Credentials contentOwnerCredentials = credentials(contentOwnerUser.email, Random.password(8));
 
@@ -76,6 +79,12 @@ public class SetupBeforeTesting implements Setup {
             checkOk(secondSetOfEyes, "Unable to create publisher user " + secondSetOfEyesUser);
         }
 
+        // Second set of eyes
+        Response<User> thirdSetOfEyes = systemSession.post(ZebedeeHost.users, thirdSetOfEyesUser, User.class);
+        if (admin.statusLine.getStatusCode() != 409) {
+            checkOk(secondSetOfEyes, "Unable to create publisher user " + thirdSetOfEyesUser);
+        }
+
         // Content Owner
         Response<User> contentOwner = systemSession.post(ZebedeeHost.users, contentOwnerUser, User.class);
         if (admin.statusLine.getStatusCode() != 409) {
@@ -106,6 +115,10 @@ public class SetupBeforeTesting implements Setup {
         Response<String> secondSetOfEyes = systemSession.post(ZebedeeHost.password, secondSetOfEyesCredentials, String.class);
         checkOk(secondSetOfEyes, "Unable to set password for publisher user.");
 
+        // Publisher
+        Response<String> thirdSetOfEyes = systemSession.post(ZebedeeHost.password, thirdSetOfEyesCredentials, String.class);
+        checkOk(thirdSetOfEyes, "Unable to set password for publisher user.");
+
         // Content Owner
         Response<String> contentOwner = systemSession.post(ZebedeeHost.password, contentOwnerCredentials, String.class);
         checkOk(contentOwner, "Unable to set password for content owner user.");
@@ -131,6 +144,11 @@ public class SetupBeforeTesting implements Setup {
         PermissionDefinition secondSetOfEyesPermissionDefinition = permission(secondSetOfEyesUser, false, true);
         Response<String> secondSetOfEyesPermission = systemSession.post(ZebedeeHost.permission, secondSetOfEyesPermissionDefinition, String.class);
         checkOk(secondSetOfEyesPermission, "Unable to set editor permission for " + secondSetOfEyesUser);
+
+        // Second set of eyes
+        PermissionDefinition thirdSetOfEyesPermissionDefinition = permission(thirdSetOfEyesUser, false, true);
+        Response<String> thirdSetOfEyesPermission = systemSession.post(ZebedeeHost.permission, thirdSetOfEyesPermissionDefinition, String.class);
+        checkOk(thirdSetOfEyesPermission, "Unable to set editor permission for " + thirdSetOfEyesUser);
 
         // Content Owner
 
