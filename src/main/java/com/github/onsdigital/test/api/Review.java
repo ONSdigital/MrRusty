@@ -31,14 +31,11 @@ public class Review {
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
         String filename = collection.inProgressUris.get(0);
 
-
-        Http httpPublisherAlice = OneLineSetups.newSessionWithPublisherPermissions();
-        Response<String> complete = Complete.complete(collection.id, filename, httpPublisherAlice);
+        Response<String> complete = Complete.complete(collection.id, filename, Login.httpPublisher);
 
         // When
         // publisher Bob calls review on the content
-        Http httpPublisherBob = OneLineSetups.newSessionWithPublisherPermissions();
-        Response<String> response = review(collection.id, filename, httpPublisherBob);
+        Response<String> response = review(collection.id, filename, Login.httpSecondSetOfEyes);
 
         // Then
         // We get the okay response code
@@ -116,7 +113,7 @@ public class Review {
         String filename = "/shouldReturnNotFoundIfNoSuchFile/" + Random.id() + ".json";
 
         // When - we call review on the content
-        Response<String> response = review(collection.name, filename, Login.httpPublisher);
+        Response<String> response = review(collection.id, filename, Login.httpPublisher);
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
