@@ -4,6 +4,7 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,7 @@ import static org.junit.Assert.*;
  * for initially logging in as the system owner.
  */
 @Api
-//@DependsOn({})
+@DependsOn({})
 public class Login {
 
     public static Http httpAdministrator;
