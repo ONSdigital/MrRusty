@@ -7,7 +7,7 @@ import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.CreatePage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
-import com.github.onsdigital.test.browser.PageObjects.PageType;
+import com.github.onsdigital.test.browser.PageObjects.PageTypes;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class Create {
                 .clickPreviewNavigationLink("/economy/nationalaccounts")
                 .clickCreate();
 
-        createPage.selectPageType(PageType.article)
+        createPage.selectPageType(PageTypes.article)
             .typePageName(Random.id().substring(0, 5));
 
 

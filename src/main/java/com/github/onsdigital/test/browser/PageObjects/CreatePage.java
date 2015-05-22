@@ -52,7 +52,7 @@ public class CreatePage extends WorkspacePage {
      * @param type
      * @return
      */
-    public CreatePage selectPageType(PageType type) {
+    public CreatePage selectPageType(PageTypes type) {
         pageTypeSelect.selectByValue(type.toString());
         return this;
     }
