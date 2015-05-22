@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.browser.PageObjects.BrowsePage;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
@@ -11,7 +12,7 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-//@DependsOn({Login.class})
+@DependsOn({Login.class})
 public class Collections {
 
     Credentials publisher = SetupBeforeTesting.publisherCredentials;
