@@ -139,20 +139,17 @@ public class Collection {
     }
     /**
      * Admins should return {@link HttpStatus#UNAUTHORIZED_401}
-     *
-     * TODO implement once we have mapping from user to collection access
-     *
      */
     @GET
-//    @Test
-    public void shouldReturn401WithAdminPermissions() throws IOException {
+    @Test
+    public void getCollectionShouldReturn401WithAdminPermissions() throws IOException {
         // Given
         // a collection
         CollectionDescription collection = createCollectionDescription();
-        post(collection, Login.httpPublisher);
+        collection = post(collection, Login.httpPublisher).body;
 
         // When
-        // we attempt to retrieve it as an admin
+        // we attempt to retrieve it as an adminLogin.httpAdministrator
         Response<CollectionDescription> response = get(collection.id, Login.httpAdministrator);
 
         // We expect
