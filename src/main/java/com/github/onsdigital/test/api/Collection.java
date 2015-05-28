@@ -65,7 +65,7 @@ public class Collection {
      */
     @POST
     @Test
-    public void shouldReturn400IfNoNameSpecifiedForCreateCollection() throws IOException {
+    public void postShouldReturn400IfNoNameSpecifiedForCreateCollection() throws IOException {
         // Given
         // an incomplete collection description
         CollectionDescription anon = new CollectionDescription();
@@ -84,7 +84,7 @@ public class Collection {
      */
     @POST
     @Test
-    public void shouldReturn409IfCollectionNameAlreadyExists() throws IOException {
+    public void postShouldReturn409IfCollectionNameAlreadyExists() throws IOException {
 
         // Given
         // an existing collection
@@ -105,7 +105,7 @@ public class Collection {
      */
     @POST
     @Test
-    public void shouldReturn401WithoutPublisherPermissions() throws IOException {
+    public void postShouldReturn401WithoutPublisherPermissions() throws IOException {
 
         // Given
         // a collection description
@@ -129,7 +129,7 @@ public class Collection {
      */
     @GET
     @Test
-    public void shouldReturn200ForViewerWithPermissions() throws IOException {
+    public void getShouldReturn200ForViewerWithPermissions() throws IOException {
         // Given
         // a collection
         CollectionDescription collection = createCollectionDescription();
@@ -149,7 +149,7 @@ public class Collection {
      */
     @GET
     @Test
-    public void getCollectionShouldReturn401WithAdminPermissions() throws IOException {
+    public void getShouldReturn401WithAdminPermissions() throws IOException {
         // Given
         // a collection
         CollectionDescription collection = createCollectionDescription();
@@ -233,6 +233,5 @@ public class Collection {
     public static Response<CollectionDescription> get(String id, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(id);
         return http.get(idUrl, CollectionDescription.class);
-
     }
 }
