@@ -38,9 +38,8 @@ public class Collection {
 
     /**
      * Test basic functionality
-     *
+     * <p/>
      * Create with publisher permissions should return {@link HttpStatus#OK_200}
-     *
      */
     @POST
     @Test
@@ -63,7 +62,6 @@ public class Collection {
 
     /**
      * Creating an unnamed collection should return {@link HttpStatus#BAD_REQUEST_400}
-     *
      */
     @POST
     @Test
@@ -80,6 +78,7 @@ public class Collection {
         // a response of 400 - Bad request
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
+
     /**
      * written
      */
@@ -103,7 +102,6 @@ public class Collection {
 
     /**
      * Create without publisher permissions should return {@link HttpStatus#UNAUTHORIZED_401}
-     *
      */
     @POST
     @Test
@@ -128,15 +126,24 @@ public class Collection {
 
     /**
      * Viewer permissions should return {@link HttpStatus#OK_200} for any permitted collection, {@link HttpStatus#UNAUTHORIZED_401} otherwise
-     *
-     * TODO implement once we have mapping from user to collection access
-     *
      */
     @GET
     @Test
-    public void shouldReturn200ForViewerWithPermissionsOtherwise401() throws IOException {
+    public void shouldReturn200ForViewerWithPermissions() throws IOException {
+        // Given
+        // a collection
+        CollectionDescription collection = createCollectionDescription();
+        collection = post(collection, Login.httpPublisher).body;
 
+        // When
+        // we attempt to retrieve it as an publisher
+        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
+
+        // We expect
+        // a response of 200
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
     }
+
     /**
      * Admins should return {@link HttpStatus#UNAUTHORIZED_401}
      */
@@ -149,7 +156,7 @@ public class Collection {
         collection = post(collection, Login.httpPublisher).body;
 
         // When
-        // we attempt to retrieve it as an adminLogin.httpAdministrator
+        // we attempt to retrieve it as an administrator
         Response<CollectionDescription> response = get(collection.id, Login.httpAdministrator);
 
         // We expect
@@ -159,7 +166,6 @@ public class Collection {
 
     /**
      * Publisher permissions should return {@link HttpStatus#OK_200} for any collection
-     *
      */
     @DELETE
     @Test
@@ -180,7 +186,6 @@ public class Collection {
 
     /**
      * All other permissions should return {@link HttpStatus#UNAUTHORIZED_401} for any collection
-     *
      */
     @DELETE
     @Test
