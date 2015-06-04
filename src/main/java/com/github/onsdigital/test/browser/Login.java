@@ -84,6 +84,6 @@ public class Login {
 
         // When We logout
         // Then we are shown the login page.
-        page.logout();
+        page.clickLogoutMenuLink();
     }
 }

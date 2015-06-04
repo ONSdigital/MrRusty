@@ -46,7 +46,7 @@ public class FlorencePage extends PageObject {
      * it is always present in the page.
      * @return
      */
-    public LoginPage logout()
+    public LoginPage clickLogoutMenuLink()
     {
         try {
             WebElement logoutMenuLink = waitAndFind(logoutLocator);

@@ -43,7 +43,7 @@ public class WorkspacePage extends FlorencePage {
 
             checkForPreviewDisclaimer();
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the workspace page contents.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -54,7 +54,7 @@ public class WorkspacePage extends FlorencePage {
      *
      * @return
      */
-    public CreatePage clickCreate() {
+    public CreatePage clickCreateMenuItem() {
         createButton.click();
         return new CreatePage(driver);
     }
@@ -64,7 +64,7 @@ public class WorkspacePage extends FlorencePage {
      *
      * @return
      */
-    public EditPage clickEdit() {
+    public EditPage clickEditMenuItem() {
         editButton.click();
         return new EditPage(driver);
     }

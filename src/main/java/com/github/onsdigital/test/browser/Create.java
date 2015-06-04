@@ -4,10 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.Collection;
-import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
-import com.github.onsdigital.test.browser.PageObjects.CreatePage;
-import com.github.onsdigital.test.browser.PageObjects.LoginPage;
-import com.github.onsdigital.test.browser.PageObjects.PageTypes;
+import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.zebedee.json.Credentials;
 import org.junit.Test;
 
@@ -27,13 +24,14 @@ public class Create {
         CollectionsPage collectionsPage = new LoginPage().login(publisher.email, publisher.password);
 
         CreatePage createPage = collectionsPage.createCollection(collectionName)
-                .clickPreviewNavigationLink("/economy")
-                .clickPreviewNavigationLink("/economy/nationalaccounts")
-                .clickCreate();
+                .clickBrowseTreeItem("/")
+                .clickBrowseTreeItem("/economy")
+                .clickBrowseTreeItem("/economy/nationalaccounts")
+                .clickCreateMenuItem();
 
-        createPage.selectPageType(PageTypes.article)
-            .typePageName(Random.id().substring(0, 5));
-
+        EditPage editPage = createPage.selectPageType(ContentType.article)
+                .typePageName(Random.id().substring(0, 5))
+                .clickCreatePage();
 
         System.out.println(createPage.previewSource());
 

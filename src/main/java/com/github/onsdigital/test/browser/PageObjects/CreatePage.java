@@ -12,7 +12,7 @@ public class CreatePage extends WorkspacePage {
     By locationInputLocator = By.id("location");
     By pageTypeSelectLocator = By.id("pagetype");
     By pageNameInputLocator = By.id("pagename");
-    By createButtonLocator = By.id(".btn-edit-save");
+    By createButtonLocator = By.className("btn-page-create");
 
     WebElement locationInput;
     Select pageTypeSelect;
@@ -31,7 +31,7 @@ public class CreatePage extends WorkspacePage {
             createButton = find(createButtonLocator);
 
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the create page contents.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -49,16 +49,18 @@ public class CreatePage extends WorkspacePage {
 
     /**
      * Select the page type on the create page.
+     *
      * @param type
      * @return
      */
-    public CreatePage selectPageType(PageTypes type) {
+    public CreatePage selectPageType(ContentType type) {
         pageTypeSelect.selectByValue(type.toString());
         return this;
     }
 
     /**
      * Type the location where this page will be created.
+     *
      * @param location
      * @return
      */
@@ -70,6 +72,7 @@ public class CreatePage extends WorkspacePage {
 
     /**
      * Type the name for the page.
+     *
      * @param name
      * @return
      */
@@ -79,8 +82,24 @@ public class CreatePage extends WorkspacePage {
         return this;
     }
 
-    public EditPage ClickCreate() {
+    /**
+     * Click the create button on the create page form.
+     * @return
+     */
+    public EditPage clickCreatePage() {
         createButton.click();
         return new EditPage(driver);
+    }
+
+    /**
+     * Helper method to create a page for the given type and name.
+     * @param pageType
+     * @param pageName
+     * @return
+     */
+    public EditPage createPage(ContentType pageType, String pageName) {
+        return selectPageType(pageType)
+                .typePageName(pageName)
+                .clickCreatePage();
     }
 }

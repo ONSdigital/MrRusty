@@ -2,11 +2,10 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.selenium.PageObjectException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
 
 public class CollectionsPage extends FlorencePage {
 
@@ -48,7 +47,7 @@ public class CollectionsPage extends FlorencePage {
             yearSelect = new Select(find(yearSelectLocator));
             createCollectionButton = find(createCollectionButtonLocator);
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the collections page.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -81,10 +80,7 @@ public class CollectionsPage extends FlorencePage {
     public CollectionsPage populateFormWithDefaults(String name) {
         typeCollectionName(name);
         selectTeamByIndex(1);
-        selectScheduledPublish();
-        selectDayByIndex(1);
-        selectMonthByIndex(1);
-        selectYear(2015);
+        selectManualPublish();
         return this;
     }
 
@@ -199,4 +195,43 @@ public class CollectionsPage extends FlorencePage {
         createCollectionButton.click();
         return new BrowsePage(driver);
     }
+
+    public CollectionsPage clickCollectionByName(String collectionName) {
+        List<WebElement> collections = driver.findElements(By.cssSelector(".collections-select-table tr .collection-name"));
+
+        for (WebElement collection : collections) {
+
+            if (collection.getText().equals(collectionName)) {
+                collection.click();
+                return this;
+            }
+        }
+
+        throw new NotFoundException("Could not find collection with name: " + collectionName);
+    }
+
+    public SelectedPagePartial clickCollectionPageByName(String pageName) {
+        List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list"));
+
+        for (WebElement page : pages) {
+
+            System.out.println(page.getAttribute("innerHTML"));
+
+            try {
+                WebElement pageSpan = page.findElement(By.tagName("span"));
+
+                if (pageSpan.getText().equals(pageName)) {
+                    pageSpan.click();
+                    return new SelectedPagePartial(this.driver, page);
+                }
+            }
+            catch (NotFoundException exception) {
+                // no pages in this page list - do nothing.
+            }
+
+        }
+
+        throw new NotFoundException("Could not find page with name: " + pageName);
+    }
 }
+

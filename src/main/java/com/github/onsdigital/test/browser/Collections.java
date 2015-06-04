@@ -19,13 +19,34 @@ public class Collections {
 
     @POST
     @Test
-    public void shouldAddNewCollection() throws IOException {
+    public void shouldAddNewScheduledCollection() throws IOException {
 
         // Given the collections page after logging in
         CollectionsPage collectionsPage = new LoginPage().login(publisher.email, publisher.password);
 
         // When the create collection form is filled in and submitted.
-        collectionsPage.populateFormWithDefaults();
+        collectionsPage.typeCollectionName(Random.id())
+        .selectTeamByIndex(1)
+        .selectScheduledPublish()
+        .selectDayByIndex(1)
+        .selectMonthByIndex(1)
+        .selectYear(2015);
+
+        // Then the collection is created and the browse screen is shown
+        collectionsPage.clickCreateCollection();
+    }
+
+    @POST
+    @Test
+    public void shouldAddNewManualCollection() throws IOException {
+
+        // Given the collections page after logging in
+        CollectionsPage collectionsPage = new LoginPage().login(publisher.email, publisher.password);
+
+        // When the create collection form is filled in and submitted.
+        collectionsPage.typeCollectionName(Random.id())
+                .selectTeamByIndex(1)
+                .selectManualPublish();
 
         // Then the collection is created and the browse screen is shown
         collectionsPage.clickCreateCollection();

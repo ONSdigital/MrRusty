@@ -27,8 +27,10 @@ public class Drivers {
         @Override
         public WebDriver newDriver() {
 //            return new HtmlUnitDriver(false);
-            return new FirefoxDriver();
-           //return new ChromeDriver();
+            //return new ChromeDriver();
+            FirefoxDriver driver = new FirefoxDriver();
+            driver.manage().window().maximize();
+            return driver;
 
 //            HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.INTERNET_EXPLORER_11);
 //            driver.setJavascriptEnabled(true);
