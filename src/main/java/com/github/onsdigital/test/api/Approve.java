@@ -159,7 +159,7 @@ public class Approve {
     }
 
 
-    private static Response<String> approve(String collectionID, Http http) throws IOException {
+    public static Response<String> approve(String collectionID, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.approve.addPathSegment(collectionID);
         return http.post(endpoint, null, String.class);
     }

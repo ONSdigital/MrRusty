@@ -70,7 +70,7 @@ public class Review {
 
         // Then
         // We get the okay response code
-        assertEquals(HttpStatus.UNAUTHORIZED_401,  response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
     }
 
     /**
@@ -186,5 +186,10 @@ public class Review {
     public static Response<String> review(String collectionID, String uri, Http http) throws IOException {
         Endpoint contentEndpoint = ZebedeeHost.review.addPathSegment(collectionID).setParameter("uri", uri);
         return http.post(contentEndpoint, "", String.class);
+    }
+    public static void reviewAll(CollectionDescription collectionDescription, Http http) throws IOException {
+        for(String uri: collectionDescription.completeUris) {
+            review(collectionDescription.id, uri, http);
+        };
     }
 }

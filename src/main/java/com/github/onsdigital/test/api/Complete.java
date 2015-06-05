@@ -147,4 +147,15 @@ public class Complete {
         Endpoint contentEndpoint = ZebedeeHost.complete.addPathSegment(collectionName).setParameter("uri", uri);
         return http.post(contentEndpoint, "", String.class);
     }
+    /**
+     * Convenience method to complete content in one line
+     * @param collectionDescription
+     * @param http
+     * @throws IOException
+     */
+    public static void completeAll(CollectionDescription collectionDescription, Http http) throws IOException {
+        for(String uri: collectionDescription.inProgressUris) {
+            complete(collectionDescription.name, uri, http);
+        }
+    }
 }

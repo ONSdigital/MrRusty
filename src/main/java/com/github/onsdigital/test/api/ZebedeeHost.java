@@ -23,6 +23,7 @@ public class ZebedeeHost {
     public static final Endpoint teams = new Endpoint(zebedeeHost, "teams");
     public static final Endpoint dataservices = new Endpoint(zebedeeHost, "dataservices");
     public static final Endpoint cleanup = new Endpoint(zebedeeHost, "cleanup");
+    public static final Endpoint publish = new Endpoint(zebedeeHost, "publish");
 
     private static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
