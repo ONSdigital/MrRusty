@@ -27,22 +27,25 @@ public class Publish {
 
         // add a new section to the page and add markdown content.
         MarkdownEditorPage editorPage = editPage.addContentSection(Random.id().substring(0, 5)).clickEditPage();
-//        editPage = editorPage.typeContent("omg this is content!").clickSaveAndExit();
-//
-//        // submit the page for review.
-//        collectionsPage = editPage.clickSubmitForReview();
-//
-//        // login as the second set of eyes.
-//        collectionsPage.clickLogoutMenuLink().typeUsername("p2@t.com").clickLogin();
-//
-//        // select the page to be reviewed.
-//        collectionsPage.clickCollectionByName(collectionName);
-//        collectionsPage.clickCollectionPageByName(pageName)
-//                .clickEditFile()
-//                .clickSubmitForApproval();
+        editPage = editorPage.typeContent("omg this is content!").clickSaveAndExit();
+
+        // submit the page for review.
+        collectionsPage = editPage.clickSubmitForReview();
+
+        // login as the second set of eyes.
+        collectionsPage.clickLogoutMenuLink().typeUsername("p2@t.com").clickLogin();
+
+        // select the page to be reviewed.
+        collectionsPage.clickCollectionByName(collectionName)
+                .clickCollectionPageByName(pageName)
+                .clickEditFile()
+                .clickSubmitForApproval();
 
         // approve collection
+        collectionsPage = collectionsPage.clickCollectionByName(collectionName)
+                .clickApprove();
 
         // go to publish screen and select publish for the collection
+        collectionsPage.clickPublishingQueueMenuLink();
     }
 }

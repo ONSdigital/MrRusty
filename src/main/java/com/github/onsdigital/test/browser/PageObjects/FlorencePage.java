@@ -17,20 +17,22 @@ public class FlorencePage extends PageObject {
 
     By collectionsLocator = By.className("nav--admin__item--collections");
     By usersLocator = By.className("nav--admin__item--users");
-    By publishLocator = By.className("nav--admin__item--publish");
-    By loginLocator = By.className("nav--admin__item--login");
+    By publishingQueueLocator = By.className("nav--admin__item--publish");
     By logoutLocator = By.className("nav--admin__item--logout");
 
     WebElement collectionsMenuLink;
     WebElement usersMenuLink;
-    WebElement publishMenuLink;
+    WebElement publishingQueueMenuLink;
 
     protected FlorencePage() {
         super(Drivers.get());
-//        super(Drivers.driverFactory.newDriver());
         openIfNecessary(url);
     }
 
+    /**
+     * Get the page source of the current page.
+     * @return
+     */
     public String getSource() {
         return driver.getPageSource();
     }
@@ -65,7 +67,7 @@ public class FlorencePage extends PageObject {
         try {
             collectionsMenuLink = waitAndFind(collectionsLocator);
             usersMenuLink = find(usersLocator);
-            publishMenuLink = find(publishLocator);
+            publishingQueueMenuLink = find(publishingQueueLocator);
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the admin menu.", exception);
         }
@@ -74,6 +76,11 @@ public class FlorencePage extends PageObject {
 
     public CollectionsPage clickCollectionsMenuLink() {
         this.collectionsMenuLink.click();
+        return new CollectionsPage(driver);
+    }
+
+    public CollectionsPage clickPublishingQueueMenuLink() {
+        this.publishingQueueMenuLink.click();
         return new CollectionsPage(driver);
     }
 }

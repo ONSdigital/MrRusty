@@ -196,42 +196,18 @@ public class CollectionsPage extends FlorencePage {
         return new BrowsePage(driver);
     }
 
-    public CollectionsPage clickCollectionByName(String collectionName) {
+    public CollectionDetailsPage clickCollectionByName(String collectionName) {
         List<WebElement> collections = driver.findElements(By.cssSelector(".collections-select-table tr .collection-name"));
 
         for (WebElement collection : collections) {
 
             if (collection.getText().equals(collectionName)) {
                 collection.click();
-                return this;
+                return new CollectionDetailsPage(driver);
             }
         }
 
         throw new NotFoundException("Could not find collection with name: " + collectionName);
-    }
-
-    public SelectedPagePartial clickCollectionPageByName(String pageName) {
-        List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list"));
-
-        for (WebElement page : pages) {
-
-            System.out.println(page.getAttribute("innerHTML"));
-
-            try {
-                WebElement pageSpan = page.findElement(By.tagName("span"));
-
-                if (pageSpan.getText().equals(pageName)) {
-                    pageSpan.click();
-                    return new SelectedPagePartial(this.driver, page);
-                }
-            }
-            catch (NotFoundException exception) {
-                // no pages in this page list - do nothing.
-            }
-
-        }
-
-        throw new NotFoundException("Could not find page with name: " + pageName);
     }
 }
 

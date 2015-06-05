@@ -17,7 +17,6 @@ public class EditPage extends WorkspacePage {
 
     WebElement contentAccordion;
     WebElement saveButton;
-    WebElement submitForReviewButton;
 
     /**
      * Check the expected elements are located in the page.
@@ -27,8 +26,6 @@ public class EditPage extends WorkspacePage {
             super.initialisePage();
             contentAccordion = waitAndFind(contentAccordionLocator);
             saveButton = find(saveButtonLocator);
-            submitForReviewButton = find(submitForReviewButtonLocator);
-
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
@@ -94,6 +91,7 @@ public class EditPage extends WorkspacePage {
     }
 
     public CollectionsPage clickSubmitForReview() {
+        WebElement submitForReviewButton = find(submitForReviewButtonLocator);
         submitForReviewButton.click();
         return new CollectionsPage(this.driver);
     }
