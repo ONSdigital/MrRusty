@@ -2,11 +2,10 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.selenium.PageObjectException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
 
 public class CollectionsPage extends FlorencePage {
 
@@ -48,7 +47,7 @@ public class CollectionsPage extends FlorencePage {
             yearSelect = new Select(find(yearSelectLocator));
             createCollectionButton = find(createCollectionButtonLocator);
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the collections page.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -81,10 +80,7 @@ public class CollectionsPage extends FlorencePage {
     public CollectionsPage populateFormWithDefaults(String name) {
         typeCollectionName(name);
         selectTeamByIndex(1);
-        selectScheduledPublish();
-        selectDayByIndex(1);
-        selectMonthByIndex(1);
-        selectYear(2015);
+        selectManualPublish();
         return this;
     }
 
@@ -199,4 +195,19 @@ public class CollectionsPage extends FlorencePage {
         createCollectionButton.click();
         return new BrowsePage(driver);
     }
+
+    public CollectionDetailsPage clickCollectionByName(String collectionName) {
+        List<WebElement> collections = driver.findElements(By.cssSelector(".collections-select-table tr .collection-name"));
+
+        for (WebElement collection : collections) {
+
+            if (collection.getText().equals(collectionName)) {
+                collection.click();
+                return new CollectionDetailsPage(driver);
+            }
+        }
+
+        throw new NotFoundException("Could not find collection with name: " + collectionName);
+    }
 }
+

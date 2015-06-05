@@ -34,7 +34,7 @@ public class LoginPage extends FlorencePage {
         try {
             usernameInput = find(usernameLocator);
         } catch (NoSuchElementException exception) {
-            logout();
+            clickLogoutMenuLink();
         }
 
         try {
@@ -43,7 +43,7 @@ public class LoginPage extends FlorencePage {
             passwordInput = find(passwordLocator);
             loginButton = find(loginButtonLocator);
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the login page.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
         return this;
     }

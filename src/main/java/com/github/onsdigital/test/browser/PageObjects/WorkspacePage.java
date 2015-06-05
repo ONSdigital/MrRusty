@@ -2,6 +2,8 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Base class for all workspace pages containing the common elements
@@ -12,13 +14,11 @@ public class WorkspacePage extends FlorencePage {
     By browseButtonLocator = By.className("nav--workspace__browse");
     By createButtonLocator = By.className("nav--workspace__create");
     By editButtonLocator = By.className("nav--workspace__edit");
-    By reviewButtonLocator = By.className("nav--workspace__review");
     By previewWindowLocator = By.id("iframe");
 
     WebElement browseButton;
     WebElement createButton;
     WebElement editButton;
-    WebElement reviewButton;
     WebElement previewWindow;
 
     /**
@@ -39,12 +39,11 @@ public class WorkspacePage extends FlorencePage {
             browseButton = waitAndFind(browseButtonLocator);
             createButton = find(createButtonLocator);
             editButton = find(editButtonLocator);
-            reviewButton = find(reviewButtonLocator);
             previewWindow = find(previewWindowLocator);
 
             checkForPreviewDisclaimer();
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the workspace page contents.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -55,7 +54,7 @@ public class WorkspacePage extends FlorencePage {
      *
      * @return
      */
-    public CreatePage clickCreate() {
+    public CreatePage clickCreateMenuItem() {
         createButton.click();
         return new CreatePage(driver);
     }
@@ -65,7 +64,7 @@ public class WorkspacePage extends FlorencePage {
      *
      * @return
      */
-    public EditPage clickEdit() {
+    public EditPage clickEditMenuItem() {
         editButton.click();
         return new EditPage(driver);
     }
@@ -85,7 +84,19 @@ public class WorkspacePage extends FlorencePage {
      * @return
      */
     public String previewSource() {
+        // apply a wait to ensure the page is loaded
+        (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(previewWindowLocator)));
         return (String)((JavascriptExecutor)driver).executeScript("return $('#iframe').contents().find('body').html();");
+    }
+
+    /**
+     * Click a link in the navigation menu in the preview window for the given path.
+     * @param path
+     * @return
+     */
+    public WorkspacePage clickPreviewNavigationLink(String path) {
+        String selector = String.format("[ons-nav-item='%s'] a", path);
+        return clickPreviewLink(By.cssSelector(selector));
     }
 
     /**
@@ -98,19 +109,8 @@ public class WorkspacePage extends FlorencePage {
         driver.switchTo().frame(previewWindow); // switch the driver to the iframe
         waitAndFind(selector).click();
         driver.switchTo().defaultContent(); // switch the driver back to the main page.
-        return this;
-    }
-
-    /**
-     *
-     * @param selector
-     * @return
-     */
-    public WorkspacePage clickPreviewMenuLink(By selector) {
-        System.out.println("Clicking preview link:" + selector.toString());
-        driver.switchTo().frame(previewWindow); // switch the driver to the iframe
-        waitForVisibleAndFind(selector).click();
-        driver.switchTo().defaultContent(); // switch the driver back to the main page.
+        // wait for the page to refresh
+        (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(previewWindowLocator)));
         return this;
     }
 

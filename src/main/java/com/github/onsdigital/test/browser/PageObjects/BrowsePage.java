@@ -26,7 +26,7 @@ public class BrowsePage extends WorkspacePage {
 //            browseTree = waitAndFind(browseTreeLocator);
             //collectionNameInput = find(collectionNameInputLocator);
         } catch (NoSuchElementException exception) {
-            throw new PageObjectException("Failed to recognise the browse page.", exception);
+            throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
 
         return this;
@@ -34,12 +34,27 @@ public class BrowsePage extends WorkspacePage {
 
     /**
      * Select an item in the browse tree for the given path.
+     *
      * @param path
      * @return
      */
-    public BrowsePage clickTreeItem(String path) {
+    public BrowsePage clickBrowseTreeItem(String path) {
         WebElement treeNode = this.waitAndFind(By.cssSelector("[data-url='" + path + "'] span"));
         treeNode.click();
         return this;
+    }
+
+
+    /**
+     * Helper method to create a page in a fixed location for the given name.
+     *
+     * @return
+     */
+    public BrowsePage NavigateToT3Page() {
+        return clickBrowseTreeItem("/")
+                .clickBrowseTreeItem("/economy")
+                .clickBrowseTreeItem("/economy/nationalaccounts");
+
+
     }
 }

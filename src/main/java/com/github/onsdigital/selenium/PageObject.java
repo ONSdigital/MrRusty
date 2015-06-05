@@ -65,6 +65,15 @@ public class PageObject {
         ((JavascriptExecutor)driver).executeScript(js);
     }
 
+    /**
+     * Execute a custom script in the page.
+     * @param script
+     * @return
+     */
+    public String runScript(String script) {
+        return (String)((JavascriptExecutor)driver).executeScript(script);
+    }
+
     protected void openIfNecessary(String url) {
         String currentUrl = driver.getCurrentUrl();
         URIBuilder builder = null;

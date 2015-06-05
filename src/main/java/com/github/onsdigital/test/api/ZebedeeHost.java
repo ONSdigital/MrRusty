@@ -24,6 +24,9 @@ public class ZebedeeHost {
     public static final Endpoint dataservices = new Endpoint(zebedeeHost, "dataservices");
     public static final Endpoint cleanup = new Endpoint(zebedeeHost, "cleanup");
     public static final Endpoint publish = new Endpoint(zebedeeHost, "publish");
+    public static final Endpoint collectionBrowseTree = new Endpoint(zebedeeHost, "collectionBrowseTree");
+    public static final Endpoint collectionDetails = new Endpoint(zebedeeHost, "collectionDetails");
+
 
     private static String getValue(String key) {
         return StringUtils.defaultIfBlank(System.getProperty(key), System.getenv(key));
