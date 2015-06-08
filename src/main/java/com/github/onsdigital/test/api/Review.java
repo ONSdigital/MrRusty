@@ -188,8 +188,10 @@ public class Review {
         return http.post(contentEndpoint, "", String.class);
     }
     public static void reviewAll(CollectionDescription collectionDescription, Http http) throws IOException {
-        for(String uri: collectionDescription.completeUris) {
-            review(collectionDescription.id, uri, http);
-        };
+        if (collectionDescription.completeUris != null) {
+            for (String uri : collectionDescription.completeUris) {
+                review(collectionDescription.id, uri, http);
+            }
+        }
     }
 }

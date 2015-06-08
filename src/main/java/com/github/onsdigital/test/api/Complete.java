@@ -154,8 +154,10 @@ public class Complete {
      * @throws IOException
      */
     public static void completeAll(CollectionDescription collectionDescription, Http http) throws IOException {
-        for(String uri: collectionDescription.inProgressUris) {
-            complete(collectionDescription.name, uri, http);
+        if (collectionDescription.inProgressUris != null) {
+            for (String uri : collectionDescription.inProgressUris) {
+                complete(collectionDescription.id, uri, http);
+            }
         }
     }
 }
