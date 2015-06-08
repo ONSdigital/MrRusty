@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 
 @Api
-@DependsOn(Permissions.class)
+@DependsOn(com.github.onsdigital.test.api.Permissions.class)
 public class Collection {
 
     private static Http http = Login.httpAdministrator;

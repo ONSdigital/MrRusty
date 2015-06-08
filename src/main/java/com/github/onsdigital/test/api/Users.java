@@ -18,9 +18,8 @@ import static org.junit.Assert.assertEquals;
  * Test cases for the {@link com.github.onsdigital.zebedee.api.Users} API.
  */
 @Api
-@DependsOn(Login.class)
+@DependsOn(com.github.onsdigital.test.api.Login.class)
 public class Users {
-
     static User user;
 
     /**

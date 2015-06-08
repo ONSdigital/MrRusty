@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  * Created by thomasridd on 29/04/15.
  */
 @Api
-@DependsOn(Login.class)
+@DependsOn(com.github.onsdigital.test.api.Login.class)
 public class Permissions {
 
     /**

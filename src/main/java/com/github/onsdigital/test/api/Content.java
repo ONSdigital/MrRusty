@@ -25,7 +25,7 @@ import java.nio.file.Path;
 import static org.junit.Assert.*;
 
 @Api
-@DependsOn(Collection.class)
+@DependsOn(com.github.onsdigital.test.api.Collection.class)
 public class Content {
 
 

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @Api
-@DependsOn(Content.class)
+@DependsOn(com.github.onsdigital.test.api.Content.class)
 public class Approve {
 
     Http http = Login.httpPublisher;
