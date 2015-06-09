@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @Api
-@DependsOn(Approve.class)
+@DependsOn(com.github.onsdigital.test.api.Approve.class)
 public class Publish {
 
     /**
@@ -39,11 +39,11 @@ public class Publish {
         File json = new File("src/main/resources/dummy_csdb/data.json");
         File csdb = new File("src/main/resources/dummy_csdb/dummy_csdb.csdb");
 
-        Content.upload(collection.name, "/shouldPublishToLaunchpad/data.json", json, Login.httpPublisher);
-        Content.upload(collection.name, "/shouldPublishToLaunchpad/file.csdb", csdb, Login.httpPublisher);
+        Content.upload(collection.id, "/shouldPublishToLaunchpad/data.json", json, Login.httpPublisher);
+        Content.upload(collection.id, "/shouldPublishToLaunchpad/file.csdb", csdb, Login.httpPublisher);
 
-        Complete.completeAll(collection, Login.httpPublisher);
-        Review.reviewAll(collection, Login.httpSecondSetOfEyes);
+        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
+        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When

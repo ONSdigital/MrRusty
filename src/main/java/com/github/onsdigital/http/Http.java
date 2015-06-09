@@ -231,9 +231,6 @@ public class Http implements AutoCloseable {
      * Sends a POST request with a file and returns the response.
      *
      * @param endpoint      The endpoint to send the request to.
-     * @param file          The file to upload
-     * @param responseClass The class to deserialise the Json response to. Can be null if no response message is expected.
-     * @param <T>           The type to deserialise the response to.
      * @return A {@link Response} containing the deserialised body, if any.
      * @throws IOException If an error occurs.
      * @see MultipartEntityBuilder
