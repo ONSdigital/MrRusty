@@ -43,7 +43,7 @@ public class Publish {
         Content.upload(collection.id, "/shouldPublishToLaunchpad/file.csdb", csdb, Login.httpPublisher);
 
         Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
-        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes);
+        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
