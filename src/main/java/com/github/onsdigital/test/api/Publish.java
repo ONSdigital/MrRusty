@@ -30,17 +30,48 @@ public class Publish {
      */
     @POST
     @Test
-    public void shouldPublishToLaunchpad() throws IOException {
+    public void shouldPublishCSDBFilesToLaunchpad() throws IOException {
 
         // Given
-        // a collection
+        // a collection that we add files to and then
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
         File json = new File("src/main/resources/dummy_csdb/data.json");
         File csdb = new File("src/main/resources/dummy_csdb/dummy_csdb.csdb");
 
-        Content.upload(collection.id, "/shouldPublishToLaunchpad/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, "/shouldPublishToLaunchpad/file.csdb", csdb, Login.httpPublisher);
+        Content.upload(collection.id, "/shouldPublishCSDBFilesToLaunchpad/data.json", json, Login.httpPublisher);
+        Content.upload(collection.id, "/shouldPublishCSDBFilesToLaunchpad/CXNV.csdb", csdb, Login.httpPublisher);
+
+        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
+        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
+        Approve.approve(collection.id, Login.httpPublisher);
+
+        // When
+        // we approve it using publish credentials
+        Response<String> response = publish(collection.id, Login.httpPublisher);
+
+        // Expect
+        // a response of okay
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+    }
+
+    /**
+     * Tests approval using simple collection setup and publisher credentials
+     *
+     */
+    @POST
+    @Test
+    public void shouldPublishCSDBFilesWithoutExtensionToLaunchpad() throws IOException {
+
+        // Given
+        // a collection
+        CollectionDescription collection = OneLineSetups.publishedCollection();
+
+        File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
+        File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
+
+        Content.upload(collection.id, "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad/data.json", json, Login.httpPublisher);
+        Content.upload(collection.id, "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad/OTT", csdb, Login.httpPublisher);
 
         Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
         Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
