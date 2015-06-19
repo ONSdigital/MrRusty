@@ -156,7 +156,10 @@ public class Complete {
     public static void completeAll(CollectionDescription collectionDescription, Http http) throws IOException {
         if (collectionDescription.inProgressUris != null) {
             for (String uri : collectionDescription.inProgressUris) {
-                complete(collectionDescription.id, uri, http);
+                Response<String> complete = complete(collectionDescription.id, uri, http);
+                if (complete.statusLine.getStatusCode() != 200) {
+                    System.out.println("Error " + complete.statusLine.getStatusCode() + " could not complete uri " + uri);
+                }
             }
         }
     }

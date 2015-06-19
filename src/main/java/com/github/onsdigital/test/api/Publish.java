@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.api;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -39,11 +40,14 @@ public class Publish {
         File json = new File("src/main/resources/dummy_csdb/data.json");
         File csdb = new File("src/main/resources/dummy_csdb/dummy_csdb.csdb");
 
-        Content.upload(collection.id, "/shouldPublishCSDBFilesToLaunchpad/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, "/shouldPublishCSDBFilesToLaunchpad/CXNV.csdb", csdb, Login.httpPublisher);
 
-        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
-        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
+        String baseUri = "/" + Random.id() + "/shouldPublishCSDBFilesToLaunchpad";
+        Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
+        Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
+
+        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
+//        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
+        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
@@ -70,11 +74,14 @@ public class Publish {
         File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
         File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
 
-        Content.upload(collection.id, "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad/OTT", csdb, Login.httpPublisher);
+        String baseUri = Random.id() + "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad";
 
-        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
-        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
+        Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
+        Content.upload(collection.id, baseUri + "/OTT", csdb, Login.httpPublisher);
+
+        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
+        Review.review(collection.id, baseUri + "/data.json", Login.httpThirdSetOfEyes);
+
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
