@@ -2,12 +2,15 @@ package com.github.onsdigital.test.generator;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.content.page.statistics.document.article.Article;
+import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.*;
+import com.github.onsdigital.test.generator.markdown.ArticleMarkdown;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
@@ -36,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  *
  */
 
-public class ContentGenerator {
+public class CollectionGenerator {
     static String contentFilePath;
     static Path root;
 
@@ -113,6 +116,12 @@ public class ContentGenerator {
 
         return post.body;
     }
+    public static void killUploadedFiles() {
+        // TODO: Code to get rid of the contentGenerator top level collection when finished with
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------------
+    // CONTENT GENERATOR
 
     /**
      * Searches every subfolder in root and finds any where data.json and a potential csdb file exist
@@ -142,7 +151,7 @@ public class ContentGenerator {
             return false;
         }
     }
-    
+
 
     static HashMap<String, Path> asCSDBPair(Path path) throws IOException {
         HashMap<String, Path> csdbPair = new HashMap<>();
@@ -164,8 +173,6 @@ public class ContentGenerator {
     }
 
     static void addFolderOfCSDBFilesToCollectionAndApprove(CollectionDescription collection, Path folder) throws IOException {
-        File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
-        File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
 
         String baseUri = "contentgenerator/";
         int filePairs = 1;
@@ -187,6 +194,78 @@ public class ContentGenerator {
         Approve.approve(collection.id, httpPublisher);
     }
 
+    //----------------------------------------------------------------------------------------------------------------------------
+
+
+    //----------------------------------------------------------------------------------------------------------------------------
+    // BULLETINS
+    static void addFolderOfBulletinsToCollectionAndApprove(CollectionDescription collection, Path folder) throws IOException {
+        String uri = "";
+        String content = "";
+        List<Path> markdownFiles = new ArrayList<>();
+
+        // Get a list of bulletins
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
+            for (Path path: stream) {
+                if (Files.isRegularFile(path) && path.toString().length() > 3 && path.toString().endsWith(".md")) {
+                    markdownFiles.add(path);
+                }
+            }
+        }
+
+        // Generate each
+        for (Path markdownFile: markdownFiles) {
+
+            Content.create(collection.id, content, Strings.toLowerCase(uri + "/data.json"), httpPublisher);
+        }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+
+
+    //----------------------------------------------------------------------------------------------------------------------------
+    // ARTICLES
+    static void addFolderOfArticlesToCollectionAndApprove(CollectionDescription collection, Path folder) throws IOException {
+        String baseUri = "collectiongenerator/";
+        String uri = "";
+        String content = "";
+        List<Path> markdownFiles = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
+            for (Path path: stream) {
+                if (Files.isRegularFile(path) && path.toString().length() > 3 && path.toString().endsWith(".md")) {
+                    markdownFiles.add(path);
+                }
+            }
+        }
+
+        // Generate each
+        for (Path markdownFile: markdownFiles) {
+
+            List<String> errors = ArticleMarkdown.checkMarkdown(markdownFile, collection, httpPublisher);
+
+            if (errors != null) {
+                for (String error: errors) {
+                    System.out.println(error);
+                }
+            } else {
+
+                Article article = ArticleMarkdown.readArticle(markdownFile);
+                content = ContentUtil.serialise(article);
+                Response<String> response = Content.create(collection.id, content, article.getUri().toString() + "/data.json", httpPublisher);
+
+                if (response.statusLine.getStatusCode() == HttpStatus.OK_200) {
+                    System.out.println("Success");
+                } else {
+                    System.out.println("Upload failed with error code: " + response.statusLine.getReasonPhrase());
+                }
+
+                Complete.complete(collection.id, article.getUri().toString() + "/data.json", httpPublisher);
+                Review.review(collection.id, article.getUri().toString() + "/data.json", httpSecondSetOfEyes);
+            }
+        }
+    }
+    //----------------------------------------------------------------------------------------------------------------------------
+
+
     public static void main(String[] args) throws IOException, InterruptedException {
         // Given
         // a collection
@@ -204,9 +283,13 @@ public class ContentGenerator {
 
         addFolderOfCSDBFilesToCollectionAndApprove(collection, root.resolve("timeseries"));
 
+        addFolderOfBulletinsToCollectionAndApprove(collection, root.resolve("bulletins"));
+
+        addFolderOfArticlesToCollectionAndApprove(collection, root.resolve("articles"));
+
         // If we
         // we approve it using publish credentials
-        Response<String> response = publish(collection.id, httpPublisher);
+        //Response<String> response = publish(collection.id, httpPublisher);
     }
 
 

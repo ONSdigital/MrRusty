@@ -14,6 +14,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <repositories>
+        <!-- Adding maven central repo explicitly to parent jitpack.io resolve artifacts that are already on Github-->
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+        <!--Jitpack io allows us include projects and libraries available on github but not built and published to maven central-->
+        <!-- It is used for including internal project modules. See more on https://jitpack.io/-->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <!-- Zebedee - for Json classes -->
@@ -74,6 +92,13 @@
             <groupId>com.github.davidcarboni</groupId>
             <artifactId>resource-utils</artifactId>
             <version>1.2.0</version>
+        </dependency>
+
+        <!-- ONS Content Library, fetched through jitpack.io -->
+        <dependency>
+            <groupId>com.github.ONSdigital</groupId>
+            <artifactId>content-library</artifactId>
+            <version>content-library-1.0.33</version>
         </dependency>
     </dependencies>
 
