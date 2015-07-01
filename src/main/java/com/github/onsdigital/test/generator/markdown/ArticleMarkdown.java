@@ -87,17 +87,13 @@ public class ArticleMarkdown {
 		if ((article.getDescription().theme == null) || (article.getDescription().level2 == null)) { return false; }
 
 		String productPageURI = getProductPageURI(article);
-		try {
-			Path path = Content.get(collection.id, productPageURI + "/data.json", http).body;
 			try {
+				Path path = Content.get(collection.id, productPageURI + "/data.json", http).body;
 				ContentUtil.deserialise(Files.newInputStream(path), ProductPage.class);
 				return true;
 			} catch (Exception e) {
 				return false;
 			}
-		} catch (IOException e) {
-			return false;
-		}
 	}
 
 	public static List<String> checkMarkdown(Path path, CollectionDescription collection, Http http) throws IOException {
@@ -165,7 +161,7 @@ public class ArticleMarkdown {
 		articleDescription.setTitle(title);
 
 		String edition = org.apache.commons.lang.StringUtils.defaultIfBlank(properties.remove("edition"), null);
-		if (edition == null) { edition = org.apache.commons.lang.StringUtils.defaultIfBlank(properties.remove("release"), "yes"); }
+		if (edition == null) { edition = org.apache.commons.lang.StringUtils.defaultIfBlank(properties.remove("release"), null); }
 		articleDescription.setEdition(edition);
 
 		String keywords = org.apache.commons.lang.StringUtils.defaultIfBlank(properties.remove("keywords"), null);

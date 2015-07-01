@@ -16,6 +16,8 @@ import com.github.onsdigital.zebedee.json.Credentials;
 import com.github.onsdigital.zebedee.json.PermissionDefinition;
 import com.github.onsdigital.zebedee.json.User;
 import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.sun.jna.platform.FileUtils;
+import org.apache.poi.util.IOUtils;
 import org.bouncycastle.util.Strings;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -108,7 +110,7 @@ public class CollectionGenerator {
     public static CollectionDescription generatorCollection() throws IOException, InterruptedException {
         CollectionDescription collection = new CollectionDescription();
         collection.name = collectionName + Random.id().substring(0,6);
-        collection.publishDate = new Date();
+        collection.publishDate = null;
 
         //deleteWholeCollection(collection); // Tear down any old collection
 
@@ -191,7 +193,7 @@ public class CollectionGenerator {
 
         }
 
-        Approve.approve(collection.id, httpPublisher);
+        //Approve.approve(collection.id, httpPublisher);
     }
 
     //----------------------------------------------------------------------------------------------------------------------------
@@ -215,7 +217,6 @@ public class CollectionGenerator {
 
         // Generate each
         for (Path markdownFile: markdownFiles) {
-
             Content.create(collection.id, content, Strings.toLowerCase(uri + "/data.json"), httpPublisher);
         }
     }
@@ -239,8 +240,9 @@ public class CollectionGenerator {
 
         // Generate each
         for (Path markdownFile: markdownFiles) {
+            Path processedFile = preprocessBetaContent(markdownFile);
 
-            List<String> errors = ArticleMarkdown.checkMarkdown(markdownFile, collection, httpPublisher);
+            List<String> errors = ArticleMarkdown.checkMarkdown(processedFile, collection, httpPublisher);
 
             if (errors != null) {
                 for (String error: errors) {
@@ -248,10 +250,16 @@ public class CollectionGenerator {
                 }
             } else {
 
-                Article article = ArticleMarkdown.readArticle(markdownFile);
-                content = ContentUtil.serialise(article);
-                Response<String> response = Content.create(collection.id, content, article.getUri().toString() + "/data.json", httpPublisher);
+                Article article = ArticleMarkdown.readArticle(processedFile);
 
+
+                // Make a temp file
+                content = Serialiser.serialise(article);
+                File tmp = File.createTempFile(Random.id(), "json");
+                Files.write(tmp.toPath(), content.getBytes());
+
+                // Upload
+                Response<String> response = Content.upload(collection.id, article.getUri().toString() + "/data.json", tmp, httpPublisher);
                 if (response.statusLine.getStatusCode() == HttpStatus.OK_200) {
                     System.out.println("Success");
                 } else {
@@ -333,5 +341,86 @@ public class CollectionGenerator {
         permissionDefinition.admin = admin;
         permissionDefinition.editor = editor;
         return permissionDefinition;
+    }
+
+    static Path preprocessBetaContent(Path path) throws IOException {
+        List<String> lines = Files.readAllLines(path);
+
+        List<String> lines2 = new ArrayList<>();
+        List<String> result = new ArrayList<>();
+
+        // Preprocess 1 - Cut down and trim
+        boolean singleFound = false;
+        for (String line : lines) {
+            // Cut down ### or more by one header size
+            if (line.trim().length() >= 3 && line.trim().startsWith("###")) {
+                // If a section break occurs before a title add in a dummy line
+                if (singleFound == false) {
+                    lines2.add("# Bulletin");
+                    singleFound = true;
+                }
+                lines2.add(lineMinusOneHash(ltrim(line)));
+
+            } else if (line.trim().length() > 1 && line.trim().startsWith("#") && line.trim().charAt(1) != '#') {
+                lines2.add(ltrim(line));
+                singleFound = true;
+            } else if (line.trim().length() > 0 && line.trim().startsWith("#")) {
+                lines2.add(ltrim(line));
+            } else {
+                lines2.add(ltrim(line));
+            }
+        }
+
+        // Preprocess 2 - Finds the length of the hashes at the beginning
+//        for (String line : lines2) {
+//            int hashes = 0;
+//            while ((hashes < line.length()) && line.charAt(hashes) == '#') {
+//                hashes++;
+//            }
+//            if (hashes > 0) {
+//                result.add(line.substring(0, hashes) + " " + line.substring(hashes).trim());
+//            } else {
+//                result.add(line);
+//            }
+//        }
+
+        // Write the file to a processed directory
+        Path processedPath = path.getParent().resolve("processed").resolve(path.getFileName());
+
+        if (!Files.exists(processedPath.getParent())) {
+            Files.createDirectory(processedPath.getParent());
+        }
+        if (Files.exists(processedPath)) {
+            Files.delete(processedPath);
+        }
+
+        Files.write(processedPath, lines2);
+
+        return processedPath;
+    }
+    static String lineMinusOneHash(String line) {
+        String trimmed = line.trim();
+        String prefix = line.substring(0, line.length() - trimmed.length());
+        String suffix = "";
+
+        int hashes = 0;
+        while ((hashes < trimmed.length()) && trimmed.charAt(hashes) == '#') {
+            hashes++;
+        }
+        if (hashes > 1) {
+            suffix = trimmed.substring(1, hashes) + " " + trimmed.substring(hashes).trim();
+        } else {
+            suffix = trimmed;
+        }
+
+        return prefix + suffix;
+    }
+
+    public static String ltrim(String s) {
+        int i = 0;
+        while (i < s.length() && (s.charAt(i) == ' ')) {
+            i++;
+        }
+        return s.substring(i);
     }
 }
