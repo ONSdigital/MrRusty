@@ -3,6 +3,8 @@ package com.github.onsdigital.test.generator;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.content.page.statistics.document.article.Article;
+import com.github.onsdigital.content.page.statistics.document.base.StatisticalDocument;
+import com.github.onsdigital.content.partial.markdown.MarkdownSection;
 import com.github.onsdigital.content.util.ContentUtil;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -251,7 +253,7 @@ public class CollectionGenerator {
             } else {
 
                 Article article = ArticleMarkdown.readArticle(processedFile);
-
+                fixAccordion(article);
 
                 // Make a temp file
                 content = Serialiser.serialise(article);
@@ -422,5 +424,31 @@ public class CollectionGenerator {
             i++;
         }
         return s.substring(i);
+    }
+
+    private static void fixAccordion(StatisticalDocument document) {
+        List<MarkdownSection> sections = new ArrayList<>();
+        List<MarkdownSection> accordion = new ArrayList<>();
+        List<MarkdownSection> allSections = document.getSections();
+
+        for (MarkdownSection section: allSections) {
+            if (section.getTitle().toLowerCase().contains("[accordion]") || section.getTitle().toLowerCase().contains("[accordian]") || section.getTitle().toLowerCase().contains("[accoridon]")) {
+                String title = section.getTitle();
+                title = title.replaceAll("\\[Accordion\\]", "");
+                title = title.replaceAll("\\[accordion\\]", "");
+                title = title.replaceAll("\\[Accordian\\]", "");
+                title = title.replaceAll("\\[accordian\\]", "");
+                title = title.replaceAll("\\[Accoridon\\]", "");
+                title = title.replaceAll("\\[accoridon\\]", "");
+
+                section.setTitle(title.trim());
+                accordion.add(section);
+            } else {
+                sections.add(section);
+            }
+        }
+
+        document.setAccordion(accordion);
+        document.setSections(sections);
     }
 }
