@@ -119,9 +119,9 @@ public class ContentGenerator {
      *
      * @return
      */
-    public static List<HashMap<String, Path>> pairsOfDatasetsToGenerate() throws IOException {
+    public static List<HashMap<String, Path>> pairsOfDatasetsToGenerate(Path folder) throws IOException {
         List<HashMap<String, Path>> pairs = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(root)) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
             for (Path path: stream) {
                 if (Files.isDirectory(path)) {
                     HashMap<String, Path> pair = asCSDBPair(path);
@@ -170,7 +170,7 @@ public class ContentGenerator {
         String baseUri = "contentgenerator/";
         int filePairs = 1;
 
-        List<HashMap<String, Path>> pairs = pairsOfDatasetsToGenerate();
+        List<HashMap<String, Path>> pairs = pairsOfDatasetsToGenerate(folder);
         for (HashMap<String, Path> pair: pairs) {
             System.out.println("Generating Content for files");
             System.out.println("json: " + pair.get("json").toString());
