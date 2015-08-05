@@ -10,25 +10,25 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-@DependsOn({})
+// depend on the last API tests
+@DependsOn(com.github.onsdigital.test.api.Publish.class)
 public class Login {
 
     /**
-     * Tests login using the publisher credentials.
+     * Tests login using the administrator credentials.
      *
      * @throws IOException
      */
     @POST
     @Test
-    public void shouldReturnToLogInWithFailedLoginCredentials() throws IOException {
+    public void shouldLogInWithDefaultCredentials() throws IOException {
 
-        // Given incorrect credentials
-        Credentials credentials = SetupBeforeTesting.scallywagCredentials;
+        // Given correct admin credentials
         LoginPage loginPage = new LoginPage();
 
         // When We submit the credentials on the login page.
-        // Then we are shown the login page.
-        loginPage.clickLoginExpectingFailure(credentials.email, credentials.password);
+        // Then we are shown the collections page.
+        loginPage.login("","");
     }
 
     /**

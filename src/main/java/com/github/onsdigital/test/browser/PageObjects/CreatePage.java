@@ -1,16 +1,22 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.selenium.PageObjectException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.joda.time.DateTime;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class CreatePage extends WorkspacePage {
 
-    By locationInputLocator = By.id("location");
+    //By locationInputLocator = By.id("location");
     By pageTypeSelectLocator = By.id("pagetype");
+    By editionInputLocator = By.id("edition");
+    By releaseDateInputLocator = By.id("releaseDate");
     By pageNameInputLocator = By.id("pagename");
     By createButtonLocator = By.className("btn-page-create");
 
@@ -25,10 +31,9 @@ public class CreatePage extends WorkspacePage {
     protected CreatePage initialisePage() {
         try {
             super.initialisePage();
-            locationInput = find(locationInputLocator);
+            pageNameInput = waitAndFind(pageNameInputLocator);
+            //locationInput = find(locationInputLocator);
             pageTypeSelect = new Select(find(pageTypeSelectLocator));
-            pageNameInput = find(pageNameInputLocator);
-            createButton = find(createButtonLocator);
 
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
@@ -70,6 +75,8 @@ public class CreatePage extends WorkspacePage {
         return this;
     }
 
+
+
     /**
      * Type the name for the page.
      *
@@ -83,10 +90,42 @@ public class CreatePage extends WorkspacePage {
     }
 
     /**
+     * Type the edition for the page.
+     *
+     * @param edition
+     * @return
+     */
+    public CreatePage typeEdition(String edition) {
+        WebElement input = waitAndFind(editionInputLocator);
+        input.clear();
+        input.sendKeys(edition);
+        return this;
+    }
+
+    /**
+     * Type the date for the page.
+     *
+     * @param date
+     * @return
+     */
+    public CreatePage typeReleaseDate(Date date) {
+        WebElement input = waitAndFind(releaseDateInputLocator);
+        input.clear();
+        input.sendKeys(new SimpleDateFormat("dd/MM/yyyy").format(date));
+        input.sendKeys(Keys.ENTER); // enter to close date picker
+
+        // wait for date picker to not be visible. It obstructs the create button.
+        (new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("ui-datepicker-div")));
+
+        return this;
+    }
+
+    /**
      * Click the create button on the create page form.
      * @return
      */
     public EditPage clickCreatePage() {
+        createButton = waitAndFind(createButtonLocator);
         createButton.click();
         return new EditPage(driver);
     }
@@ -99,6 +138,8 @@ public class CreatePage extends WorkspacePage {
      */
     public EditPage createPage(ContentType pageType, String pageName) {
         return selectPageType(pageType)
+                .typeEdition(Random.id())
+                .typeReleaseDate(new DateTime(new Date()).plusDays(1).toDate())
                 .typePageName(pageName)
                 .clickCreatePage();
     }

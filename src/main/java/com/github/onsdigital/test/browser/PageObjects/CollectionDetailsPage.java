@@ -4,6 +4,7 @@ import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class CollectionDetailsPage extends CollectionsPage {
 
@@ -33,6 +34,8 @@ public class CollectionDetailsPage extends CollectionsPage {
     }
 
     public SelectedPagePartial clickCollectionPageByName(String pageName) {
+
+        
         List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list"));
 
         for (WebElement page : pages) {
@@ -42,7 +45,7 @@ public class CollectionDetailsPage extends CollectionsPage {
             try {
                 WebElement pageSpan = page.findElement(By.tagName("span"));
 
-                if (pageSpan.getText().equals(pageName)) {
+                if (pageSpan.getText().contains(pageName)) {
                     pageSpan.click();
                     return new SelectedPagePartial(this.driver, page);
                 }
@@ -58,6 +61,10 @@ public class CollectionDetailsPage extends CollectionsPage {
     public CollectionsPage clickApprove() {
         WebElement approveButton = waitAndFind(approveCollectionButtonLocator);
         approveButton.click();
-        return this;
+
+        // adding wait until we find a way of knowing when the approve is done.
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+
+        return new CollectionsPage(driver);
     }
 }

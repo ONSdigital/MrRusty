@@ -195,7 +195,7 @@ public class Content {
 
         // A delete event should be present in the collection details
         CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
-        assertTrue(updatedCollection.eventsByUri.get(directory).hasEventForType(ContentEventType.DELETED));
+        assertTrue(updatedCollection.eventsByUri.get("/" + directory).hasEventForType(ContentEventType.DELETED));
     }
 
     /**

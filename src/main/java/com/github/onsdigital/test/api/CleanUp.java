@@ -5,11 +5,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
 import com.github.onsdigital.zebedee.json.CollectionDescriptions;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import org.junit.Test;
-import sun.rmi.runtime.Log;
 
-import javax.ws.rs.GET;
 import java.io.IOException;
 
 /**
@@ -25,6 +21,11 @@ public class CleanUp {
         // We get the list of collections
         Endpoint endpoint = ZebedeeHost.collections;
         Response<CollectionDescriptions> getResponse = Login.httpPublisher.get(endpoint, CollectionDescriptions.class);
+
+        if (getResponse == null) {
+            return;
+        }
+
         CollectionDescriptions descriptions = getResponse.body;
 
 

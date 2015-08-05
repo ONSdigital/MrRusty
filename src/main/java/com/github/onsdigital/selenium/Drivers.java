@@ -1,9 +1,15 @@
 package com.github.onsdigital.selenium;
 
+import com.github.onsdigital.test.configuration.Configuration;
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,22 +25,55 @@ public class Drivers {
      */
     static Map<String, WebDriver> drivers = java.util.Collections.synchronizedMap(new ConcurrentHashMap<String, WebDriver>(8, 0.9f, 1));
 
-
     /**
-     * The default {@link DriverFactory} generates {@link HtmlUnitDriver} instances with Javascript enabled.
+     * The default {@link DriverFactory} generates {@link WebDriver} instances with Javascript enabled.
      */
     public static DriverFactory driverFactory = new DriverFactory() {
         @Override
         public WebDriver newDriver() {
-//            return new HtmlUnitDriver(false);
-            //return new ChromeDriver();
-            FirefoxDriver driver = new FirefoxDriver();
-            driver.manage().window().maximize();
-            return driver;
 
-//            HtmlUnitDriver driver = new HtmlUnitDriver(BrowserVersion.INTERNET_EXPLORER_11);
-//            driver.setJavascriptEnabled(true);
-//            return driver;
+            WebDriver driver = null;
+
+            String browserStackUrl = Configuration.getBrowserStackUrl();
+
+            if (StringUtils.isNotBlank(browserStackUrl)) {
+                DesiredCapabilities caps = new DesiredCapabilities();
+                caps.setCapability("browser", "Chrome");
+                caps.setCapability("browser_version", "31.0");
+                caps.setCapability("os", "Windows");
+                caps.setCapability("os_version", "7");
+                caps.setCapability("resolution", "1600x1200");
+                caps.setCapability("browserstack.debug", "true");
+
+                try {
+                    driver = new RemoteWebDriver(new URL(browserStackUrl), caps);
+                    driver.manage().window().setSize(new Dimension(1600,1200));
+                } catch (MalformedURLException e) {
+                    throw new Error("Could not connect to BrowserStack with the given URL: " + browserStackUrl, e);
+                }
+            } else {
+
+                try {
+                    ChromeOptions options = new ChromeOptions();
+//                    options.addArguments("--start-maximized");
+//                    options.addArguments("--no-sandbox");
+//                    options.addArguments("--disable-web-security");
+//                    options.addArguments("--ignore-certificate-errors");
+                    DesiredCapabilities desiredCapabilities = DesiredCapabilities.chrome();
+                    desiredCapabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                    //desiredCapabilities.setCapability("resolution", "1600x1200");
+
+                    driver = new RemoteWebDriver(new URL("http://localhost:9515"), desiredCapabilities);
+                } catch (MalformedURLException e) {
+                    throw new Error("Could not connect to ChromeDriver with the given URL: " + Configuration.getFlorenceUrl(), e);
+                }
+
+                //driver = new FirefoxDriver();
+                //driver.manage().window().maximize();
+                driver.manage().window().setSize(new Dimension(1600,1200));
+            }
+
+            return driver;
         }
     };
 

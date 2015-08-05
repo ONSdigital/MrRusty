@@ -3,6 +3,7 @@ package com.github.onsdigital.test.browser.PageObjects;
 import com.github.onsdigital.selenium.Drivers;
 import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.selenium.PageObjectException;
+import com.github.onsdigital.test.configuration.Configuration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -12,8 +13,6 @@ import org.openqa.selenium.WebElement;
  * Base object common to all pages in florence.
  */
 public class FlorencePage extends PageObject {
-
-    private static String url = "http://localhost:8081/florence/index.html";
 
     By collectionsLocator = By.className("nav--admin__item--collections");
     By usersLocator = By.className("nav--admin__item--users");
@@ -26,7 +25,7 @@ public class FlorencePage extends PageObject {
 
     protected FlorencePage() {
         super(Drivers.get());
-        openIfNecessary(url);
+        openIfNecessary(Configuration.getFlorenceUrl());
     }
 
     /**
@@ -65,9 +64,7 @@ public class FlorencePage extends PageObject {
      */
     protected FlorencePage initialisePage() {
         try {
-            collectionsMenuLink = waitAndFind(collectionsLocator);
-            usersMenuLink = find(usersLocator);
-            publishingQueueMenuLink = find(publishingQueueLocator);
+
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the admin menu.", exception);
         }
@@ -75,11 +72,13 @@ public class FlorencePage extends PageObject {
     }
 
     public CollectionsPage clickCollectionsMenuLink() {
+        collectionsMenuLink = waitAndFind(collectionsLocator);
         this.collectionsMenuLink.click();
         return new CollectionsPage(driver);
     }
 
     public CollectionsPage clickPublishingQueueMenuLink() {
+        publishingQueueMenuLink = find(publishingQueueLocator);
         this.publishingQueueMenuLink.click();
         return new CollectionsPage(driver);
     }

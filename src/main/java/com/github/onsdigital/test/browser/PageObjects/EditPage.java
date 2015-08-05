@@ -10,7 +10,7 @@ import java.util.List;
 
 public class EditPage extends WorkspacePage {
 
-    By contentAccordionLocator = By.cssSelector("#content .edit-section__head");
+    By contentAccordionLocator = By.cssSelector("#section .edit-section__head");
     By saveButtonLocator = By.cssSelector(".btn-edit-save");
     By submitForReviewButtonLocator = By.cssSelector(".btn-edit-save-and-submit-for-review");
     By submitForApprovalButtonLocator = By.cssSelector(".btn-edit-save-and-submit-for-approval");
@@ -52,17 +52,20 @@ public class EditPage extends WorkspacePage {
 
     public PageSectionPartial addContentSection(String name) {
 
-        WebElement contentAccordion = waitAndFind(By.cssSelector("#content")); // find the content accordion
-        contentAccordion.findElement(By.cssSelector(".edit-section__head")).click(); // click the header to open it
-        contentAccordion.findElement(By.cssSelector("#addSection")).click(); // add a new section
-
-        contentAccordion = waitAndFind(By.cssSelector("#content")); // find the content accordion
+        WebElement contentAccordion = waitAndFind(By.cssSelector("#section")); // find the content accordion
         contentAccordion.findElement(By.cssSelector(".edit-section__head")).click(); // click the header to open it
 
+        waitAndFind(By.cssSelector("#add-section")).click();;
+
+        contentAccordion = waitAndFind(By.cssSelector("#section")); // find the content accordion
         // get a list of all sections then pick the section that we want.
-        List<WebElement> sections = contentAccordion.findElements(By.cssSelector("#sortable-sections"));
+
+        waitAndFind(By.cssSelector(".edit-section__sortable-item"));
+        List<WebElement> sections = contentAccordion.findElements(By.cssSelector(".edit-section__sortable-item"));
         WebElement newSection = sections.get(sections.size() - 1);
 
+
+        newSection.getAttribute("innerHTML");
         List<WebElement> textAreas = newSection.findElements(By.cssSelector("textarea"));
         WebElement titleEntry = textAreas.get(0);
         titleEntry.sendKeys(name);

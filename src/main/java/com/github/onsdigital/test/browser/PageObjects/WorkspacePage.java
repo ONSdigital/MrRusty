@@ -118,7 +118,7 @@ public class WorkspacePage extends FlorencePage {
 
         try {
             driver.switchTo().frame(previewWindow); // switch the driver to the iframe
-            driver.findElement(By.cssSelector(".rightButton a")).click();
+            driver.findElement(By.cssSelector(".btn-modal-continue")).click();
             driver.switchTo().defaultContent(); // switch the driver back to the main page.
         } catch (Exception e) {
             driver.switchTo().defaultContent(); // switch the driver back to the main page.

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by thomasridd on 05/06/2015.
@@ -79,14 +80,17 @@ public class Publish {
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/OTT", csdb, Login.httpPublisher);
 
-        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-        Review.review(collection.id, baseUri + "/data.json", Login.httpThirdSetOfEyes);
+        Response<String> response = Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
+        assertTrue(response.statusLine.getStatusCode() == HttpStatus.OK_200);
+
+        response = Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
         // we approve it using publish credentials
-        Response<String> response = publish(collection.id, Login.httpPublisher);
+        response = publish(collection.id, Login.httpPublisher);
 
         // Expect
         // a response of okay

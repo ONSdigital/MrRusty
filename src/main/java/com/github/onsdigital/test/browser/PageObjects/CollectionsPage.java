@@ -5,6 +5,8 @@ import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.Select;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class CollectionsPage extends FlorencePage {
@@ -13,18 +15,14 @@ public class CollectionsPage extends FlorencePage {
     By teamSelectLocator = By.id("team");
     By scheduledPublishRadioLocator = By.id("scheduledpublish");
     By manualPublishRadioLocator = By.id("manualpublish");
-    By daySelectLocator = By.id("day");
-    By monthSelectLocator = By.id("month");
-    By yearSelectLocator = By.id("year");
+    By dateInputLocator = By.id("date");
     By createCollectionButtonLocator = By.className("btn-collection-create");
 
     WebElement collectionNameInput;
     Select teamSelect;
     WebElement scheduledPublishRadio;
     WebElement manualPublishRadio;
-    Select daySelect;
-    Select monthSelect;
-    Select yearSelect;
+    WebElement dateInput;
     WebElement createCollectionButton;
 
     public CollectionsPage(WebDriver driver) {
@@ -42,10 +40,8 @@ public class CollectionsPage extends FlorencePage {
             teamSelect = new Select(find(teamSelectLocator));
             scheduledPublishRadio = find(scheduledPublishRadioLocator);
             manualPublishRadio = find(manualPublishRadioLocator);
-            daySelect = new Select(find(daySelectLocator));
-            monthSelect = new Select(find(monthSelectLocator));
-            yearSelect = new Select(find(yearSelectLocator));
             createCollectionButton = find(createCollectionButtonLocator);
+            dateInput = find(dateInputLocator);
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
@@ -97,6 +93,18 @@ public class CollectionsPage extends FlorencePage {
     }
 
     /**
+     * Type the given date value into the collection form.
+     *
+     * @param date
+     * @return
+     */
+    public CollectionsPage typeDate(Date date) {
+        dateInput.clear();
+        dateInput.sendKeys(new SimpleDateFormat("dd/MM/yyyy").format(date));
+        return this;
+    }
+
+    /**
      * Select the team associated with the collection from the select box using the given index.
      *
      * @param index
@@ -126,39 +134,6 @@ public class CollectionsPage extends FlorencePage {
      */
     public CollectionsPage selectTeamByValue(String team) {
         teamSelect.selectByValue(team);
-        return this;
-    }
-
-    /**
-     * Select the day of the collections release by index.
-     *
-     * @param index
-     * @return
-     */
-    public CollectionsPage selectDayByIndex(int index) {
-        daySelect.selectByIndex(index);
-        return this;
-    }
-
-    /**
-     * Select the month of the collections release by index.
-     *
-     * @param index
-     * @return
-     */
-    public CollectionsPage selectMonthByIndex(int index) {
-        monthSelect.selectByIndex(index);
-        return this;
-    }
-
-    /**
-     * Select the year of the collections release by value.
-     *
-     * @param value
-     * @return
-     */
-    public CollectionsPage selectYear(int value) {
-        yearSelect.selectByValue(Integer.toString(value));
         return this;
     }
 
@@ -203,6 +178,11 @@ public class CollectionsPage extends FlorencePage {
 
             if (collection.getText().equals(collectionName)) {
                 collection.click();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return new CollectionDetailsPage(driver);
             }
         }

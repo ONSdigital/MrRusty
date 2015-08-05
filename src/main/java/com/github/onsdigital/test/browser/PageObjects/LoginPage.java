@@ -38,7 +38,6 @@ public class LoginPage extends FlorencePage {
         }
 
         try {
-
             usernameInput = waitAndFind(usernameLocator);
             passwordInput = find(passwordLocator);
             loginButton = find(loginButtonLocator);

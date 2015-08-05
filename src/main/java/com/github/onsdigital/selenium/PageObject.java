@@ -35,7 +35,7 @@ public class PageObject {
      */
     protected WebElement waitAndFind(By selector) {
         try {
-            return (new WebDriverWait(driver, 5)).until(ExpectedConditions.presenceOfElementLocated(selector));
+            return (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOfElementLocated(selector));
         } catch (TimeoutException timeoutException) {
             System.out.println(driver.getPageSource());
             throw timeoutException;

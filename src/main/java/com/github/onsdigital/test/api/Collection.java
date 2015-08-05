@@ -225,9 +225,13 @@ public class Collection {
 
     public static CollectionDescription createCollectionDescription() {
         CollectionDescription collection = new CollectionDescription();
-        collection.name = "Rusty_" + Random.id();
+        collection.name = createCollectionNameForTest();
         collection.publishDate = new Date();
         return collection;
+    }
+
+    public static String createCollectionNameForTest() {
+        return "Rusty_" + Random.id().substring(0,10);
     }
 
     public static Response<CollectionDescription> get(String id, Http http) throws IOException {
