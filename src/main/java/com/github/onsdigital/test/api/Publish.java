@@ -8,8 +8,10 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.zebedee.json.CollectionDescription;
+import com.github.onsdigital.zebedee.json.ContentDetail;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
+import sun.rmi.runtime.Log;
 
 import javax.ws.rs.POST;
 import java.io.File;
@@ -47,7 +49,6 @@ public class Publish {
         Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
         Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-//        Complete.completeAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpPublisher);
         Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
@@ -80,17 +81,16 @@ public class Publish {
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/OTT", csdb, Login.httpPublisher);
 
-        Response<String> response = Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-        assertTrue(response.statusLine.getStatusCode() == HttpStatus.OK_200);
 
-        response = Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
+        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
 
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
         // we approve it using publish credentials
-        response = publish(collection.id, Login.httpPublisher);
+        Response<String> response = publish(collection.id, Login.httpPublisher);
+
 
         // Expect
         // a response of okay

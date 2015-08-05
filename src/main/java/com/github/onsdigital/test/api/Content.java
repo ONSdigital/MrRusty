@@ -175,24 +175,27 @@ public class Content {
         // Given
         // We have a collection with content and an uploaded file
         CollectionDescription collection = OneLineSetups.publishedCollection();
-        String directory = "economy/regionalaccounts/";
+        String directory = "/economy/regionalaccounts/";
         String jsonUri = directory + Random.id() + ".json";
         Content.create(collection.id, "thisisContent", jsonUri, Login.httpPublisher);
 
         File file = new File("src/main/resources/snail.jpg");
-        String jpgUri = "economy/regionalaccounts/" + Random.id() + ".jpg";
+        String jpgUri = "/economy/regionalaccounts/" + Random.id() + ".jpg";
         upload(collection.id, jpgUri, file, Login.httpPublisher);
 
-        // When we attempt to delete the directory
+        // When
+        // we attempt to delete the directory
         delete(collection.id, directory, Login.httpPublisher);
 
-        // Then the files should not exist
+        // Then
+        // the files should not exist
         Response<Path> jsonResponse = download(collection.id, jsonUri, Login.httpPublisher);
         assertNull(jsonResponse);
 
         Response<Path> jpgResponse = download(collection.id, jpgUri, Login.httpPublisher);
         assertNull(jpgResponse);
 
+        // And
         // A delete event should be present in the collection details
         CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
         assertTrue(updatedCollection.eventsByUri.get("/" + directory).hasEventForType(ContentEventType.DELETED));
