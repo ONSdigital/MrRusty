@@ -34,6 +34,7 @@ public class TestRunner {
         setup();
         queue = getQueue();
 
+        List<String> failedClassNames = new ArrayList<>();
         int readySize;
         do {
 
@@ -45,7 +46,6 @@ public class TestRunner {
                 jUnitCore.run(rustyRequest);
 
                 // Add passed classes to the passed Set to unlock more tests
-                List<String> failedClassNames = new ArrayList<>();
                 for (Failure failure : listener.rustyResult.getFailures()) {
                     failedClassNames.add(failure.getDescription().getClassName());
                 }
@@ -65,6 +65,11 @@ public class TestRunner {
 
         // Now trigger printing out the results:
         listener.testRunsAllFinished(queue, passed, rounds);
+
+        // return a non zero code if there are test failures.
+        if (!failedClassNames.isEmpty()) {
+            System.exit(1);
+        }
     }
 
     private static void setup() throws Exception {
