@@ -98,7 +98,7 @@ public class Publish {
     }
 
     private static Response<String> publish(String collectionID, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID);
+        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("breakbeforefiletransfer", "true");
         return http.post(endpoint, null, String.class);
     }
 }
