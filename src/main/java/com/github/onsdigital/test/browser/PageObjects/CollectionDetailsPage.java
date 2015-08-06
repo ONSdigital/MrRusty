@@ -40,7 +40,7 @@ public class CollectionDetailsPage extends CollectionsPage {
 
         for (WebElement page : pages) {
 
-            System.out.println(page.getAttribute("innerHTML"));
+            //System.out.println(page.getAttribute("innerHTML"));
 
             try {
                 WebElement pageSpan = page.findElement(By.tagName("span"));
