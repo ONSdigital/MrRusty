@@ -110,7 +110,7 @@ public class WorkspacePage extends FlorencePage {
         waitAndFind(selector).click();
         driver.switchTo().defaultContent(); // switch the driver back to the main page.
         // wait for the page to refresh
-        (new WebDriRemovinRemoverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(previewWindowLocator)));
+        (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(previewWindowLocator)));
         return this;
     }
 
