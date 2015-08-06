@@ -24,21 +24,10 @@ public class TestRunner {
     static Set<Class<?>> passed = new HashSet<>();
     static List<Set<Class<?>>> rounds = new ArrayList<>();
 
-    // default to root namespace to find all test classes.
-    static String testNamespace = "com.github.onsdigital";
-
-    static Reflections reflections = new Reflections(testNamespace);
-    static Reflections testReflections;
+    static Reflections reflections = new Reflections("com.github.onsdigital");
 
     public static void main(String[] args) throws Exception {
 
-        // args[0] = override test namespace allowing specific tests to be run.
-        if (args.length > 0) {
-            System.out.println(args[0]);
-            testNamespace = args[0];
-        }
-
-        testReflections = new Reflections(testNamespace);
         listener = new RustyListener();
         jUnitCore.addListener(listener);
 
@@ -98,7 +87,7 @@ public class TestRunner {
     static Set<Class<?>> getQueue() {
 
         Set<Class<?>> annotated =
-                testReflections.getTypesAnnotatedWith(DependsOn.class);
+                reflections.getTypesAnnotatedWith(DependsOn.class);
         System.out.println(annotated);
         return annotated;
     }
