@@ -8,13 +8,12 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.*;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.User;
-import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.Credentials;
+import com.github.onsdigital.test.json.PermissionDefinition;
+import com.github.onsdigital.test.json.User;
+import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.bouncycastle.util.Strings;
-import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +26,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Created by thomasridd on 23/06/15.
- *
+ * <p/>
  * The content generator
- *
  */
 
 public class ContentGenerator {
@@ -104,7 +100,7 @@ public class ContentGenerator {
 
     public static CollectionDescription generatorCollection() throws IOException, InterruptedException {
         CollectionDescription collection = new CollectionDescription();
-        collection.name = collectionName + Random.id().substring(0,6);
+        collection.name = collectionName + Random.id().substring(0, 6);
         collection.publishDate = new Date();
 
         //deleteWholeCollection(collection); // Tear down any old collection
@@ -122,15 +118,18 @@ public class ContentGenerator {
     public static List<HashMap<String, Path>> pairsOfDatasetsToGenerate(Path folder) throws IOException {
         List<HashMap<String, Path>> pairs = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(folder)) {
-            for (Path path: stream) {
+            for (Path path : stream) {
                 if (Files.isDirectory(path)) {
                     HashMap<String, Path> pair = asCSDBPair(path);
-                    if (pair != null) { pairs.add(pair); }
+                    if (pair != null) {
+                        pairs.add(pair);
+                    }
                 }
             }
         }
         return pairs;
     }
+
     static boolean couldBeCSDBFile(Path path) {
         if (Files.isDirectory(path)) {
             return false;
@@ -142,7 +141,7 @@ public class ContentGenerator {
             return false;
         }
     }
-    
+
 
     static HashMap<String, Path> asCSDBPair(Path path) throws IOException {
         HashMap<String, Path> csdbPair = new HashMap<>();
@@ -150,7 +149,7 @@ public class ContentGenerator {
         if (dataPath.toFile().exists()) {
             csdbPair.put("json", dataPath);
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
-                for (Path file: stream) {
+                for (Path file : stream) {
                     if (couldBeCSDBFile(file)) {
                         csdbPair.put("file", file);
                         return csdbPair;
@@ -171,7 +170,7 @@ public class ContentGenerator {
         int filePairs = 1;
 
         List<HashMap<String, Path>> pairs = pairsOfDatasetsToGenerate(folder);
-        for (HashMap<String, Path> pair: pairs) {
+        for (HashMap<String, Path> pair : pairs) {
             System.out.println("Generating Content for files");
             System.out.println("json: " + pair.get("json").toString());
             System.out.println("file: " + pair.get("file").toString());
@@ -210,7 +209,6 @@ public class ContentGenerator {
     }
 
 
-
     private static Response<String> publish(String collectionID, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID);
         return http.post(endpoint, null, String.class);
@@ -229,6 +227,7 @@ public class ContentGenerator {
         user.email = email;
         return user;
     }
+
     /**
      * Convenience method for generating login credentials.
      *

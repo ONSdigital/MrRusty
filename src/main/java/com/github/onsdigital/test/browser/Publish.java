@@ -5,7 +5,7 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
-import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.test.json.Credentials;
 import org.junit.Test;
 
 @DependsOn({Create.class})

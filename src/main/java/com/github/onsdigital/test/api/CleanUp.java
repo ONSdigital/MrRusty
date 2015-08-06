@@ -3,8 +3,8 @@ package com.github.onsdigital.test.api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionDescriptions;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.CollectionDescriptions;
 
 import java.io.IOException;
 

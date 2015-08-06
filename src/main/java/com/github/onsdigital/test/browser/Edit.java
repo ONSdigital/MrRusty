@@ -3,7 +3,7 @@ package com.github.onsdigital.test.browser;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.Collection;
-import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.test.json.Credentials;
 import org.junit.Test;
 
 import javax.ws.rs.POST;

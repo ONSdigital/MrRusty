@@ -8,8 +8,8 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -23,7 +23,6 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-
 @Api
 @DependsOn(com.github.onsdigital.test.api.Permissions.class)
 public class Collection {
@@ -34,7 +33,6 @@ public class Collection {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
         Serialiser.getBuilder().registerTypeAdapter(Date.class, new IsoDateSerializer());
     }
-
 
     /**
      * Test basic functionality
