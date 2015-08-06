@@ -47,7 +47,7 @@ public class BrowsePage extends WorkspacePage {
             WebElement treeNode = (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-url='" + path + "'] span")));
             treeNode.click();
         } catch (TimeoutException timeoutException) {
-            System.out.println(driver.getPageSource());
+            //System.out.println(driver.getPageSource());
             throw timeoutException;
         }
         return this;

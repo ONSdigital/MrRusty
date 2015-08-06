@@ -5,7 +5,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.api.*;
-import com.github.onsdigital.zebedee.json.*;
+import com.github.onsdigital.test.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;

@@ -10,8 +10,8 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.CollectionDescriptions;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.CollectionDescriptions;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
@@ -27,7 +27,6 @@ public class Collections {
 
     /**
      * Test basic functionality
-     *
      */
     @GET
     @Test
@@ -55,7 +54,7 @@ public class Collections {
 
     /**
      * Test functionality limiting view permissions by team
-     *
+     * <p/>
      * TODO
      */
     @GET

@@ -7,9 +7,9 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentDetail;
-import com.github.onsdigital.zebedee.json.serialiser.IsoDateSerializer;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.ContentDetail;
+import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 

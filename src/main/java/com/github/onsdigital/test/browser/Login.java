@@ -4,7 +4,7 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
-import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.test.json.Credentials;
 import org.junit.Test;
 
 import javax.ws.rs.POST;

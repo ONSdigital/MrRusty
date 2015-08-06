@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,6 +67,8 @@ public class Drivers {
                     driver = new RemoteWebDriver(new URL("http://localhost:9515"), desiredCapabilities);
                 } catch (MalformedURLException e) {
                     throw new Error("Could not connect to ChromeDriver with the given URL: " + Configuration.getFlorenceUrl(), e);
+                } catch (UnreachableBrowserException exception) {
+                    throw new Error("Could not find browser, are you running chrome driver?", exception);
                 }
 
                 //driver = new FirefoxDriver();

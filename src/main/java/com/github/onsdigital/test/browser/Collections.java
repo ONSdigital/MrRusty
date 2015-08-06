@@ -6,7 +6,7 @@ import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.BrowsePage;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
-import com.github.onsdigital.zebedee.json.Credentials;
+import com.github.onsdigital.test.json.Credentials;
 import org.joda.time.DateTime;
 import org.junit.Test;
 

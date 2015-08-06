@@ -105,7 +105,7 @@ public class WorkspacePage extends FlorencePage {
      * @param selector
      */
     public WorkspacePage clickPreviewLink(By selector) {
-        System.out.println("Clicking preview link:" + selector.toString());
+        //System.out.println("Clicking preview link:" + selector.toString());
         driver.switchTo().frame(previewWindow); // switch the driver to the iframe
         waitAndFind(selector).click();
         driver.switchTo().defaultContent(); // switch the driver back to the main page.

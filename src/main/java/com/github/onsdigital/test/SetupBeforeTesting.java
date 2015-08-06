@@ -6,9 +6,9 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.Setup;
 import com.github.onsdigital.test.api.ZebedeeHost;
-import com.github.onsdigital.zebedee.json.Credentials;
-import com.github.onsdigital.zebedee.json.PermissionDefinition;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.test.json.Credentials;
+import com.github.onsdigital.test.json.PermissionDefinition;
+import com.github.onsdigital.test.json.User;
 
 import java.io.IOException;
 

@@ -6,17 +6,13 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.zebedee.json.converter.ChartObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import com.github.onsdigital.test.json.ChartObject;
 import org.junit.Test;
-import org.omg.CORBA.NameValuePair;
 
 import javax.ws.rs.POST;
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 

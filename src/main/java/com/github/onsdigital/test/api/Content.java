@@ -8,8 +8,8 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.zebedee.json.CollectionDescription;
-import com.github.onsdigital.zebedee.json.ContentEventType;
+import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.EventType;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -198,7 +198,7 @@ public class Content {
         // And
         // A delete event should be present in the collection details
         CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
-        assertTrue(updatedCollection.eventsByUri.get(directory).hasEventForType(ContentEventType.DELETED));
+        assertTrue(updatedCollection.eventsByUri.get(directory).hasEventForType(EventType.DELETED));
     }
 
     /**

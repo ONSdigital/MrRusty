@@ -7,9 +7,9 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.zebedee.json.Team;
-import com.github.onsdigital.zebedee.json.TeamList;
-import com.github.onsdigital.zebedee.json.User;
+import com.github.onsdigital.test.json.Team;
+import com.github.onsdigital.test.json.TeamList;
+import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
