@@ -43,20 +43,6 @@ public class PageObject {
     }
 
     /**
-     * Helper method for waiting for an element to be present before finding.
-     * @param selector
-     * @return
-     */
-    public WebElement waitForVisibleAndFind(By selector) {
-        try {
-            return (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOf(find(selector)));
-        } catch (TimeoutException timeoutException) {
-            System.out.println(driver.getPageSource());
-            throw timeoutException;
-        }
-    }
-
-    /**
      * Scroll to the given element selector.
      * @return
      */
@@ -85,5 +71,11 @@ public class PageObject {
         if (!StringUtils.equalsIgnoreCase(url, builder.getHost())) {
             driver.get(url);
         }
+    }
+
+    // wait for an expected JS alert to display and accept it.
+    public void acceptAlert() {
+        Alert alert = (new WebDriverWait(driver, 5)).until(ExpectedConditions.alertIsPresent());
+        alert.accept();
     }
 }

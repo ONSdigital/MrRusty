@@ -163,6 +163,7 @@ public class CollectionsPage extends FlorencePage {
      */
     public CollectionsPage clickCreateCollectionExpectingError() {
         createCollectionButton.click();
+        this.acceptAlert();
         return this;
     }
 
