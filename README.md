@@ -5,22 +5,18 @@ Running browser tests locally requires the Chrome browser to be installed and th
 
 https://sites.google.com/a/chromium.org/chromedriver/downloads
 
-By default using either the run.sh script or running the test runner class will default to running all the tests against localhost.
+## Running tests against an environment other than localhost
 
-## Choose a limited namespace to run tests
+By default the tests will run against localhost. If you want to run the tests against an environment other than localhost, you can pass a base url to the run.sh script:
 
-If you want to just run the API tests, you can pass a parameter to the run script (or TestRunner class) to specify this:
-
-  ./run "api"
+  ./run.sh http://user:pass@develop.carboni.uk
   
-Likewise you can run just the browser tests:
-
-  ./run "browser"
-  
-If you want to run the tests against an environment other than localhost, you can pass a second parameter to the run.sh script to specifiy the base URL of the environment:
-
-  ./run.sh "" http://user:pass@develop.carboni.uk
-  
-  Note the empty first parameter to run all the tests. The second parameter contains basic http auth credentials to access the develop environment. You will need to replace the "user:pass" part of the URL with the credentials.
+The url parameter contains basic http auth credentials to access the develop environment. You will need to replace the "user:pass" part of the URL with the credentials.
   
 ## Running tests using BrowserStack
+
+The run.sh script can take a second parameter that defines a URL to use against a remote web driver:
+
+  ./run.sh http://user:pass@develop.carboni.uk http://user:token@hub.browserstack.com/wd/hub
+
+For BrowserStack usage the second url parameter requires the BrowserStack username and token.
