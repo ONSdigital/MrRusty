@@ -10,9 +10,17 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static junit.framework.TestCase.fail;
+
 // depend on the last API tests
 @DependsOn(com.github.onsdigital.test.api.Publish.class)
 public class Login {
+
+    @Test
+    public void shouldFail()
+    {
+        fail();
+    }
 
     /**
      * Tests login using the administrator credentials.
