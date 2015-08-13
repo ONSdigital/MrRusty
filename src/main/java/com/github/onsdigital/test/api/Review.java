@@ -187,11 +187,17 @@ public class Review {
         Endpoint contentEndpoint = ZebedeeHost.review.addPathSegment(collectionID).setParameter("uri", uri);
         return http.post(contentEndpoint, "", String.class);
     }
-    public static void reviewAll(CollectionDescription collectionDescription, Http http) throws IOException {
+
+    public static int reviewAll(CollectionDescription collectionDescription, Http http) throws IOException {
         if (collectionDescription.completeUris != null) {
             for (String uri : collectionDescription.completeUris) {
-                review(collectionDescription.id, uri, http);
+                Response<String> stringResponse = review(collectionDescription.id, uri, http);
+                if (stringResponse.statusLine.getStatusCode() != HttpStatus.OK_200) {
+                    System.out.println("Error " + stringResponse.statusLine.getStatusCode() + " in reviewAll");
+                    return stringResponse.statusLine.getStatusCode();
+                }
             }
         }
+        return HttpStatus.OK_200;
     }
 }

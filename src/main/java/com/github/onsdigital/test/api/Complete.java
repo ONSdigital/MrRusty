@@ -153,14 +153,16 @@ public class Complete {
      * @param http
      * @throws IOException
      */
-    public static void completeAll(CollectionDescription collectionDescription, Http http) throws IOException {
+    public static int completeAll(CollectionDescription collectionDescription, Http http) throws IOException {
         if (collectionDescription.inProgressUris != null) {
             for (String uri : collectionDescription.inProgressUris) {
                 Response<String> complete = complete(collectionDescription.id, uri, http);
                 if (complete.statusLine.getStatusCode() != 200) {
                     System.out.println("Error " + complete.statusLine.getStatusCode() + " could not complete uri " + uri);
+                    return complete.statusLine.getStatusCode();
                 }
             }
         }
+        return HttpStatus.OK_200;
     }
 }

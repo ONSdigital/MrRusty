@@ -10,6 +10,7 @@ import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
+import sun.rmi.runtime.Log;
 
 import javax.ws.rs.POST;
 import java.io.File;
@@ -22,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @Api
-@DependsOn(com.github.onsdigital.test.api.Approve.class)
+@DependsOn(com.github.onsdigital.test.api.Permissions.class)
 public class Publish {
 
     /**
@@ -30,7 +31,7 @@ public class Publish {
      *
      */
     @POST
-    @Test
+    //@Test
     public void shouldPublishCSDBFilesToLaunchpad() throws IOException {
 
         // Given
@@ -41,12 +42,13 @@ public class Publish {
         File csdb = new File("src/main/resources/dummy_csdb/dummy_csdb.csdb");
 
 
-        String baseUri = "/" + Random.id() + "/shouldPublishCSDBFilesToLaunchpad";
+        String baseUri = "/" + Random.id() + "/datasets/shouldPublishCSDBFilesToLaunchpad";
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
         Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes);
+
+        assertEquals(HttpStatus.OK_200, Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes));
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
@@ -63,7 +65,7 @@ public class Publish {
      *
      */
     @POST
-    @Test
+    //@Test
     public void shouldPublishCSDBFilesWithoutExtensionToLaunchpad() throws IOException {
 
         // Given
@@ -73,13 +75,14 @@ public class Publish {
         File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
         File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
 
-        String baseUri = Random.id() + "/shouldPublishCSDBFilesWithoutExtensionToLaunchpad";
+        String baseUri = Random.id() + "/datasets/shouldPublishCSDBFilesWithoutExtensionToLaunchpad";
 
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/OTT", csdb, Login.httpPublisher);
 
 
         Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
+
         Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
 
         Approve.approve(collection.id, Login.httpPublisher);
@@ -94,8 +97,27 @@ public class Publish {
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
     }
 
+    @POST
+    @Test
+    public void zebedee_whenPublishCalled_shouldPostToTheDestination() throws IOException {
+        System.out.println("When publish called");
+        // Given
+        // a collection that we add files to and then
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/economy/", 100);
+
+        assertEquals(HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
+        collection = Collection.get(collection.id, Login.httpPublisher).body;
+
+        assertEquals(HttpStatus.OK_200, Review.reviewAll(collection, Login.httpSecondSetOfEyes));
+        assertEquals(HttpStatus.OK_200, Approve.approve(collection.id, Login.httpPublisher).statusLine.getStatusCode());
+
+        // When
+        // we approve it using publish credentials
+        Response<String> response = publish(collection.id, Login.httpPublisher);
+    }
+
     private static Response<String> publish(String collectionID, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("breakbeforefiletransfer", "true");
+        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("breakbeforefiletransfer", "false");
         return http.post(endpoint, null, String.class);
     }
 }

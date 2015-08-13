@@ -56,9 +56,9 @@ public class OneLineSetups {
         for(int i = 0; i < fileCount; i++) {
             String uri = "";
             if(directory.equals("") || directory.equals("/")) {
-                uri = "/" + Random.id() + ".json";
+                uri = "/" + Random.id() + "/data.json";
             } else {
-                uri = directory + Random.id() + ".json";
+                uri = directory + Random.id() + "/data.json";
             }
             Content.create(collection.id, uri, uri, Login.httpPublisher);
         }
