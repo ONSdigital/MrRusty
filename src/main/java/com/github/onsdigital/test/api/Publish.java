@@ -31,7 +31,7 @@ public class Publish {
      *
      */
     @POST
-    //@Test
+    @Test
     public void shouldPublishCSDBFilesToLaunchpad() throws IOException {
 
         // Given
@@ -47,8 +47,7 @@ public class Publish {
         Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
         Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-
-        assertEquals(HttpStatus.OK_200, Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpSecondSetOfEyes));
+        Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
@@ -100,10 +99,9 @@ public class Publish {
     @POST
     @Test
     public void zebedee_whenPublishCalled_shouldPostToTheDestination() throws IOException {
-        System.out.println("When publish called");
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/economy/", 100);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/economy/", 2);
 
         assertEquals(HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
         collection = Collection.get(collection.id, Login.httpPublisher).body;
