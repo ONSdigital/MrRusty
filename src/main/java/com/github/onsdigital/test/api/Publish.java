@@ -10,13 +10,13 @@ import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
-import sun.rmi.runtime.Log;
 
 import javax.ws.rs.POST;
 import java.io.File;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by thomasridd on 05/06/2015.
@@ -102,6 +102,8 @@ public class Publish {
         // Given
         // a collection that we add files to and then
         CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/economy/", 2);
+
+        assertNotNull(collection);
 
         assertEquals(HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
         collection = Collection.get(collection.id, Login.httpPublisher).body;

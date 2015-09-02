@@ -9,11 +9,15 @@ import org.openqa.selenium.WebElement;
 
 public class MarkdownEditorPage extends PageObject {
 
+    By chartButtonLocator = By.className("btn-markdown-editor-chart");
+    By tableButtonLocator = By.className("btn-markdown-editor-table");
     By cancelButtonLocator = By.className("btn-markdown-editor-cancel");
     By saveButtonLocator = By.className("btn-markdown-editor-save");
     By exitButtonLocator = By.className("btn-markdown-editor-exit");
     By editorLocator = By.id("wmd-input");
 
+    WebElement chartButton;
+    WebElement tableButton;
     WebElement editor;
     WebElement cancelButton;
     WebElement saveButton;
@@ -27,6 +31,8 @@ public class MarkdownEditorPage extends PageObject {
             cancelButton = waitAndFind(cancelButtonLocator);
             saveButton = find(saveButtonLocator);
             exitButton = find(exitButtonLocator);
+            chartButton = find(chartButtonLocator);
+            tableButton = find(tableButtonLocator);
             editor = waitAndFind(editorLocator);
 
         } catch (NoSuchElementException exception) {
@@ -54,6 +60,11 @@ public class MarkdownEditorPage extends PageObject {
         return this;
     }
 
+    public TableBuilderPage clickCreateTable() {
+        tableButton.click();
+        return new TableBuilderPage(driver);
+    }
+
     public EditPage clickSaveAndExit() {
         exitButton.click();
         return new EditPage(driver);
@@ -64,5 +75,4 @@ public class MarkdownEditorPage extends PageObject {
         editor.sendKeys(content);
         return this;
     }
-
 }
