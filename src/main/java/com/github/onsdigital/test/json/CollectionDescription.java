@@ -14,6 +14,7 @@ public class CollectionDescription {
     public String id;
     public String name;
     public Date publishDate;
+    public CollectionType type;
 
     public List<String> inProgressUris;
     public List<String> completeUris;

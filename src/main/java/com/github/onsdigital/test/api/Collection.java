@@ -9,6 +9,7 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.CollectionType;
 import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -225,6 +226,7 @@ public class Collection {
         CollectionDescription collection = new CollectionDescription();
         collection.name = createCollectionNameForTest();
         collection.publishDate = new Date();
+        collection.type = CollectionType.manual;
         return collection;
     }
 
