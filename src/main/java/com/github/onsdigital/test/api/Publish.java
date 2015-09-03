@@ -29,20 +29,21 @@ public class Publish {
     /**
      * Tests approval using simple collection setup and publisher credentials
      *
+     * This is for original style files with type = "dataset"
      */
     @POST
     @Test
-    public void shouldPublishCSDBFilesToLaunchpad() throws IOException {
+    public void dataPublisher_givenDataset_shouldPublishCSDBFiles() throws IOException {
 
         // Given
         // a collection that we add files to and then
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
-        File json = new File("src/main/resources/dummy_csdb/data.json");
-        File csdb = new File("src/main/resources/dummy_csdb/dummy_csdb.csdb");
+        File json = new File("src/main/resources/dummy_dataset/data.json");
+        File csdb = new File("src/main/resources/dummy_dataset/dummy_csdb.csdb");
 
 
-        String baseUri = "/" + Random.id() + "/datasets/shouldPublishCSDBFilesToLaunchpad";
+        String baseUri = "/archive/" + Random.id() + "/datasets/dataset";
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
@@ -62,34 +63,30 @@ public class Publish {
     /**
      * Tests approval using simple collection setup and publisher credentials
      *
+     * This is for advanced style files with type = "timeseries_dataset"
      */
     @POST
-    //@Test
-    public void shouldPublishCSDBFilesWithoutExtensionToLaunchpad() throws IOException {
+    @Test
+    public void dataPublisher_givenTimeseriesDataset_shouldPublishCSDBFiles() throws IOException {
 
         // Given
         // a collection
         CollectionDescription collection = OneLineSetups.publishedCollection();
 
-        File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
-        File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
+        File json = new File("src/main/resources/dummy_timeseriesdataset/data.json");
+        File csdb = new File("src/main/resources/dummy_timeseriesdataset/dummy_csdb.csdb");
 
-        String baseUri = Random.id() + "/datasets/shouldPublishCSDBFilesWithoutExtensionToLaunchpad";
-
+        String baseUri = "/archive/" + Random.id() + "/datasets/timeseriesdataset";
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, baseUri + "/OTT", csdb, Login.httpPublisher);
-
+        Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
         Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-
-        Review.reviewAll(Collection.get(collection.id, Login.httpPublisher).body, Login.httpThirdSetOfEyes);
-
+        Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
         Approve.approve(collection.id, Login.httpPublisher);
 
         // When
         // we approve it using publish credentials
         Response<String> response = publish(collection.id, Login.httpPublisher);
-
 
         // Expect
         // a response of okay

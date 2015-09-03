@@ -164,7 +164,7 @@ public class ContentGenerator {
 
     static void addFolderOfCSDBFilesToCollectionAndApprove(CollectionDescription collection, Path folder) throws IOException {
         File json = new File("src/main/resources/dummy_csdb_no_extension/data.json");
-        File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_csdb");
+        File csdb = new File("src/main/resources/dummy_csdb_no_extension/dummy_dataset");
 
         String baseUri = "contentgenerator/";
         int filePairs = 1;
