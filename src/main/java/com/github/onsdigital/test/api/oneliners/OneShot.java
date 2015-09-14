@@ -92,9 +92,9 @@ public class OneShot {
      * @return The collection's {@link CollectionDescription}
      * @throws IOException
      */
-    public static CollectionDescription publishedCollection() throws IOException {
+    public static CollectionDescription publishedCollection(Http publisher) throws IOException {
         CollectionDescription collection = createCollectionDescription();
-        return postCollection(collection, OneShot.httpPublisher).body;
+        return postCollection(collection, publisher).body;
     }
     public static CollectionDescription createCollectionDescription() {
         SimpleDateFormat format = new SimpleDateFormat("hh-mm-ss");

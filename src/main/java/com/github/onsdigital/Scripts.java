@@ -1,5 +1,6 @@
 package com.github.onsdigital;
 
+import com.github.onsdigital.http.Http;
 import com.github.onsdigital.test.api.Approve;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.api.Complete;
@@ -29,7 +30,7 @@ public class Scripts {
      * @return
      * @throws Exception
      */
-    public static CollectionDescription buildCustomCollection(int bulletins, int datasets, int csdbFiles) throws Exception {
+    public static CollectionDescription buildCustomCollection(int bulletins, int datasets, int csdbFiles, final Http publisher) throws Exception {
         OneShot.setup();
 
         final Path bulletinSource = Paths.get("src/main/resources/script_resources/complex_bulletin");
@@ -39,7 +40,7 @@ public class Scripts {
         SimpleDateFormat format = new SimpleDateFormat("EEEE_hh-mm-ss");
         String collectionTime = format.format(new Date());
 
-        final CollectionDescription collection = OneShot.publishedCollection();
+        final CollectionDescription collection = OneShot.publishedCollection(publisher);
 
         // upload bulletins by walking the filetree a bunch of times
         for (int i = 1; i <= bulletins; i++) {
@@ -55,7 +56,7 @@ public class Scripts {
                     if (filePath.toString().endsWith(".json")) { uploadPath = tempFileWithStringReplacement(filePath, "<URI_ROOT>", uriRoot); }
 
                     // Do the upload
-                    OneShot.upload(collection.id, uri, uploadPath.toFile(), OneShot.httpPublisher);
+                    OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -76,7 +77,7 @@ public class Scripts {
                     if (filePath.toString().endsWith(".json")) { uploadPath = tempFileWithStringReplacement(filePath, "<URI_ROOT>", uriRoot); }
 
                     // Do the upload
-                    OneShot.upload(collection.id, uri, uploadPath.toFile(), OneShot.httpPublisher);
+                    OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -97,7 +98,7 @@ public class Scripts {
                     if (filePath.toString().endsWith(".json")) { uploadPath = tempFileWithStringReplacement(filePath, "<URI_ROOT>", uriRoot); }
 
                     // Do the upload
-                    OneShot.upload(collection.id, uri, uploadPath.toFile(), OneShot.httpPublisher);
+                    OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
                     return FileVisitResult.CONTINUE;
                 }
@@ -116,22 +117,26 @@ public class Scripts {
      * @return
      * @throws Exception
      */
-    public static CollectionDescription buildReviewedCustomCollection(int bulletins, int datasets, int csdbFiles) throws Exception {
-        CollectionDescription collection = Scripts.buildCustomCollection(bulletins, datasets, csdbFiles);
+    public static CollectionDescription buildReviewedCustomCollection(int bulletins, int datasets, int csdbFiles, Http publisher, Http secondSetOfEyes) throws Exception {
+        CollectionDescription collection = Scripts.buildCustomCollection(bulletins, datasets, csdbFiles, publisher);
 
         // Complete everything
-        collection = Collection.get(collection.id, OneShot.httpPublisher).body;
+        collection = Collection.get(collection.id, publisher).body;
         for (String uri : collection.inProgressUris) {
-            if (uri.endsWith("data.json")) { Complete.complete(collection.id, uri, OneShot.httpPublisher);}
+            if (uri.endsWith("data.json")) {
+                Complete.complete(collection.id, uri, publisher);
+            }
         }
 
         // Review everything
-        collection = Collection.get(collection.id, OneShot.httpPublisher).body;
+        collection = Collection.get(collection.id, publisher).body;
         for (String uri : collection.completeUris) {
-            if (uri.endsWith("data.json")) { Review.review(collection.id, uri, OneShot.httpSecondSetOfEyes);}
+            if (uri.endsWith("data.json")) {
+                Review.review(collection.id, uri, secondSetOfEyes);
+            }
         }
 
-        return Collection.get(collection.id, OneShot.httpPublisher).body;
+        return Collection.get(collection.id, publisher).body;
     }
 
     /**
@@ -160,7 +165,9 @@ public class Scripts {
 
 
     public static void main(String[] args) throws Exception {
-        CollectionDescription collection = buildReviewedCustomCollection(1, 1, 1);
+        OneShot.setup();
+
+        CollectionDescription collection = buildReviewedCustomCollection(1, 1, 1, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
         Approve.approve(collection.id, OneShot.httpPublisher);
     }
 }
