@@ -228,6 +228,57 @@ public class Http implements AutoCloseable {
     }
 
     /**
+     * Fire and forget post.
+     *
+     * @param endpoint      The endpoint to send the request to.
+     * @param file          The file to upload
+     * @return A {@link Response} containing the deserialised body, if any.
+     * @throws IOException If an error occurs.
+     * @see MultipartEntityBuilder
+     */
+    public void justPost(Endpoint endpoint, File file) throws IOException {
+        if (file == null) { justPost(endpoint); return; }
+
+        // Create the request
+        HttpPost post = new HttpPost(endpoint.url());
+        post.setHeaders(combineHeaders());
+
+        // Add fields as text pairs
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+        // Add file as binary
+        FileBody bin = new FileBody(file);
+        multipartEntityBuilder.addPart("file", bin);
+
+        // Set the body
+        post.setEntity(multipartEntityBuilder.build());
+
+        // Send the request and process the response
+        httpClient().execute(post);
+    }
+
+    /**
+     * Fire and forget post.
+     *
+     * Specifically for the use case where we have no requestMessage
+     *
+     * @param endpoint      The endpoint to send the request to.
+     * @param headers       Any additional headers to send with this request. You can use {@link org.apache.http.HttpHeaders} constants for header names.
+     * @throws IOException If an error occurs.
+     */
+    public void justPost(Endpoint endpoint, NameValuePair... headers) throws IOException {
+
+        // Create the request
+        HttpPost post = new HttpPost(endpoint.url());
+        post.setHeaders(combineHeaders(headers));
+
+        // Add the request message if there is one
+        post.setEntity(serialiseRequestMessage(null));
+
+        // Send the request and process the response
+        httpClient().execute(post);
+    }
+
+    /**
      * Sends a POST request with a file and returns the response.
      *
      * @param endpoint      The endpoint to send the request to.

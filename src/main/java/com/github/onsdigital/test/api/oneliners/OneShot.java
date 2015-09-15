@@ -17,6 +17,7 @@ import java.util.Date;
  * Created by thomasridd on 11/09/15.
  */
 public class OneShot {
+    private static boolean loggedIn = false;
 
     private static Http systemSession = Sessions.get("system");
 
@@ -128,12 +129,16 @@ public class OneShot {
 
 
     public static void setup() throws Exception {
+        if (loggedIn) {
+            return;
+        }
         loginAsSystemOwner();
         createUsers();
         setPasswords();
         setPermissions();
 
         initialiseZebedeeConnection();
+        loggedIn = true;
     }
 
     private static void loginAsSystemOwner() throws IOException {

@@ -44,7 +44,7 @@ public class Scripts {
 
         // upload bulletins by walking the filetree a bunch of times
         for (int i = 1; i <= bulletins; i++) {
-            final String uriRoot = "/archive/" + collectionTime + "/bulletins/bulletin_" + i;
+            final String uriRoot = "/rusty/" + collectionTime + "/bulletins/bulletin_" + i;
             Files.walkFileTree(bulletinSource, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs)
@@ -58,9 +58,11 @@ public class Scripts {
                     // Do the upload
                     OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
+
                     return FileVisitResult.CONTINUE;
                 }
             });
+            System.out.print(".");
         }
 
         // upload big datasetss
@@ -79,9 +81,11 @@ public class Scripts {
                     // Do the upload
                     OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
+
                     return FileVisitResult.CONTINUE;
                 }
             });
+            System.out.print("d");
         }
 
         // upload csdb files
@@ -100,9 +104,11 @@ public class Scripts {
                     // Do the upload
                     OneShot.upload(collection.id, uri, uploadPath.toFile(), publisher);
 
+
                     return FileVisitResult.CONTINUE;
                 }
             });
+            System.out.print("c");
         }
 
         return Collection.get(collection.id, OneShot.httpPublisher).body;
