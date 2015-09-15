@@ -28,15 +28,16 @@ import static org.junit.Assert.assertTrue;
  */
 
 @Api
+@DependsOn(com.github.onsdigital.test.api.Publish.class)
 public class Train {
     public static final Host florenceHost = new Host(Configuration.getFlorenceUrl());
     public static final Endpoint florenceContent = new Endpoint(florenceHost, "");
 
     @Test
-    @DependsOn(com.github.onsdigital.test.api.Publish.class)
     public void manualPublishPipeline_givenMegaCollection_shouldPublishToFlorenceInUnder60Seconds() throws Exception {
         // Given
         // a sample collection
+        System.out.println("");
         System.out.println("Manual Publish: Building big collection");
         System.out.println("");
         final CollectionDescription sample = Scripts.buildReviewedCustomCollection(5, 5, 2, Login.httpPublisher, Login.httpSecondSetOfEyes);
