@@ -122,69 +122,6 @@ public class Publish {
         Response<String> response = publishWithBreak(collection.id, Login.httpPublisher);
     }
 
-    @Test
-    public void manualPublishPipeline_givenMegaCollection_shouldPublishToFlorenceInUnder60Seconds() throws Exception {
-        // Given
-        // a sample collection
-        System.out.println("Manual Publish: Building mother of all collections");
-        final CollectionDescription sample = Scripts.buildReviewedCustomCollection(5, 5, 2, Login.httpPublisher, Login.httpSecondSetOfEyes);
-        System.out.println("Manual Publish: Approving m.o.a.c");
-        Approve.approve(sample.id, Login.httpPublisher);
-
-        List<String> uris = randomUrisFromCollection(sample, 10);
-        System.out.println("Manual Publish: Mother of all collections built - starting publish");
-
-        long start = System.currentTimeMillis();
-
-        // When
-        // we start a publish asynchronously
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Login.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-        // Then
-        // We poll every five seconds to see if the files reach remote system
-        boolean urisArePublished = false;
-        while(System.currentTimeMillis() - start < 60000) {
-
-            urisArePublished = false;
-            if (urisArePublishedToFlorence(uris)) {
-                urisArePublished = true;
-                System.out.println(System.currentTimeMillis() - start + "ms: published csdb");
-                break;
-            }
-            Thread.sleep(1000);
-        }
-
-        assertTrue(urisArePublished);
-    }
-    private boolean urisArePublishedToFlorence(List<String> uris) throws IOException {
-
-        for (String uri: uris) {
-            Response<Path> pathResponse = OneShot.httpPublisher.get(florenceContent.addPathSegment(uri));
-            if (pathResponse.statusLine.getStatusCode() != HttpStatus.OK_200) {
-                return false;
-            }
-        }
-        return true;
-    }
-    private List<String> randomUrisFromCollection(CollectionDescription collection, int count) {
-        List<String> uris = collection.reviewedUris;
-
-        if (uris.size() <= count) { return uris; }
-
-        java.util.Collections.shuffle(uris);
-
-        return uris.subList(0, count);
-    }
-
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {
         Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("breakbeforefiletransfer", "true");
         return http.post(endpoint, null, String.class);

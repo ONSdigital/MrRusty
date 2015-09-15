@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -35,6 +33,7 @@ public class Train {
     public static final Endpoint florenceContent = new Endpoint(florenceHost, "");
 
     @Test
+    @DependsOn(com.github.onsdigital.test.api.Publish.class)
     public void manualPublishPipeline_givenMegaCollection_shouldPublishToFlorenceInUnder60Seconds() throws Exception {
         // Given
         // a sample collection
@@ -69,7 +68,7 @@ public class Train {
         while(System.currentTimeMillis() - start < 60000) {
 
             urisArePublished = false;
-            if (urisArePublishedToFlorence(uris)) {
+            if (urisArePublishedToFlorence(uris, Login.httpPublisher)) {
                 urisArePublished = true;
                 System.out.println(System.currentTimeMillis() - start + "ms: published csdb");
                 break;
@@ -79,10 +78,10 @@ public class Train {
 
         assertTrue(urisArePublished);
     }
-    private boolean urisArePublishedToFlorence(List<String> uris) throws IOException {
+    private boolean urisArePublishedToFlorence(List<String> uris, Http http) throws IOException {
 
         for (String uri: uris) {
-            Response<Path> pathResponse = OneShot.httpPublisher.get(florenceContent.addPathSegment(uri));
+            Response<Path> pathResponse = http.get(florenceContent.addPathSegment(uri));
             if (pathResponse.statusLine.getStatusCode() != HttpStatus.OK_200) {
                 return false;
             }
