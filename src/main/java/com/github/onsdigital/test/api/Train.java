@@ -33,7 +33,7 @@ public class Train {
     public static final Host florenceHost = new Host(Configuration.getFlorenceUrl());
     public static final Endpoint florenceContent = new Endpoint(florenceHost, "");
 
-    @Test
+    //@Test
     public void manualPublishPipeline_givenMegaCollection_shouldPublishToFlorenceInUnder60Seconds() throws Exception {
         // Given
         // a sample collection
