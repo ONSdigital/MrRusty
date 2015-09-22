@@ -66,7 +66,7 @@ public class Publish {
 
         // Expect
         // a response of okay
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+        assertEquals("Publish failed", HttpStatus.OK_200, response.statusLine.getStatusCode());
     }
 
     /**
@@ -111,15 +111,19 @@ public class Publish {
 
         assertNotNull(collection);
 
-        assertEquals(HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
+        assertEquals("Complete failed", HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
         collection = Collection.get(collection.id, Login.httpPublisher).body;
 
-        assertEquals(HttpStatus.OK_200, Review.reviewAll(collection, Login.httpSecondSetOfEyes));
-        assertEquals(HttpStatus.OK_200, Approve.approve(collection.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals("Review failed", HttpStatus.OK_200, Review.reviewAll(collection, Login.httpSecondSetOfEyes));
+        assertEquals("Approve failed", HttpStatus.OK_200, Approve.approve(collection.id, Login.httpPublisher).statusLine.getStatusCode());
 
         // When
         // we approve it using publish credentials
         Response<String> response = publishWithBreak(collection.id, Login.httpPublisher);
+
+        // Expect
+        // a response of okay
+        assertEquals("Publish failed", HttpStatus.OK_200, response.statusLine.getStatusCode());
     }
 
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {
