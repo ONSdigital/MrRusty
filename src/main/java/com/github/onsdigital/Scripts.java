@@ -1,10 +1,7 @@
 package com.github.onsdigital;
 
 import com.github.onsdigital.http.Http;
-import com.github.onsdigital.test.api.Approve;
-import com.github.onsdigital.test.api.Collection;
-import com.github.onsdigital.test.api.Complete;
-import com.github.onsdigital.test.api.Review;
+import com.github.onsdigital.test.api.*;
 import com.github.onsdigital.test.api.oneliners.OneShot;
 import com.github.onsdigital.test.json.CollectionDescription;
 
@@ -67,7 +64,7 @@ public class Scripts {
 
         // upload big datasetss
         for (int i = 1; i <= datasets; i++) {
-            final String uriRoot = "/archive/" + collectionTime + "/datasets/dataset_" + i + "/";
+            final String uriRoot = "/rusty/" + collectionTime + "/datasets/dataset_" + i + "/";
             Files.walkFileTree(datasetSource, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs)
@@ -90,7 +87,7 @@ public class Scripts {
 
         // upload csdb files
         for (int i = 1; i <= csdbFiles; i++) {
-            final String uriRoot = "/archive/" + collectionTime + "/datasets/csdb_" + i + "/";
+            final String uriRoot = "/rusty/" + collectionTime + "/datasets/csdb_" + i + "/";
             Files.walkFileTree(csdbSource, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs)
@@ -170,10 +167,23 @@ public class Scripts {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void publishSomething() throws Exception {
         OneShot.setup();
 
-        CollectionDescription collection = buildReviewedCustomCollection(1, 1, 1, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
+        CollectionDescription collection = buildReviewedCustomCollection(1, 0, 1, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
         Approve.approve(collection.id, OneShot.httpPublisher);
+
+        Publish.publish(collection.id, OneShot.httpPublisher);
+    }
+
+    public static void approveSomething() throws Exception {
+        OneShot.setup();
+
+        CollectionDescription collection = buildReviewedCustomCollection(2, 5, 2, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
+        Approve.approve(collection.id, OneShot.httpPublisher);
+    }
+
+    public static void main(String[] args) throws Exception {
+        approveSomething();
     }
 }
