@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  */
 
 @Api
-@DependsOn(com.github.onsdigital.test.api.Permissions.class)
+@DependsOn({Approve.class, Transfer.class, Permissions.class})
 public class Publish {
     public static final Host florenceHost = new Host(Configuration.getFlorenceUrl());
     public static final Endpoint florenceContent = new Endpoint(florenceHost, "");
@@ -41,7 +41,7 @@ public class Publish {
      * This is for original style files with type = "dataset"
      */
     @POST
-    @Test
+    //@Test
     public void dataPublisher_givenDataset_shouldPublishCSDBFiles() throws IOException {
 
         // Given
