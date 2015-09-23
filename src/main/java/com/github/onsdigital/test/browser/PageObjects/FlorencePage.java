@@ -77,9 +77,9 @@ public class FlorencePage extends PageObject {
         return new CollectionsPage(driver);
     }
 
-    public CollectionsPage clickPublishingQueueMenuLink() {
+    public PublishingQueuePage clickPublishingQueueMenuLink() {
         publishingQueueMenuLink = find(publishingQueueLocator);
         this.publishingQueueMenuLink.click();
-        return new CollectionsPage(driver);
+        return new PublishingQueuePage(driver);
     }
 }

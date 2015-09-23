@@ -179,11 +179,16 @@ public class Scripts {
     public static void approveSomething() throws Exception {
         OneShot.setup();
 
-        CollectionDescription collection = buildReviewedCustomCollection(10, 10, 5, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
+        CollectionDescription collection = buildReviewedCustomCollection(1, 0, 0, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
         Approve.approve(collection.id, OneShot.httpPublisher);
     }
 
     public static void main(String[] args) throws Exception {
-        publishSomething();
+        OneShot.setup();
+
+        CollectionDescription collection = buildReviewedCustomCollection(1, 0, 0, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
+        Approve.approve(collection.id, OneShot.httpPublisher);
+
+        Publish.publish(collection.id, OneShot.httpPublisher);
     }
 }
