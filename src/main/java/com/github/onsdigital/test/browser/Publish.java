@@ -47,6 +47,6 @@ public class Publish {
                 .clickApprove();
 
         // go to publish screen and select publish for the collection
-        //collectionsPage.clickPublishingQueueMenuLink();
+        collectionsPage.clickPublishingQueueMenuLink();
     }
 }
