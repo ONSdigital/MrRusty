@@ -12,6 +12,7 @@ import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.api.oneliners.OneShot;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.CollectionDescription;
+import com.github.onsdigital.test.json.CollectionType;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
@@ -124,6 +125,25 @@ public class Publish {
         // Expect
         // a response of okay
         assertEquals("Publish failed", HttpStatus.OK_200, response.statusLine.getStatusCode());
+    }
+
+    @POST
+    @Test
+    public void timedPublish_ifCollectionNotApproved_shouldRevertToManual() throws IOException, InterruptedException {
+        // Given
+        // a collection that we add files to and then
+        CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent("/economy/", 2, 5);
+
+        assertNotNull(collection);
+
+        // When
+        // we approve it using publish credentials
+        Thread.sleep(6000);
+        collection = Collection.get(collection.id, Login.httpPublisher).body;
+
+        // Expect
+        // a response of okay
+        assertEquals(CollectionType.manual, collection.type);
     }
 
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {

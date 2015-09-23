@@ -9,6 +9,7 @@ import com.github.onsdigital.test.json.*;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import static org.junit.Assert.assertEquals;
 
@@ -65,6 +66,38 @@ public class OneLineSetups {
 
         return Collection.get(collection.id, Login.httpPublisher).body;
     }
+
+    /**
+     * Returns a scheduled CollectionDescription with randomly generated content in a specific folder
+     *
+     * @param directory the base uri
+     * @param fileCount the number of files
+     * @param delayInSeconds the time, from now, to set the publish
+     * @return
+     * @throws IOException
+     */
+    public static CollectionDescription scheduledCollectionWithContent(String directory, int fileCount, int delayInSeconds) throws IOException {
+        CollectionDescription collection = Collection.createCollectionDescription();
+        collection.type = CollectionType.scheduled;
+
+        Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+        calendar.add(Calendar.SECOND, delayInSeconds);
+        collection.publishDate = calendar.getTime();
+
+        collection = Collection.post(collection, Login.httpPublisher).body;
+        for(int i = 0; i < fileCount; i++) {
+            String uri = "";
+            if(directory.equals("") || directory.equals("/")) {
+                uri = "/" + Random.id() + "/data.json";
+            } else {
+                uri = directory + Random.id() + "/data.json";
+            }
+            Content.create(collection.id, uri, uri, Login.httpPublisher);
+        }
+
+        return Collection.get(collection.id, Login.httpPublisher).body;
+    }
+
 
     public static Http newSessionWithViewerPermissions(String name, String email) throws IOException {
         // Given
