@@ -78,8 +78,9 @@ public class FlorencePage extends PageObject {
     }
 
     public PublishingQueuePage clickPublishingQueueMenuLink() {
-        publishingQueueMenuLink = find(publishingQueueLocator);
-        this.publishingQueueMenuLink.click();
+        publishingQueueMenuLink = waitAndFind(publishingQueueLocator);
+        this.publishingQueueMenuLink.findElement(By.linkText("Publishing queue")).click();
+
         return new PublishingQueuePage(driver);
     }
 }

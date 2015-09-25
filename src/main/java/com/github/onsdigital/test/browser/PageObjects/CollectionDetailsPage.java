@@ -2,6 +2,9 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -62,8 +65,7 @@ public class CollectionDetailsPage extends CollectionsPage {
         WebElement approveButton = waitAndFind(approveCollectionButtonLocator);
         approveButton.click();
 
-        // adding wait until we find a way of knowing when the approve is done.
-        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
 
         return new CollectionsPage(driver);
     }

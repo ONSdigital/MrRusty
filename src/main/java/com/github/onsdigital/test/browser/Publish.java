@@ -14,7 +14,7 @@ public class Publish {
     Credentials publisher = SetupBeforeTesting.publisherCredentials;
 
     @Test
-    public void shouldPublishContent() {
+    public void shouldPublishContent() throws InterruptedException {
 
         // login and create a collection
         String collectionName = Collection.createCollectionNameForTest();
@@ -46,7 +46,21 @@ public class Publish {
         collectionsPage = collectionsPage.clickCollectionByName(collectionName)
                 .clickApprove();
 
+
         // go to publish screen and select publish for the collection
-        collectionsPage.clickPublishingQueueMenuLink();
+        PublishingQueuePage publishingQueuePage = collectionsPage.clickPublishingQueueMenuLink();
+
+        // select the page and unlock
+        PublishingQueueDetailsPage publishingQueueDetailsPage = publishingQueuePage.selectManualPublish();
+        publishingQueueDetailsPage.clickCollectionSection(collectionName);
+        collectionsPage = publishingQueueDetailsPage.unlockCollectionWithName(collectionName);
+
+
+        // select the page and publish
+        collectionsPage = collectionsPage.clickCollectionByName(collectionName).clickApprove();
+        publishingQueuePage = collectionsPage.clickPublishingQueueMenuLink();
+        publishingQueueDetailsPage = publishingQueuePage.selectManualPublish();
+        publishingQueueDetailsPage.clickCollectionSection(collectionName);
+        publishingQueueDetailsPage.publishCollectionWithName(collectionName);
     }
 }

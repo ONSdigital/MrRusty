@@ -34,5 +34,22 @@ public class PublishingQueuePage extends FlorencePage {
 
         return this;
     }
+
+    public PublishingQueueDetailsPage selectManualPublish() {
+        WebElement manualCell;
+        try {
+            manualCell = driver.findElement(By.xpath("//td[contains(., '[manual collection]')]"));
+            manualCell.click();
+        } catch (NoSuchElementException e) {
+            throw new NotFoundException("Could not find [manual collection]");
+        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new PublishingQueueDetailsPage(driver);
+
+    }
 }
 
