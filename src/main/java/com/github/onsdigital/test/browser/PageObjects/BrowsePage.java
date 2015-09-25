@@ -65,27 +65,28 @@ public class BrowsePage extends WorkspacePage {
                 .clickBrowseTreeItem("/economy/environmentalaccounts");
     }
 
+    /**
+     * Search for the currently visible create
+     *
+     * @return
+     */
     public CreatePage clickCreateForCurrentPage() {
-        List<WebElement> elements = driver.findElements(createButtonLocator);
-        for (WebElement element : elements) {
-            if (element.isDisplayed()) {
-                element.click();
-                break;
-            }
 
-        }
+        WebElement button = driver.findElement(By.className("tree-nav-holder")).
+                findElement(By.className("selected"))
+                .findElement(createButtonLocator);
+        button.click();
+
         return new CreatePage(driver);
     }
 
     public EditPage clickEditForCurrentPage() {
-        List<WebElement> elements = driver.findElements(editButtonLocator);
-        for (WebElement element : elements) {
-            if (element.isDisplayed()) {
-                element.click();
-                break;
-            }
 
-        }
+        WebElement button = driver.findElement(By.className("tree-nav-holder")).
+                findElement(By.className("selected"))
+                .findElement(createButtonLocator);
+        button.click();
+
         return new EditPage(driver);
     }
 
