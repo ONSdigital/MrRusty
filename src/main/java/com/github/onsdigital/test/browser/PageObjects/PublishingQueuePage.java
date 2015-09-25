@@ -51,5 +51,27 @@ public class PublishingQueuePage extends FlorencePage {
         return new PublishingQueueDetailsPage(driver);
 
     }
+
+    /**
+     * Estabished 26/08/2078 as our example publishing date
+     *
+     * @return
+     */
+    public PublishingQueueDetailsPage selectPublishDateIn2078() {
+        WebElement publishCell;
+        try {
+            publishCell = driver.findElement(By.xpath("//td[contains(., '2078')]"));
+            publishCell.click();
+        } catch (NoSuchElementException e) {
+            throw new NotFoundException("Could not find [2078 collection]");
+        }
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new PublishingQueueDetailsPage(driver);
+
+    }
 }
 

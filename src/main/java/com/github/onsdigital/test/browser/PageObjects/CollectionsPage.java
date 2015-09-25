@@ -3,9 +3,12 @@ package com.github.onsdigital.test.browser.PageObjects;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +19,8 @@ public class CollectionsPage extends FlorencePage {
     By scheduledPublishRadioLocator = By.id("scheduledpublish");
     By manualPublishRadioLocator = By.id("manualpublish");
     By dateInputLocator = By.id("date");
+    By hourInputLocator = By.id("hour");
+    By minInputLocator = By.id("min");
     By createCollectionButtonLocator = By.className("btn-collection-create");
 
     WebElement collectionNameInput;
@@ -24,6 +29,8 @@ public class CollectionsPage extends FlorencePage {
     WebElement manualPublishRadio;
     WebElement dateInput;
     WebElement createCollectionButton;
+    Select hourInput;
+    Select minInput;
 
     public CollectionsPage(WebDriver driver) {
         super(driver);
@@ -42,6 +49,9 @@ public class CollectionsPage extends FlorencePage {
             manualPublishRadio = find(manualPublishRadioLocator);
             createCollectionButton = find(createCollectionButtonLocator);
             dateInput = find(dateInputLocator);
+            hourInput = new Select(find(hourInputLocator));
+            minInput = new Select(find(minInputLocator));
+
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
@@ -56,6 +66,16 @@ public class CollectionsPage extends FlorencePage {
      */
     public BrowsePage createCollection(String name) {
         populateFormWithDefaults(name);
+        return clickCreateCollection();
+    }
+
+    /**
+     * Helper method to compose populating the form and submitting
+     * @param name
+     * @return
+     */
+    public BrowsePage createScheduledCollection(String name) {
+        populateFormWithScheduledDefaults(name);
         return clickCreateCollection();
     }
 
@@ -81,6 +101,32 @@ public class CollectionsPage extends FlorencePage {
     }
 
     /**
+     * Populate all fields to create a collection with defaults and a random name.
+     *
+     * @return
+     */
+    public CollectionsPage populateFormWithScheduledDefaults() {
+        return populateFormWithScheduledDefaults(Random.id());
+    }
+
+    /**
+     * Populate all fields to create a collection with defaults and the given name.
+     * @param name
+     * @return
+     */
+    public CollectionsPage populateFormWithScheduledDefaults(String name) {
+        typeCollectionName(name);
+        selectTeamByIndex(1);
+        selectScheduledPublish();
+
+        typeDate("26/08/2078");
+        selectHour(8);
+        selectMinute(1);
+
+        return this;
+    }
+
+    /**
      * Type the given collection name into the create new collection form.
      *
      * @param collectionName
@@ -101,6 +147,64 @@ public class CollectionsPage extends FlorencePage {
     public CollectionsPage typeDate(Date date) {
         dateInput.clear();
         dateInput.sendKeys(new SimpleDateFormat("dd/MM/yyyy").format(date));
+        return this;
+    }
+    /**
+     * Type the given date value into the collection form.
+     *
+     * @param date
+     * @return
+     */
+    public CollectionsPage typeDate(String date) {
+        dateInput.clear();
+        dateInput.sendKeys(date);
+        dateInput.sendKeys(Keys.ENTER);
+
+        // wait for date picker to not be visible. It obstructs the create button.
+        (new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("ui-datepicker-div")));
+
+        return this;
+    }
+
+    /**
+     * Select the hour to publish a scheduled collection.
+     *
+     * @param index
+     * @return
+     */
+    public CollectionsPage selectHour(int index) {
+        hourInput.selectByIndex(index);
+        return this;
+    }
+    /**
+     * Select the hour to publish a scheduled collection.
+     *
+     * @param hour
+     * @return
+     */
+    public CollectionsPage selectHour(String hour) {
+        hourInput.selectByValue(hour);
+        return this;
+    }
+
+    /**
+     * Select the minute to publish a scheduled collection.
+     *
+     * @param index
+     * @return
+     */
+    public CollectionsPage selectMinute(int index) {
+        minInput.selectByIndex(index);
+        return this;
+    }
+    /**
+     * Select the minute to publish a scheduled collection.
+     *
+     * @param min
+     * @return
+     */
+    public CollectionsPage selectMinute(String min) {
+        minInput.selectByValue(min);
         return this;
     }
 
