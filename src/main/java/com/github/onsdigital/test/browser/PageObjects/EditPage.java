@@ -24,8 +24,7 @@ public class EditPage extends WorkspacePage {
     protected WorkspacePage initialisePage() {
         try {
             super.initialisePage();
-            contentAccordion = waitAndFind(contentAccordionLocator);
-            saveButton = find(saveButtonLocator);
+            saveButton = waitAndFind(saveButtonLocator);
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
@@ -45,6 +44,7 @@ public class EditPage extends WorkspacePage {
     }
 
     public EditPage openContentAccordion() {
+        contentAccordion = waitAndFind(contentAccordionLocator);
         contentAccordion.click();
         scrollTo("#content");
         return this;

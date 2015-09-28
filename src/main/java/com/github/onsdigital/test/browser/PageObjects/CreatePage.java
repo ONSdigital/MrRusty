@@ -143,4 +143,11 @@ public class CreatePage extends WorkspacePage {
                 .typePageName(pageName)
                 .clickCreatePage();
     }
+
+    public EditPage createRelease(String pageName) {
+        return selectPageType(ContentType.release)
+                .typeReleaseDate(new DateTime(new Date()).plusDays(1).toDate())
+                .typePageName(pageName)
+                .clickCreatePage();
+    }
 }
