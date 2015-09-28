@@ -278,10 +278,9 @@ public class Content {
      * @return
      * @throws IOException
      */
-    public static Response<String> create(String collectionName, String content, String uri, Http http) throws IOException {
+    public static Response<String> create(String collectionName, Object content, String uri, Http http) throws IOException {
 
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
-
         return http.post(contentEndpoint, content, String.class);
     }
 
@@ -297,9 +296,13 @@ public class Content {
      * @throws IOException
      */
     public static Response<Path> get(String collectionName, String uri, Http http) throws IOException {
-
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
         return http.get(contentEndpoint);
+    }
+
+    public static <T> Response<T> get(String collectionName, String uri, Http http, Class<T> responseClass) throws IOException {
+        Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collectionName).setParameter("uri", uri);
+        return http.get(contentEndpoint, responseClass);
     }
 
     /**

@@ -2,14 +2,12 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.Scripts;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Host;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.test.api.oneliners.OneShot;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionType;
@@ -19,12 +17,8 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by thomasridd on 05/06/2015.
@@ -156,5 +150,35 @@ public class Publish {
         return http.post(endpoint, null, String.class);
     }
 
+    /**
+     * Publish the collection for the given id and poll the api to check when the publish is complete.
+     * @param collectionID
+     * @param httpPublisher
+     * @throws IOException
+     */
+    public static void publishAndWait(String collectionID, Http httpPublisher, int secondsToWait) throws IOException {
+        publish(collectionID, httpPublisher);
 
+        int count = 0;
+        boolean published = false;
+
+        while (count < secondsToWait) {
+            Response<CollectionDescription> response = Collection.get(collectionID, Login.httpPublisher);
+
+            if (response.statusLine.getStatusCode() == 404 || response.body.publishComplete) {
+                published = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+
+            count++;
+        }
+
+        if (!published)
+            fail("Collection was not published");
+    }
 }

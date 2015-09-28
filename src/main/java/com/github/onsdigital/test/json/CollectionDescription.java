@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.json;
 
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,17 +10,14 @@ import java.util.Map;
  *
  * @author david
  */
-public class CollectionDescription {
-
-    public String id;
-    public String name;
-    public Date publishDate;
-    public CollectionType type;
+public class CollectionDescription extends CollectionBase {
 
     public List<String> inProgressUris;
     public List<String> completeUris;
     public List<String> reviewedUris;
     public boolean approvedStatus;
+    public boolean publishComplete;
+    public String publishTransactionId;
 
     /**
      * events related to this collection
@@ -30,6 +28,7 @@ public class CollectionDescription {
      * A List of {@link Event} for each uri in the collection.
      */
     public Map<String, Events> eventsByUri;
+
 
     /**
      * Default constuructor for serialisation.
@@ -71,5 +70,4 @@ public class CollectionDescription {
 
         events.add(event);
     }
-
 }
