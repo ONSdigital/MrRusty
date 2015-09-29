@@ -85,7 +85,7 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
         acceptAlert();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
-        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("section-head")));
+        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementWithText(By.className("collections-section__head"), collectionName));
 
         // return to the collections page
         clickCollectionsMenuLink();

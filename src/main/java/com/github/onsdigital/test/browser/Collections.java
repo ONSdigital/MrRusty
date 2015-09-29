@@ -30,7 +30,8 @@ public class Collections {
         collectionsPage.typeCollectionName(Collection.createCollectionNameForTest())
         .selectTeamByIndex(1)
         .selectScheduledPublish()
-        .typeDate(new DateTime(new Date()).plusDays(1).toDate());
+        .typeDate(new DateTime(new Date()).plusDays(1).toDate())
+        .selectHour("32400000").selectMinute("1800000");
 
         // Then the collection is created and the browse screen is shown
         collectionsPage.clickCreateCollection();
@@ -70,4 +71,7 @@ public class Collections {
         // Then the collection is not created and the user stays on the collections page.
         collectionsPage.clickCreateCollectionExpectingError();
     }
+
+
+
 }

@@ -147,6 +147,11 @@ public class CollectionsPage extends FlorencePage {
     public CollectionsPage typeDate(Date date) {
         dateInput.clear();
         dateInput.sendKeys(new SimpleDateFormat("dd/MM/yyyy").format(date));
+        dateInput.sendKeys(Keys.ENTER);
+
+        // wait for date picker to not be visible. It obstructs the create button.
+        (new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("ui-datepicker-div")));
+
         return this;
     }
     /**
@@ -158,10 +163,7 @@ public class CollectionsPage extends FlorencePage {
     public CollectionsPage typeDate(String date) {
         dateInput.clear();
         dateInput.sendKeys(date);
-        dateInput.sendKeys(Keys.ENTER);
 
-        // wait for date picker to not be visible. It obstructs the create button.
-        (new WebDriverWait(driver, 2)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("ui-datepicker-div")));
 
         return this;
     }
