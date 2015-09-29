@@ -102,6 +102,7 @@ public class Collection {
         release.setDescription(new PageDescription());
         release.getDescription().setPublished(false);
         release.setUri(URI.create(releaseUri));
+        release.getDescription().setTitle(Random.id());
         return release;
     }
 
