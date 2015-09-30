@@ -1,13 +1,7 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.Select;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 public class PublishingQueuePage extends FlorencePage {
 
@@ -43,11 +37,7 @@ public class PublishingQueuePage extends FlorencePage {
         } catch (NoSuchElementException e) {
             throw new NotFoundException("Could not find [manual collection]");
         }
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        waitForAnimations();
         return new PublishingQueueDetailsPage(driver);
 
     }
