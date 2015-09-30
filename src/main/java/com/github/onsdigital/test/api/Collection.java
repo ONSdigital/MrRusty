@@ -15,6 +15,7 @@ import com.github.onsdigital.test.json.page.release.Release;
 import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.ws.rs.DELETE;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 
+import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -67,39 +69,40 @@ public class Collection {
      * <p/>
      * Create with publisher permissions should return {@link HttpStatus#OK_200}
      */
-//    @POST
-//    @Test
-//    public void canCreateCollectionAssociatedWithARelease() throws IOException {
-//
-//        // Given an announced release.
-//        Release release = CreateRelease();
-//        String releaseUri = release.getUri().toString();
-//
-//        CollectionDescription announcementCollection = OneLineSetups.publishedCollection();
-//        assertOk(Content.create(announcementCollection.id, release, releaseUri, Login.httpPublisher));
-//
-//        assertOk(Complete.complete(announcementCollection.id, releaseUri, Login.httpPublisher));
-//        assertOk(Review.review(announcementCollection.id, releaseUri, Login.httpSecondSetOfEyes));
-//        assertOk(Approve.approve(announcementCollection.id, Login.httpPublisher));
-//        Publish.publishAndWait(announcementCollection.id, Login.httpPublisher, 10);
-//
-//        // When we create a new collection with the release URI.
-//        CollectionDescription releaseCollection = createCollectionDescription();
-//        releaseCollection.releaseUri = release.getUri();
-//        releaseCollection = assertOk(Collection.post(releaseCollection, Login.httpPublisher)).body;
-//
-//        // Then the release page is added to the collection, and the release page is set to published
-//        assertEquals(releaseUri, releaseCollection.releaseUri.toString());
-//
-//        Release releasePage = assertOk(Content.get(releaseCollection.id, releaseUri, Login.httpPublisher, Release.class)).body;
-//        assertTrue(releasePage.getDescription().getPublished());
-//    }
+    @POST
+    @Test
+    public void canCreateCollectionAssociatedWithARelease() throws IOException {
+
+        // Given an announced release.
+        Release release = CreateRelease();
+        String releaseUri = release.getUri().toString() + "/data.json";
+
+        CollectionDescription announcementCollection = OneLineSetups.publishedCollection();
+        assertOk(Content.create(announcementCollection.id, release, releaseUri, Login.httpPublisher));
+
+        assertOk(Complete.complete(announcementCollection.id, releaseUri, Login.httpPublisher));
+        assertOk(Review.review(announcementCollection.id, releaseUri, Login.httpSecondSetOfEyes));
+        assertOk(Approve.approve(announcementCollection.id, Login.httpPublisher));
+        Publish.publishAndWait(announcementCollection.id, Login.httpPublisher, 10);
+
+        // When we create a new collection with the release URI.
+        CollectionDescription releaseCollection = createCollectionDescription();
+        releaseCollection.releaseUri = release.getUri();
+        releaseCollection = assertOk(Collection.post(releaseCollection, Login.httpPublisher)).body;
+
+        // Then the release page is added to the collection, and the release page is set to published
+        assertEquals(release.getUri().toString(), releaseCollection.releaseUri.toString());
+
+        Release releasePage = assertOk(Content.get(releaseCollection.id, releaseUri, Login.httpPublisher, Release.class)).body;
+        assertTrue(releasePage.getDescription().getPublished());
+    }
 
     private Release CreateRelease() {
-        String releaseUri = "/releases/" + Random.id() + "/data.json";
+        String releaseUri = "/releases/" + Random.id() ;
         Release release = new Release();
         release.setDescription(new PageDescription());
         release.getDescription().setPublished(false);
+        release.getDescription().setReleaseDate(new DateTime().plusMinutes(5).toDate());
         release.setUri(URI.create(releaseUri));
         release.getDescription().setTitle(Random.id());
         return release;
