@@ -3,6 +3,7 @@ package com.github.onsdigital.selenium;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -56,8 +57,12 @@ public class PageObject {
      * @param script
      * @return
      */
-    public String runScript(String script) {
-        return (String)((JavascriptExecutor)driver).executeScript(script);
+    public Object runScript(String script) {
+        return runScript(driver, script);
+    }
+
+    public static Object runScript(WebDriver driver, String script) {
+        return ((JavascriptExecutor) driver).executeScript(script);
     }
 
     protected void openIfNecessary(String url) {
@@ -77,5 +82,28 @@ public class PageObject {
     public void acceptAlert() {
         Alert alert = (new WebDriverWait(driver, 5)).until(ExpectedConditions.alertIsPresent());
         alert.accept();
+    }
+
+    public void waitForAnimations() {
+        new WebDriverWait(driver, 5).until(allAnimationsFinished());
+    }
+
+    /**
+     * Return true if the collection details pane has an animation in progress.
+     *
+     * @return
+     */
+    private static boolean allAnimationsFinished(WebDriver driver) {
+        long animations = (long) PageObject.runScript(driver, "return jQuery(':animated').length;");
+        System.out.println("animations:" + animations);
+        return animations == 0;
+    }
+
+    private static ExpectedCondition<Boolean> allAnimationsFinished() {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                return allAnimationsFinished(driver);
+            }
+        };
     }
 }

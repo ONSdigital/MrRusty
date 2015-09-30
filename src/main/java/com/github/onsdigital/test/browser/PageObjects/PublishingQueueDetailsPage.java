@@ -1,7 +1,6 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
-import com.github.onsdigital.test.json.CollectionDescription;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -33,20 +32,26 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
     private WebElement findCollectionSection(String collectionName) {
         List<WebElement> collections = driver.findElements(By.className("collections-section"));
 
+        int index = 0;
+
         for (WebElement collection : collections) {
             WebElement head = collection.findElement(By.className("collections-section__head")).findElement(By.className("collection-name"));
+
             if (head.getText().equals(collectionName)) {
 
                 String uid = collection.findElement(By.className("collections-section__head")).getAttribute("id");
                 System.out.println(uid);
 
                 try {
-                    scrollTo(uid);
+                    runScript(String.format("$('.publish-selected .section-content').animate({ scrollTop: (%d * $('#%s').height()) });", index, uid));
+                    waitForAnimations();
                 } catch (WebDriverException e) {
-                    System.out.println("Could not scroll to cell " + uid);
+                    System.out.println("Could not scroll to cell " + uid + e.getMessage());
                 }
                 return collection;
             }
+
+            index++;
         }
         throw new PageObjectException("Publish: Failed to recognise the " + collectionName + " collection in list.");
     }
@@ -86,6 +91,8 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementWithText(By.className("collections-section__head"), collectionName));
+
+        waitForAnimations();
 
         // return to the collections page
         clickCollectionsMenuLink();

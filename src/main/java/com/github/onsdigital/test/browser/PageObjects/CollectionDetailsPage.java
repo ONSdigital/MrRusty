@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
+import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -7,7 +8,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class CollectionDetailsPage extends CollectionsPage {
 
@@ -38,7 +38,7 @@ public class CollectionDetailsPage extends CollectionsPage {
 
     public SelectedPagePartial clickCollectionPageByName(String pageName) {
 
-        
+
         List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list"));
 
         for (WebElement page : pages) {
@@ -66,7 +66,31 @@ public class CollectionDetailsPage extends CollectionsPage {
         approveButton.click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
+        waitForAnimationToFinish();
 
         return new CollectionsPage(driver);
+    }
+
+    private void waitForAnimationToFinish() {
+        new WebDriverWait(driver, 5).until(animationFinished());
+    }
+
+    /**
+     * Return true if the collection details pane has an animation in progress.
+     *
+     * @return
+     */
+    private static boolean hasAnimationFinished(WebDriver driver) {
+        boolean isAnimated = (boolean) PageObject.runScript(driver, "return jQuery('.collection-selected').is(':animated')");
+        //System.out.println("Checking isAnimated...." + isAnimated);
+        return !isAnimated;
+    }
+
+    private static ExpectedCondition<Boolean> animationFinished() {
+        return new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver driver) {
+                return hasAnimationFinished(driver);
+            }
+        };
     }
 }
