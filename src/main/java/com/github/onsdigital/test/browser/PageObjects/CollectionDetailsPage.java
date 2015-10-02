@@ -66,7 +66,8 @@ public class CollectionDetailsPage extends CollectionsPage {
         approveButton.click();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
-        waitForAnimationToFinish();
+        new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("collection-selected")));
+
 
         return new CollectionsPage(driver);
     }
