@@ -102,7 +102,7 @@ public class Publish {
     public void zebedee_whenPublishCalled_shouldPostToTheDestination() throws IOException {
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/economy/", 2);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/rusty/", 2);
 
         assertNotNull(collection);
 
@@ -126,7 +126,7 @@ public class Publish {
     public void timedPublish_ifCollectionNotApproved_shouldRevertToManual() throws IOException, InterruptedException {
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent("/economy/", 2, 5);
+        CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent("/rusty/", 2, 5);
 
         assertNotNull(collection);
 

@@ -10,6 +10,8 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -56,12 +58,17 @@ public class OneLineSetups {
 
         for(int i = 0; i < fileCount; i++) {
             String uri = "";
+
             if(directory.equals("") || directory.equals("/")) {
                 uri = "/" + Random.id() + "/data.json";
             } else {
                 uri = directory + Random.id() + "/data.json";
             }
-            Content.create(collection.id, uri, uri, Login.httpPublisher);
+
+            ContentDetail detail = new ContentDetail();
+            detail.description = new ContentDetailDescription("title");
+
+            Content.create(collection.id, detail, uri, Login.httpPublisher);
         }
 
         return Collection.get(collection.id, Login.httpPublisher).body;
@@ -92,7 +99,11 @@ public class OneLineSetups {
             } else {
                 uri = directory + Random.id() + "/data.json";
             }
-            Content.create(collection.id, uri, uri, Login.httpPublisher);
+
+            ContentDetail detail = new ContentDetail();
+            detail.description = new ContentDetailDescription("title");
+
+            Content.create(collection.id, detail, uri, Login.httpPublisher);
         }
 
         return Collection.get(collection.id, Login.httpPublisher).body;
