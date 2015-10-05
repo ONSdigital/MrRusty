@@ -44,7 +44,7 @@ public class CollectionsPage extends FlorencePage {
         try {
             super.initialisePage();
             collectionNameInput = waitAndFind(collectionNameInputLocator);
-            teamSelect = new Select(find(teamSelectLocator));
+            teamSelect = new Select(waitAndFind(teamSelectLocator));
             scheduledPublishRadio = find(scheduledPublishRadioLocator);
             manualPublishRadio = find(manualPublishRadioLocator);
             createCollectionButton = find(createCollectionButtonLocator);

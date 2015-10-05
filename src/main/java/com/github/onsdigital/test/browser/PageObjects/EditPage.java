@@ -102,6 +102,7 @@ public class EditPage extends WorkspacePage {
     public CollectionsPage clickSubmitForApproval() {
         WebElement submitForApprovalButton = waitAndFind(submitForApprovalButtonLocator);
         submitForApprovalButton.click();
+        waitForAnimations();
         return new CollectionsPage(this.driver);
     }
 }

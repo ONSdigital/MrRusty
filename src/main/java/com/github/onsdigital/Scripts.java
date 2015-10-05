@@ -1,7 +1,10 @@
 package com.github.onsdigital;
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Http;
+import com.github.onsdigital.http.Response;
 import com.github.onsdigital.test.api.*;
+import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.api.oneliners.OneShot;
 import com.github.onsdigital.test.json.CollectionDescription;
 
@@ -183,12 +186,27 @@ public class Scripts {
         Approve.approve(collection.id, OneShot.httpPublisher);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void publishDataset() throws Exception {
         OneShot.setup();
 
-        CollectionDescription collection = buildReviewedCustomCollection(1, 0, 0, OneShot.httpPublisher, OneShot.httpSecondSetOfEyes);
-        Approve.approve(collection.id, OneShot.httpPublisher);
+        CollectionDescription collection = OneShot.publishedCollection(OneShot.httpPublisher);
 
-        Publish.publish(collection.id, OneShot.httpPublisher);
+        System.out.println(collection.toString());
+
+        File json = new File("src/main/resources/script_resources/big_publish_dataset/data.json");
+        File csdb = new File("src/main/resources/script_resources/big_publish_dataset/pgdp.csdb");
+
+        String baseUri = "/economy/grossdomesticproductgdp/datasets/preliminaryestimateofgdp";
+        Content.upload(collection.id, baseUri + "/data.json", json, OneShot.httpPublisher);
+        Content.upload(collection.id, baseUri + "/pgdp.csdb", csdb, OneShot.httpPublisher);
+
+        Complete.complete(collection.id, baseUri + "/data.json", OneShot.httpPublisher);
+        Review.review(collection.id, baseUri + "/data.json", OneShot.httpSecondSetOfEyes);
+        Approve.approve(collection.id, OneShot.httpPublisher);
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        publishDataset();
     }
 }

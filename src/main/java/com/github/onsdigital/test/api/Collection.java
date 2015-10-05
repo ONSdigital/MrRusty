@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 @DependsOn(com.github.onsdigital.test.api.Permissions.class)
 public class Collection {
 
-    private static Http http = Login.httpAdministrator;
 
     public Collection() {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()

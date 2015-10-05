@@ -37,7 +37,7 @@ public class Publish {
         collectionsPage.clickLogoutMenuLink().typeUsername("p2@t.com").clickLogin();
 
         // select the page to be reviewed.
-        collectionsPage.clickCollectionByName(collectionName)
+        collectionsPage = collectionsPage.clickCollectionByName(collectionName)
                 .clickCollectionPageByName(pageName)
                 .clickEditFile()
                 .clickSubmitForApproval();
@@ -64,7 +64,7 @@ public class Publish {
         publishingQueueDetailsPage.publishCollectionWithName(collectionName);
     }
 
-    @Test
+    //@Test
     public void shouldPublishScheduledCollection() {
         // login and create a collection
         String collectionName = Collection.createCollectionNameForTest();
