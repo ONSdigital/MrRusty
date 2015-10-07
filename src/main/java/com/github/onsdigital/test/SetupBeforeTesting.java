@@ -165,7 +165,7 @@ public class SetupBeforeTesting implements Setup {
      * @param email The user's email
      * @return A {@link User} containing the given details.
      */
-    private static User user(String name, String email) {
+    public static User user(String name, String email) {
         User user = new User();
         user.name = name;
         user.email = email;
@@ -180,7 +180,7 @@ public class SetupBeforeTesting implements Setup {
      * @param password The password
      * @return A {@link Credentials} instance containing the given details.
      */
-    private static Credentials credentials(String email, String password) {
+    public static Credentials credentials(String email, String password) {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;

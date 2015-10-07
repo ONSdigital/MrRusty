@@ -351,7 +351,7 @@ public class Http implements AutoCloseable {
     }
 
     /**
-     * Sends a POST request and returns the response.
+     * Sends a DELETE request and returns the response.
      *
      * @param endpoint      The endpoint to send the request to.
      * @param responseClass The class to deserialise the Json response to. Can be null if no response message is expected.

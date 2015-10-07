@@ -2,20 +2,24 @@ package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
+import com.github.onsdigital.http.Endpoint;
+import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
+import sun.rmi.runtime.Log;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test cases for the {@link com.github.onsdigital.zebedee.api.Users} API.
+ * Test cases for the Zebedee users API.
  */
 @Api
 @DependsOn(com.github.onsdigital.test.api.Login.class)
@@ -179,6 +183,72 @@ public class Users {
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
+    @DELETE
+    @Test
+    public void deleteUser_givenAdminLogin_shouldRemoveUser() throws IOException {
+        // Given
+        // A created user
+        User deleteUser = new User();
+        deleteUser.email = "Rusty_" + Random.id() + "@example.com";
+        deleteUser.name = "Hello World";
+        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
 
+        // When
+        // we delete the user
+        Response<String> delete = delete(deleteUser.email, Login.httpAdministrator);
 
+        // Then
+        // the delete should go through & the user should not exist
+        assertEquals(HttpStatus.OK_200, delete.statusLine.getStatusCode());
+
+        Response<User> userResponse = get(deleteUser.email, Login.httpPublisher);
+        assertEquals(HttpStatus.NOT_FOUND_404, userResponse.statusLine.getStatusCode());
+    }
+
+    @DELETE
+    @Test
+    public void deleteUser_givenRandomEmail_shouldReturnNotFoundException() throws IOException {
+        // Given
+        // A random and presumably non existent email
+        String email = "Rusty_" + Random.id() + "@example.com";
+
+        // When
+        // we delete the user
+        Response<String> delete = delete(email, Login.httpAdministrator);
+
+        // Then
+        // the delete should return Not found
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, delete.statusLine.getStatusCode());
+    }
+
+    @DELETE
+    @Test
+    public void deleteUser_givenNonAdminLogin_shouldFail() throws IOException {
+        // Given
+        // A created user
+        User deleteUser = new User();
+        deleteUser.email = "Rusty_" + Random.id() + "@example.com";
+        deleteUser.name = "Hello World";
+        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
+
+        // When
+        // we delete the user using a non admin login
+        Response<String> delete = delete(deleteUser.email, Login.httpPublisher);
+
+        // Then
+        // the delete should go through & the user should not exist
+        assertEquals(HttpStatus.UNAUTHORIZED_401, delete.statusLine.getStatusCode());
+
+        Response<User> userResponse = get(deleteUser.email, Login.httpPublisher);
+        assertEquals(HttpStatus.OK_200, userResponse.statusLine.getStatusCode());
+    }
+
+    public static Response<User> get(String email, Http http) throws IOException {
+        Endpoint idUrl = ZebedeeHost.users.setParameter("email", email);
+        return http.get(idUrl, User.class);
+    }
+    public static Response<String> delete(String email, Http http) throws IOException {
+        Endpoint idUrl = ZebedeeHost.users.setParameter("email", email);
+        return http.delete(idUrl, String.class);
+    }
 }
