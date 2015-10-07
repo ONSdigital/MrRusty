@@ -1,0 +1,100 @@
+{
+  "downloads": [
+    {
+      "title": "Preliminary Estimate of GDP",
+      "cdids": [
+        "KII2",
+        "L3BB",
+        "L3ZZ",
+        "L3BA",
+        "L3ZY",
+        "L3BH",
+        "L427",
+        "L3BG",
+        "L426",
+        "KI8M",
+        "L3BN",
+        "KI8L",
+        "L2PZ",
+        "L3DM",
+        "IHYP",
+        "KI8Q",
+        "L44C",
+        "IHYQ",
+        "KI8P",
+        "KI8O",
+        "KI8N",
+        "L3DQ",
+        "L3E2",
+        "YBEZ",
+        "L44G",
+        "L3DW",
+        "L42D",
+        "IHYR",
+        "ABMM",
+        "L44M",
+        "ABMI",
+        "L2KL",
+        "L2KK",
+        "L44Q",
+        "L2N2",
+        "KIH9",
+        "KIH8",
+        "L2KR",
+        "L2KQ",
+        "L2KX",
+        "KLH9",
+        "KLH8",
+        "KLH7",
+        "L2MW",
+        "L2N8",
+        "L3GP",
+        "L47F",
+        "L2NC"
+      ]
+    },
+    {
+      "title": "xlsx download",
+      "file": "/economy/grossdomesticproductgdp/datasets/preliminaryestimateofgdp/pgdp.xlsx"
+    },
+    {
+      "title": "csv download",
+      "file": "/economy/grossdomesticproductgdp/datasets/preliminaryestimateofgdp/pgdp.csv"
+    }
+  ],
+  "relatedMethodology": [],
+  "section": {
+    "markdown": ""
+  },
+  "relatedDatasets": [
+    {
+      "uri": "/economy/grossdomesticproductgdp/datasets/preliminaryestimateofgdp"
+    }
+  ],
+  "relatedDocuments": [
+    {
+      "uri": "/economy/grossdomesticproductgdp/bulletins/grossdomesticproductpreliminaryestimate/2015-07-28"
+    }
+  ],
+  "type": "timeseries_dataset",
+  "uri": "/economy/grossdomesticproductgdp/datasets/preliminaryestimateofgdp",
+  "description": {
+    "title": "Preliminary Estimate of GDP",
+    "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK.",
+    "metaDescription": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK.",
+    "nationalStatistic": true,
+    "latestRelease": false,
+    "contact": {
+      "email": "ios.enquiries@ons.gsi.gov.uk",
+      "name": "Robert Doody",
+      "telephone": "+44 (0)1633 455803"
+    },
+    "releaseDate": "2015-07-27T23:00:00.000Z",
+    "nextRelease": "27 October 2015",
+    "datasetId": "pgdp",
+    "unit": "",
+    "preUnit": "",
+    "source": "",
+    "sampleSize": "0"
+  }
+}
