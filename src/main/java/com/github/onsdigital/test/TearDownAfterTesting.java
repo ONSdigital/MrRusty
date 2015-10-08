@@ -4,8 +4,6 @@ import com.github.onsdigital.junit.Teardown;
 import com.github.onsdigital.selenium.Drivers;
 import com.github.onsdigital.test.api.CleanUp;
 
-import java.io.IOException;
-
 /**
  * Created by thomasridd on 03/06/15.
  */
@@ -17,7 +15,7 @@ public class TearDownAfterTesting implements Teardown {
         try {
 
             CleanUp.cleanUpAllCollectionsBeginningWithRusty();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

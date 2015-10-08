@@ -10,8 +10,6 @@ import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -158,6 +156,7 @@ public class OneLineSetups {
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = Random.password(8);
+        credentials.temporaryPassword = false;
         Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
 

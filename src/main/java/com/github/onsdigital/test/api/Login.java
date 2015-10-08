@@ -209,6 +209,24 @@ public class Login {
         assertEquals(401, response.statusLine.getStatusCode());
     }
 
+    /**
+     * Tests login with an incorrect password.
+     *
+     * @throws IOException
+     */
+    @POST
+    @Test
+    public void shouldReturnExpectationFailedForTemporaryPassword() throws IOException {
+
+        // When
+        // We attempt to log in
+        Response<String> response = httpAdministrator.post(ZebedeeHost.login, SetupBeforeTesting.newUserCredentials, String.class);
+
+        // Then
+        // We should get an unauthorised response
+        assertEquals(417, response.statusLine.getStatusCode());
+    }
+
 
     /**
      * Convenience method for generating login credentials.
@@ -218,9 +236,21 @@ public class Login {
      * @return A {@link Credentials} instance containing the given details.
      */
     private static Credentials credentials(String email, String password) {
+        return credentials(email, password, null);
+    }
+
+    /**
+     * Convenience method for generating login credentials.
+     *
+     * @param email    The email address
+     * @param password The password
+     * @return A {@link Credentials} instance containing the given details.
+     */
+    private static Credentials credentials(String email, String password, Boolean temporaryPassword) {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
+        credentials.temporaryPassword = temporaryPassword;
         return credentials;
     }
 

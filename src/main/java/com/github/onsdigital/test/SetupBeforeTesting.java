@@ -20,25 +20,28 @@ public class SetupBeforeTesting implements Setup {
     Http systemSession = Sessions.get("system");
 
     public static User systemUser = user("Florence Nightingale", "florence@magicroundabout.ons.gov.uk");
-    public static Credentials systemCredentials = credentials(systemUser.email, "Doug4l");
+    public static Credentials systemCredentials = credentials(systemUser.email, "Doug4l", false);
 
     public static User adminUser = user("Matt Jukes", "in.charge@magicroundabout.ons.gov.uk");
-    public static Credentials adminCredentials = credentials(adminUser.email, Random.password(8));
+    public static Credentials adminCredentials = credentials(adminUser.email, Random.password(8), false);
 
     public static User publisherUser = user("Paul Blusher", "dp@magicroundabout.ons.gov.uk");
-    public static Credentials publisherCredentials = credentials(publisherUser.email, Random.password(8));
+    public static Credentials publisherCredentials = credentials(publisherUser.email, Random.password(8), false);
 
     public static User secondSetOfEyesUser = user("Myfanwy Morgan", "mm@magicroundabout.ons.gov.uk");
-    public static Credentials secondSetOfEyesCredentials = credentials(secondSetOfEyesUser.email, Random.password(8));
+    public static Credentials secondSetOfEyesCredentials = credentials(secondSetOfEyesUser.email, Random.password(8), false);
 
     public static User thirdSetOfEyesUser = user("Dai Griffiths", "dg@magicroundabout.ons.gov.uk");
-    public static Credentials thirdSetOfEyesCredentials = credentials(thirdSetOfEyesUser.email, Random.password(8));
+    public static Credentials thirdSetOfEyesCredentials = credentials(thirdSetOfEyesUser.email, Random.password(8), false);
 
     public static User contentOwnerUser = user("Stacy To", "statto@magicroundabout.ons.gov.uk");
-    public static Credentials contentOwnerCredentials = credentials(contentOwnerUser.email, Random.password(8));
+    public static Credentials contentOwnerCredentials = credentials(contentOwnerUser.email, Random.password(8), false);
+
+    public static User newUserWithTemporaryPassword = user("New guy", "new@magicroundabout.ons.gov.uk");
+    public static Credentials newUserCredentials = credentials(newUserWithTemporaryPassword.email, Random.password(8), true);
 
     public static User scallywagUser = user("Ha Querr", "script.kiddie@bluecat.com");
-    public static Credentials scallywagCredentials = credentials(scallywagUser.email, Random.password(8));
+    public static Credentials scallywagCredentials = credentials(scallywagUser.email, Random.password(8), false);
 
     @Override
     public void setup() throws Exception {
@@ -90,6 +93,12 @@ public class SetupBeforeTesting implements Setup {
         if (admin.statusLine.getStatusCode() != 409) {
             checkOk(contentOwner, "Unable to create content owner user " + contentOwnerUser);
         }
+
+        // New user with temp password
+        Response<User> newUser = systemSession.post(ZebedeeHost.users, newUserWithTemporaryPassword, User.class);
+        if (admin.statusLine.getStatusCode() != 409) {
+            checkOk(newUser, "Unable to create new user " + newUser);
+        }
     }
 
     private PermissionDefinition permission(User user, boolean admin, boolean editor) {
@@ -122,6 +131,10 @@ public class SetupBeforeTesting implements Setup {
         // Content Owner
         Response<String> contentOwner = systemSession.post(ZebedeeHost.password, contentOwnerCredentials, String.class);
         checkOk(contentOwner, "Unable to set password for content owner user.");
+
+        // New user with temporary password
+        Response<String> newUser = systemSession.post(ZebedeeHost.password, newUserCredentials, String.class);
+        checkOk(newUser, "Unable to set password for new user.");
     }
 
     /**
@@ -156,6 +169,10 @@ public class SetupBeforeTesting implements Setup {
         Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
         Response<Boolean> addUser = systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", contentOwnerUser.email), "", Boolean.class);
 
+        // new user
+        PermissionDefinition newUserPermissionDefinition = permission(newUserWithTemporaryPassword, false, true);
+        Response<String> newUserPermission = systemSession.post(ZebedeeHost.permission, newUserPermissionDefinition, String.class);
+        checkOk(newUserPermission, "Unable to set editor permission for " + newUserWithTemporaryPassword);
     }
 
     /**
@@ -181,9 +198,14 @@ public class SetupBeforeTesting implements Setup {
      * @return A {@link Credentials} instance containing the given details.
      */
     public static Credentials credentials(String email, String password) {
+        return credentials(email, password, null);
+    }
+
+    public static Credentials credentials(String email, String password, Boolean temporaryPassword) {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
+        credentials.temporaryPassword = temporaryPassword;
         return credentials;
     }
 
