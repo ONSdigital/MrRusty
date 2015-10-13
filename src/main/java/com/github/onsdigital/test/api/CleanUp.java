@@ -5,6 +5,10 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionDescriptions;
+import com.github.onsdigital.test.json.User;
+import com.github.onsdigital.test.json.UserList;
+import org.apache.commons.lang.StringUtils;
+import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
 
@@ -52,6 +56,28 @@ public class CleanUp {
                     }
                 }
                 deleteCollection(fullDescription.id, Login.httpPublisher);
+            }
+        }
+    }
+
+    public static void cleanUpAllUsersBeginningWithRusty() throws IOException {
+
+        // We get the list of collections
+        Endpoint usersEndpoint = ZebedeeHost.users;
+        Response<UserList> getResponse = Login.httpAdministrator.get(usersEndpoint, UserList.class);
+
+        if (getResponse == null) {
+            return;
+        }
+
+        UserList userList = getResponse.body;
+
+
+        // Send a delete request for all those that begin with Rusty
+        for(User user: userList) {
+            if (StringUtils.startsWithIgnoreCase(user.email, "rusty_")) {
+                System.out.println("Deleting user " + user.name + " with email " + user.email);
+                Login.httpAdministrator.delete(usersEndpoint, String.class, new BasicNameValuePair("email", user.email));
             }
         }
     }
