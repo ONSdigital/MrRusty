@@ -4,15 +4,13 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
-import com.github.onsdigital.test.browser.PageObjects.SelectedPagePartial;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.POST;
@@ -28,17 +26,15 @@ import static org.junit.Assert.assertEquals;
 @DependsOn(Users.class)
 public class Password {
 
-    static Credentials credentials;
-
+    private User user;
+    private Credentials credentials;
     Http http = Login.httpAdministrator;
 
-    /**
-     * Set up a user's credentials for the test suite.
-     */
-    @BeforeClass
-    public static void setupUserCredentials() {
+    @Before
+    public void setUp() throws Exception {
+        user = Users.createRandomTestUser();
         credentials = new Credentials();
-        credentials.email = Users.user.email;
+        credentials.email = user.email;
         credentials.password = Random.password(8);
     }
 
@@ -53,6 +49,7 @@ public class Password {
 
         // Given
         // A user with credentials
+        OneLineSetups.newSessionWithPublisherPermissions("Rusty", credentials.email);
 
         // When
         // We attempt to create a new password
