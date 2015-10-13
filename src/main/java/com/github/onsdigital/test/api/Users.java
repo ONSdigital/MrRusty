@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
 @Api
 @DependsOn(com.github.onsdigital.test.api.Login.class)
 public class Users {
-    static User user;
+    private User user;
 
     /**
      * Ensures we get a 200 OK when creating a valid user.
@@ -239,7 +239,7 @@ public class Users {
     }
 
     public static User createRandomTestUser() {
-        user = new User();
+        User user = new User();
         user.email = generateRandomTestUserEmail();
         user.name = "Rusty";
         return user;
