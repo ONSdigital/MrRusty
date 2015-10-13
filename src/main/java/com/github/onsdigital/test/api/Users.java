@@ -10,7 +10,6 @@ import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
-import sun.rmi.runtime.Log;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -37,9 +36,7 @@ public class Users {
 
         // Given
         // A valid user
-        user = new User();
-        user.email = "Rusty_" + Random.id() + "@example.com";
-        user.name = "Hello World";
+        user = createRandomTestUser();
 
         // When
         // We attempt to create a user
@@ -60,18 +57,17 @@ public class Users {
 
         // Given
         // A valid user
-        user = new User();
-        user.name = "Rusty";
+        user = createRandomTestUser();
 
         // When
         // We attempt to create a user with each alternate
-        user.email = "Rusty_" + Random.id() + "@example.com";
+        user.email = generateRandomTestUserEmail();
         Response<User> response1 = Login.httpPublisher.post(ZebedeeHost.users, user, User.class);
 
-        user.email = "Rusty_" + Random.id() + "@example.com";
+        user.email = generateRandomTestUserEmail();
         Response<User> response2 = Login.httpScallywag.post(ZebedeeHost.users, user, User.class);
 
-        user.email = "Rusty_" + Random.id() + "@example.com";
+        user.email = generateRandomTestUserEmail();
         Response<User> response3 = Login.httpViewer.post(ZebedeeHost.users, user, User.class);
 
         // Then
@@ -93,9 +89,7 @@ public class Users {
 
         // Given
         // A new user
-        User inactive = new User();
-        inactive.email = "Rusty_" + Random.id() + "@example.com";
-        inactive.name = "Rusty";
+        User inactive = createRandomTestUser();
         Login.httpAdministrator.post(ZebedeeHost.users, inactive, User.class);
 
         // When
@@ -120,9 +114,7 @@ public class Users {
 
         // Given
         // An existing user
-        User user = new User();
-        user.email = "Rusty_" + Random.id() + "@example.com";
-        user.name = "Rusty";
+        User user = createRandomTestUser();
         Response<User> create = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
         assertEquals(HttpStatus.OK_200, create.statusLine.getStatusCode());
 
@@ -146,9 +138,8 @@ public class Users {
 
         // Given
         // A user with no email address
-        User user = new User();
+        User user = createRandomTestUser();
         user.email = "";
-        user.name = "Rusty";
 
         // When
         // We attempt to create the user
@@ -170,8 +161,7 @@ public class Users {
 
         // Given
         // A user with no email address
-        User user = new User();
-        user.email = "Rusty_" + Random.id() + "@example.com";
+        User user = createRandomTestUser();
         user.name = "";
 
         // When
@@ -188,9 +178,7 @@ public class Users {
     public void deleteUser_givenAdminLogin_shouldRemoveUser() throws IOException {
         // Given
         // A created user
-        User deleteUser = new User();
-        deleteUser.email = "Rusty_" + Random.id() + "@example.com";
-        deleteUser.name = "Hello World";
+        User deleteUser = createRandomTestUser();
         Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
 
         // When
@@ -210,7 +198,7 @@ public class Users {
     public void deleteUser_givenRandomEmail_shouldReturnNotFoundException() throws IOException {
         // Given
         // A random and presumably non existent email
-        String email = "Rusty_" + Random.id() + "@example.com";
+        String email = generateRandomTestUserEmail();
 
         // When
         // we delete the user
@@ -226,9 +214,7 @@ public class Users {
     public void deleteUser_givenNonAdminLogin_shouldFail() throws IOException {
         // Given
         // A created user
-        User deleteUser = new User();
-        deleteUser.email = "Rusty_" + Random.id() + "@example.com";
-        deleteUser.name = "Hello World";
+        User deleteUser = createRandomTestUser();
         Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
 
         // When
@@ -250,5 +236,16 @@ public class Users {
     public static Response<String> delete(String email, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.users.setParameter("email", email);
         return http.delete(idUrl, String.class);
+    }
+
+    public static User createRandomTestUser() {
+        user = new User();
+        user.email = generateRandomTestUserEmail();
+        user.name = "Rusty";
+        return user;
+    }
+
+    public static String generateRandomTestUserEmail() {
+        return "Rusty_" + Random.id() + "@example.com";
     }
 }
