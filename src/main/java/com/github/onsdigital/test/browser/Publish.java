@@ -34,7 +34,7 @@ public class Publish {
         collectionsPage = editPage.clickSubmitForReview();
 
         // login as the second set of eyes.
-        collectionsPage.clickLogoutMenuLink().typeUsername("p2@t.com").clickLogin();
+        collectionsPage.clickLogoutMenuLink().login(SetupBeforeTesting.secondSetOfEyesCredentials);
 
         // select the page to be reviewed.
         collectionsPage.clickCollectionByName(collectionName)
@@ -84,7 +84,7 @@ public class Publish {
         collectionsPage = editPage.clickSubmitForReview();
 
         // login as the second set of eyes.
-        collectionsPage.clickLogoutMenuLink().typeUsername("p2@t.com").clickLogin();
+        collectionsPage.clickLogoutMenuLink().login(SetupBeforeTesting.secondSetOfEyesCredentials);
 
         // select the page to be reviewed.
         collectionsPage.clickCollectionByName(collectionName)
