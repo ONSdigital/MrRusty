@@ -21,23 +21,6 @@ public class Login {
      */
     @POST
     @Test
-    public void shouldLogInWithDefaultCredentials() throws IOException {
-
-        // Given correct admin credentials
-        LoginPage loginPage = new LoginPage();
-
-        // When We submit the credentials on the login page.
-        // Then we are shown the collections page.
-        loginPage.login("","");
-    }
-
-    /**
-     * Tests login using the administrator credentials.
-     *
-     * @throws IOException
-     */
-    @POST
-    @Test
     public void shouldLogInAsAdmin() throws IOException {
 
         // Given correct admin credentials
