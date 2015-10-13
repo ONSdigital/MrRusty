@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
+import com.github.onsdigital.test.json.Credentials;
 import org.openqa.selenium.*;
 
 public class LoginPage extends FlorencePage {
@@ -45,6 +46,15 @@ public class LoginPage extends FlorencePage {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
         return this;
+    }
+
+    /**
+     * Helper method to login a user for the given credentials object.
+     * @param credentials
+     * @return
+     */
+    public CollectionsPage login(Credentials credentials) {
+        return login(credentials.email, credentials.password);
     }
 
     /**
