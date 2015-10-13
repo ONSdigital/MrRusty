@@ -206,7 +206,7 @@ public class Users {
 
         // Then
         // the delete should return Not found
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, delete.statusLine.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND_404, delete.statusLine.getStatusCode());
     }
 
     @DELETE
