@@ -95,7 +95,6 @@ public class PageObject {
      */
     private static boolean allAnimationsFinished(WebDriver driver) {
         long animations = (long) PageObject.runScript(driver, "return jQuery(':animated').length;");
-        System.out.println("animations:" + animations);
         return animations == 0;
     }
 
