@@ -8,7 +8,6 @@ import com.github.onsdigital.test.json.CollectionDescriptions;
 import com.github.onsdigital.test.json.User;
 import com.github.onsdigital.test.json.UserList;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.io.IOException;
 
@@ -77,7 +76,7 @@ public class CleanUp {
         for(User user: userList) {
             if (StringUtils.startsWithIgnoreCase(user.email, "rusty_")) {
                 System.out.println("Deleting user " + user.name + " with email " + user.email);
-                Login.httpAdministrator.delete(usersEndpoint, String.class, new BasicNameValuePair("email", user.email));
+                Login.httpAdministrator.delete(usersEndpoint.setParameter("email", user.email), String.class);
             }
         }
     }
