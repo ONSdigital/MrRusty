@@ -53,8 +53,8 @@ public class LoginPage extends FlorencePage {
      * @param password
      */
     public CollectionsPage login(String username, String password) {
-        //typeUsername(username);
-        //typePassword(password);
+        typeUsername(username);
+        typePassword(password);
         return clickLogin();
     }
 
@@ -62,8 +62,8 @@ public class LoginPage extends FlorencePage {
      * Simulate clicking the login button on the login page expecting it to fail.
      */
     public LoginPage clickLoginExpectingFailure(String username, String password) {
-        //typeUsername(username);
-        //typePassword(password);
+        typeUsername(username);
+        typePassword(password);
         loginButton.click();
         return new LoginPage(driver);
     }
