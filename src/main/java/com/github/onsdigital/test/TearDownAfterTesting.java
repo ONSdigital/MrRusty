@@ -13,8 +13,8 @@ public class TearDownAfterTesting implements Teardown {
     public void teardown() {
         Drivers.quit();
         try {
-
             CleanUp.cleanUpAllCollectionsBeginningWithRusty();
+            CleanUp.cleanUpAllUsersBeginningWithRusty();
         } catch (Exception e) {
             e.printStackTrace();
         }
