@@ -3,6 +3,7 @@ package com.github.onsdigital.test.api.oneliners;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.*;
+import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.*;
 import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
 import org.apache.commons.lang3.StringUtils;
@@ -21,8 +22,8 @@ public class OneShot {
 
     private static Http systemSession = Sessions.get("system");
 
-    public static User systemUser = user("Florence Nightingale", "florence@magicroundabout.ons.gov.uk");
-    public static Credentials systemCredentials = credentials(systemUser.email, "Doug4l");
+    public static User systemUser = user("Florence Nightingale", Configuration.getSystemUsername());
+    public static Credentials systemCredentials = credentials(systemUser.email, Configuration.getSystemUserPassword());
 
     public static User adminUser = user("Matt Jukes", "in.charge@magicroundabout.ons.gov.uk");
     public static Credentials adminCredentials = credentials(adminUser.email, Random.password(8));

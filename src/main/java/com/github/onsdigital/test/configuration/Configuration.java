@@ -6,10 +6,21 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081/florence/index.html";
+    private static final String DEFAULT_SYSTEM_USER = "florence@magicroundabout.ons.gov.uk";
+    private static final String DEFAULT_SYSTEM_PASSWORD = "Doug4l";
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
     }
+
+    public static String getSystemUsername() {
+        return StringUtils.defaultIfBlank(getValue("FLORENCE_ADMIN_USER"), DEFAULT_SYSTEM_USER);
+    }
+
+    public static String getSystemUserPassword() {
+        return StringUtils.defaultIfBlank(getValue("FLORENCE_ADMIN_PASSWORD"), DEFAULT_SYSTEM_PASSWORD);
+    }
+
 
     public static String getBrowserStackUrl() {
         return getValue("BROWSERSTACK_URL");

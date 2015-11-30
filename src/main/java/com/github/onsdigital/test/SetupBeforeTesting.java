@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.Setup;
 import com.github.onsdigital.test.api.ZebedeeHost;
+import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.PermissionDefinition;
 import com.github.onsdigital.test.json.User;
@@ -19,8 +20,8 @@ public class SetupBeforeTesting implements Setup {
 
     Http systemSession = Sessions.get("system");
 
-    public static User systemUser = user("Florence Nightingale", "florence@magicroundabout.ons.gov.uk");
-    public static Credentials systemCredentials = credentials(systemUser.email, "Doug4l", false);
+    public static User systemUser = user("Florence Nightingale", Configuration.getSystemUsername());
+    public static Credentials systemCredentials = credentials(systemUser.email, Configuration.getSystemUserPassword(), false);
 
     public static User adminUser = user("Matt Jukes", "in.charge@magicroundabout.ons.gov.uk");
     public static Credentials adminCredentials = credentials(adminUser.email, Random.password(8), false);
@@ -85,7 +86,7 @@ public class SetupBeforeTesting implements Setup {
         // Second set of eyes
         Response<User> thirdSetOfEyes = systemSession.post(ZebedeeHost.users, thirdSetOfEyesUser, User.class);
         if (admin.statusLine.getStatusCode() != 409) {
-            checkOk(secondSetOfEyes, "Unable to create publisher user " + thirdSetOfEyesUser);
+            checkOk(thirdSetOfEyes, "Unable to create publisher user " + thirdSetOfEyesUser);
         }
 
         // Content Owner
@@ -111,30 +112,37 @@ public class SetupBeforeTesting implements Setup {
     }
 
     private void setPasswords() throws IOException {
+        setUserPassword(adminCredentials);
+        setUserPassword(publisherCredentials);
+        setUserPassword(secondSetOfEyesCredentials);
+        setUserPassword(thirdSetOfEyesCredentials);
+        setUserPassword(contentOwnerCredentials);
+        setUserPassword(newUserCredentials);
 
-        // Admin
-        Response<String> admin = systemSession.post(ZebedeeHost.password, adminCredentials, String.class);
-        checkOk(admin, "Unable to set password for admin user.");
+        Response<String> admin = systemSession.post(ZebedeeHost.password, newUserCredentials, String.class);
+        checkOk(admin, "Unable to set password for user with email " + newUserCredentials.email);
+    }
 
-        // Publisher
-        Response<String> publisher = systemSession.post(ZebedeeHost.password, publisherCredentials, String.class);
-        checkOk(publisher, "Unable to set password for publisher user.");
+    /**
+     * Need to run through the following steps to set the users password that is not a temporary password
+     *  - reset the password via the system user
+     *  - set the password
+     * @param credentials
+     * @throws IOException
+     */
+    private void setUserPassword(Credentials credentials) throws IOException {
+        Response<String> admin = systemSession.post(ZebedeeHost.password, credentials, String.class);
+        checkOk(admin, "Unable to set password for user with email " + credentials.email);
 
-        // Publisher
-        Response<String> secondSetOfEyes = systemSession.post(ZebedeeHost.password, secondSetOfEyesCredentials, String.class);
-        checkOk(secondSetOfEyes, "Unable to set password for publisher user.");
+        Http userSession = new Http();
 
-        // Publisher
-        Response<String> thirdSetOfEyes = systemSession.post(ZebedeeHost.password, thirdSetOfEyesCredentials, String.class);
-        checkOk(thirdSetOfEyes, "Unable to set password for publisher user.");
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.password = credentials.password;
+        changePasswordCredentials.oldPassword = credentials.password;
 
-        // Content Owner
-        Response<String> contentOwner = systemSession.post(ZebedeeHost.password, contentOwnerCredentials, String.class);
-        checkOk(contentOwner, "Unable to set password for content owner user.");
-
-        // New user with temporary password
-        Response<String> newUser = systemSession.post(ZebedeeHost.password, newUserCredentials, String.class);
-        checkOk(newUser, "Unable to set password for new user.");
+        Response<String> login = userSession.post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        checkOk(login, "Unable to set password for test user with email " + credentials.email);
     }
 
     /**
