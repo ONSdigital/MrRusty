@@ -19,7 +19,6 @@ import org.joda.time.DateTime;
 import org.junit.Test;
 
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.net.URI;
@@ -161,13 +160,11 @@ public class Collection {
 
         // When
         // we post as anyone but a publisher
-        Response<CollectionDescription> responseAdmin = post(collection, Login.httpAdministrator);
         Response<CollectionDescription> responseScallywag = post(collection, Login.httpScallywag);
         Response<CollectionDescription> responseViewer = post(collection, Login.httpViewer);
 
         // Expect
         // a response of 401 - unauthorized
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdmin.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
     }
@@ -175,9 +172,9 @@ public class Collection {
     /**
      * Viewer permissions should return {@link HttpStatus#OK_200} for any permitted collection, {@link HttpStatus#UNAUTHORIZED_401} otherwise
      */
-    @GET
+    @POST
     @Test
-    public void getShouldReturn200ForViewerWithPermissions() throws IOException {
+    public void postShouldReturn200ForViewerWithPermissions() throws IOException {
         // Given
         // a collection
         CollectionDescription collection = createCollectionDescription();
@@ -186,30 +183,12 @@ public class Collection {
         // When
         // we attempt to retrieve it as an publisher
         Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
+        Response<CollectionDescription> responseAdmin = post(collection, Login.httpAdministrator);
 
         // We expect
         // a response of 200
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
-    }
-
-    /**
-     * Admins should return {@link HttpStatus#UNAUTHORIZED_401}
-     */
-    @GET
-    @Test
-    public void getShouldReturn401WithAdminPermissions() throws IOException {
-        // Given
-        // a collection
-        CollectionDescription collection = createCollectionDescription();
-        collection = post(collection, Login.httpPublisher).body;
-
-        // When
-        // we attempt to retrieve it as an administrator
-        Response<CollectionDescription> response = get(collection.id, Login.httpAdministrator);
-
-        // We expect
-        // a response of 401 - unauthorized
-        assertEquals(HttpStatus.UNAUTHORIZED_401, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, responseAdmin.statusLine.getStatusCode());
     }
 
     /**
