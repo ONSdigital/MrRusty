@@ -250,7 +250,6 @@ public class Login {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
-        credentials.temporaryPassword = temporaryPassword;
         return credentials;
     }
 

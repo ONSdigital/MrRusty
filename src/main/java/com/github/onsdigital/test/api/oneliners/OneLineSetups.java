@@ -156,7 +156,6 @@ public class OneLineSetups {
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = Random.password(8);
-        credentials.temporaryPassword = false;
         Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
 
@@ -166,6 +165,14 @@ public class OneLineSetups {
         definition.editor = true;
         Response<String> permissionResponse = Login.httpAdministrator.post(ZebedeeHost.permission, definition, String.class);
         assertEquals(HttpStatus.OK_200, permissionResponse.statusLine.getStatusCode());
+
+        // Change the password as the user to remove the temporary password restrictions.
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.password = credentials.password;
+        changePasswordCredentials.oldPassword = credentials.password;
+        Response<String> login = new Http().post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        assertEquals(HttpStatus.OK_200, login.statusLine.getStatusCode());
 
         // Create a session
         Http http = Sessions.get(email);

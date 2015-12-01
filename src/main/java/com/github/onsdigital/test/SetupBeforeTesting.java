@@ -213,7 +213,6 @@ public class SetupBeforeTesting implements Setup {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
-        credentials.temporaryPassword = temporaryPassword;
         return credentials;
     }
 
