@@ -41,10 +41,12 @@ public class CollectionBrowseTree {
         // When
         // we attempt to get the browse tree as a publisher
         Response<ContentDetail> response = get(collection.id, Login.httpPublisher);
+        Response<ContentDetail> responseAdmin = get(collection.id, Login.httpAdministrator);
 
         // We expect
         // a response of 200
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, responseAdmin.statusLine.getStatusCode());
     }
 
     /**
@@ -78,13 +80,11 @@ public class CollectionBrowseTree {
         // When
         // we attempt to retrieve it as an administrator
         Response<ContentDetail> responseScally = get(collection.id, Login.httpScallywag);
-        Response<ContentDetail> responseAdmin = get(collection.id, Login.httpAdministrator);
         Response<ContentDetail> responseViewer = get(collection.id, Login.httpViewer);
 
         // We expect
         // a response of 401 - unauthorized
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseScally.statusLine.getStatusCode());
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdmin.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
     }
 

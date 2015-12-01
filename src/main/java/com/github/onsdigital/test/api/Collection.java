@@ -178,12 +178,13 @@ public class Collection {
         // Given
         // a collection
         CollectionDescription collection = createCollectionDescription();
+        CollectionDescription collectionAdmin = createCollectionDescription();
         collection = post(collection, Login.httpPublisher).body;
 
         // When
         // we attempt to retrieve it as an publisher
-        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
-        Response<CollectionDescription> responseAdmin = post(collection, Login.httpAdministrator);
+        Response<CollectionDescription> response = post(collection, Login.httpPublisher);
+        Response<CollectionDescription> responseAdmin = post(collectionAdmin, Login.httpAdministrator);
 
         // We expect
         // a response of 200
@@ -200,15 +201,21 @@ public class Collection {
         // Given
         //...a collection
         CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection2 = OneLineSetups.publishedCollection();
 
         // When
         //...we delete it
         delete(collection.id, Login.httpPublisher);
+        delete(collection2.id, Login.httpAdministrator);
+
 
         // We expect
         //...it to be entirely deleted
         Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
+
+        Response<CollectionDescription> responseAdmin = get(collection.id, Login.httpAdministrator);
+        assertEquals(HttpStatus.NOT_FOUND_404, responseAdmin.statusLine.getStatusCode());
     }
 
     /**
@@ -221,24 +228,20 @@ public class Collection {
         // a collection
         CollectionDescription collection1 = OneLineSetups.publishedCollection();
         CollectionDescription collection2 = OneLineSetups.publishedCollection();
-        CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
         // When
         //...we we try and delete them delete it
         Response<String> deleteResponseScallywag = delete(collection1.id, Login.httpScallywag);
-        Response<String> deleteResponseAdministrator = delete(collection2.id, Login.httpAdministrator);
-        Response<String> deleteResponseViewer = delete(collection3.id, Login.httpViewer);
+        Response<String> deleteResponseViewer = delete(collection2.id, Login.httpViewer);
 
         // Then
         // delete should fail with unauthorized returned
         // + the collections should still exist
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseScallywag.statusLine.getStatusCode());
-        assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseAdministrator.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseViewer.statusLine.getStatusCode());
 
         assertEquals(HttpStatus.OK_200, get(collection1.id, Login.httpPublisher).statusLine.getStatusCode());
         assertEquals(HttpStatus.OK_200, get(collection2.id, Login.httpPublisher).statusLine.getStatusCode());
-        assertEquals(HttpStatus.OK_200, get(collection3.id, Login.httpPublisher).statusLine.getStatusCode());
     }
 
     public static Response<String> delete(String name, Http http) throws IOException {
