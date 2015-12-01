@@ -49,7 +49,7 @@ public class Password {
 
         // Given
         // A user with credentials
-        OneLineSetups.newSessionWithPublisherPermissions("Rusty", credentials.email);
+        OneLineSetups.newSessionWithPublisherPermissions("Rusty", credentials.email, Random.password(8));
 
         // When
         // We attempt to create a new password
@@ -79,9 +79,11 @@ public class Password {
         // Given
         // A user with credentials
         User self = SetupBeforeTesting.user("Rusty", "Rusty_" + Random.id() + "@example.com");
-        Http httpSelf = OneLineSetups.newSessionWithPublisherPermissions(self.name, self.email);
+        String password = Random.password(8);
+        Http httpSelf = OneLineSetups.newSessionWithPublisherPermissions(self.name, self.email, password);
 
         Credentials updateCredentials = SetupBeforeTesting.credentials(self.email, Random.password(8));
+        updateCredentials.oldPassword = password;
 
         // When
         // We attempt to create a duplicate user
@@ -95,7 +97,7 @@ public class Password {
         User updated = Users.get(self.email, Login.httpPublisher).body;
         assertEquals(Boolean.FALSE, updated.temporaryPassword);
 
-        assertEquals(self.email, updated.lastAdmin);
+        assertEquals(self.email.toLowerCase(), updated.lastAdmin.toLowerCase());
     }
 
 
@@ -113,14 +115,16 @@ public class Password {
 
         // When
         // We attempt to create a duplicate user
-        Response<String> response1 = Login.httpViewer.post(ZebedeeHost.password, credentials, String.class);
-        Response<String> response2 = Login.httpPublisher.post(ZebedeeHost.password, credentials, String.class);
-        Response<String> response3 = Login.httpScallywag.post(ZebedeeHost.password, credentials, String.class);
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.password = credentials.password;
+        changePasswordCredentials.oldPassword = credentials.password;
+        Response<String> response1 = Login.httpViewer.post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        Response<String> response3 = Login.httpScallywag.post(ZebedeeHost.password, changePasswordCredentials, String.class);
 
         // Then
         // Each request should fail
         assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
-        assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }
 

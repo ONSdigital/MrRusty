@@ -179,12 +179,13 @@ public class Collection {
         // a collection
         CollectionDescription collection = createCollectionDescription();
         CollectionDescription collectionAdmin = createCollectionDescription();
-        collection = post(collection, Login.httpPublisher).body;
+        collection = assertOk(post(collection, Login.httpPublisher)).body;
+        collectionAdmin = assertOk(post(collectionAdmin, Login.httpPublisher)).body;
 
         // When
         // we attempt to retrieve it as an publisher
-        Response<CollectionDescription> response = post(collection, Login.httpPublisher);
-        Response<CollectionDescription> responseAdmin = post(collectionAdmin, Login.httpAdministrator);
+        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
+        Response<CollectionDescription> responseAdmin = get(collectionAdmin.id, Login.httpAdministrator);
 
         // We expect
         // a response of 200

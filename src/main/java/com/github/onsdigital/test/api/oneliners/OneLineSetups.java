@@ -141,7 +141,7 @@ public class OneLineSetups {
     }
 
 
-    public static Http newSessionWithPublisherPermissions(String name, String email) throws IOException {
+    public static Http newSessionWithPublisherPermissions(String name, String email, String password) throws IOException {
         // Given
         // A user with no email address
         User user = new User();
@@ -155,7 +155,7 @@ public class OneLineSetups {
         // Set their password
         Credentials credentials = new Credentials();
         credentials.email = user.email;
-        credentials.password = Random.password(8);
+        credentials.password = password;
         Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
 
@@ -188,7 +188,7 @@ public class OneLineSetups {
         return http;
     }
     public static Http newSessionWithPublisherPermissions() throws IOException {
-        return newSessionWithPublisherPermissions("Rusty", "Rusty_" + Random.id() + "@example.com");
+        return newSessionWithPublisherPermissions("Rusty", "Rusty_" + Random.id() + "@example.com", Random.password(8));
     }
 
     public static User newActiveUserWithViewerPermissions(String name, String email) throws IOException {
