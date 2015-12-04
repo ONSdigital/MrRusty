@@ -116,7 +116,7 @@ public class Password {
         // When
         // We attempt to create a duplicate user
         Credentials changePasswordCredentials = new Credentials();
-        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.email = SetupBeforeTesting.adminUser.email;
         changePasswordCredentials.password = credentials.password;
         changePasswordCredentials.oldPassword = credentials.password;
         Response<String> response1 = Login.httpViewer.post(ZebedeeHost.password, changePasswordCredentials, String.class);
