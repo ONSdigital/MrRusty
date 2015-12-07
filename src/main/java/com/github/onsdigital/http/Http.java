@@ -11,14 +11,19 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.http.HttpStatus;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 /**
@@ -29,6 +34,7 @@ public class Http implements AutoCloseable {
     private CloseableHttpClient httpClient;
     private ArrayList<Header> headers = new ArrayList<>();
 
+    private static SSLContext sslContext;
     /**
      * Sends a GET request and returns the response.
      *
@@ -472,7 +478,8 @@ public class Http implements AutoCloseable {
 
     private CloseableHttpClient httpClient() {
         if (httpClient == null) {
-            httpClient = HttpClients.createDefault();
+            //httpClient = HttpClientBuilder.create().build();
+            httpClient = HttpClientBuilder.create().setSslcontext(getSslContext()).build();
         }
         return httpClient;
     }
@@ -489,4 +496,39 @@ public class Http implements AutoCloseable {
         }
     }
 
+    public static SSLContext getSslContext() {
+
+        if (sslContext == null) {
+
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType
+                        ) {
+                        }
+
+                        public void checkServerTrusted(
+                                java.security.cert.X509Certificate[] certs, String authType
+                        ) {
+                        }
+                    }
+            };
+
+
+            try {
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                sslContext = sc;
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return sslContext;
+    }
 }
