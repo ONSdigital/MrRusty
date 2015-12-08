@@ -82,20 +82,17 @@ public class Review {
 
         // Given
         // content that is set to complete
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(3);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(2);
         Complete.complete(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
         Complete.complete(collection.id, collection.inProgressUris.get(1), Login.httpPublisher);
-        Complete.complete(collection.id, collection.inProgressUris.get(2), Login.httpPublisher);
 
         // When
         // we call review on the content with different users
 
-        Response<String> response1 = review(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
-        Response<String> response2 = review(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
-        Response<String> response3 = review(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
+        Response<String> response2 = review(collection.id, collection.inProgressUris.get(0), Login.httpViewer);
+        Response<String> response3 = review(collection.id, collection.inProgressUris.get(1), Login.httpScallywag);
 
         // Then - We get the expected response code
-        assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }
