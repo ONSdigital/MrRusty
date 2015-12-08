@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import java.io.File;
 import java.io.IOException;
 
+import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.*;
 
 /**
@@ -84,9 +85,9 @@ public class Publish {
         Content.upload(collection.id, baseUri + "/data.json", json, Login.httpPublisher);
         Content.upload(collection.id, baseUri + "/CXNV.csdb", csdb, Login.httpPublisher);
 
-        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-        Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
-        Approve.approve(collection.id, Login.httpPublisher);
+        assertOk(Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher));
+        assertOk(Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes));
+        assertOk(Approve.approve(collection.id, Login.httpPublisher));
 
         // When
         // we approve it using publish credentials
