@@ -128,4 +128,24 @@ public class Password {
         assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }
 
+    @POST
+    @Test
+    public void shouldReturnUnauthorizedIfExistingPasswordIsIncorrect() throws IOException {
+
+        // Given
+        // A set of user credentials
+
+        // When
+        // We attempt to create a duplicate user
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = SetupBeforeTesting.publisherCredentials.email;
+        changePasswordCredentials.password = "wrong password";
+        changePasswordCredentials.oldPassword = "new password";
+        Response<String> response1 = Login.httpPublisher.post(ZebedeeHost.password, changePasswordCredentials, String.class);
+
+        // Then
+        // Each request should fail
+        assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
+    }
+
 }
