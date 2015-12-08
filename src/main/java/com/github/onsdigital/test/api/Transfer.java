@@ -62,13 +62,11 @@ public class Transfer {
 
         // When
         // we try to transfer those items using non publisher accounts
-        Response<String> response1 = transfer(collection_1.name, collection_2.name, collection_1.inProgressUris.get(0), Login.httpAdministrator);
         Response<String> response2 = transfer(collection_1.name, collection_2.name, collection_1.inProgressUris.get(1), Login.httpViewer);
         Response<String> response3 = transfer(collection_1.name, collection_2.name, collection_1.inProgressUris.get(2), Login.httpScallywag);
 
         // Then
         // We expect a response of Unauthorized each time
-        assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, response3.statusLine.getStatusCode());
     }

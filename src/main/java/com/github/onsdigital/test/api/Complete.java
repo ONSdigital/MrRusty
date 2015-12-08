@@ -56,13 +56,11 @@ public class Complete {
 
         // When
         // We call complete on the content
-        Response<String> complete1 = complete(collection.id, collection.inProgressUris.get(0), Login.httpAdministrator);
         Response<String> complete2 = complete(collection.id, collection.inProgressUris.get(1), Login.httpViewer);
         Response<String> complete3 = complete(collection.id, collection.inProgressUris.get(2), Login.httpScallywag);
 
         // Then
         // We expect unauthorised responses
-        assertEquals(HttpStatus.UNAUTHORIZED_401, complete1.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, complete2.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, complete3.statusLine.getStatusCode());
 

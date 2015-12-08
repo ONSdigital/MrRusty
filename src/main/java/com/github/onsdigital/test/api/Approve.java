@@ -102,19 +102,16 @@ public class Approve {
         // Given
         // a collection
         CollectionDescription collection1 = OneLineSetups.publishedCollection();
-        CollectionDescription collection2 = OneLineSetups.publishedCollection();
         CollectionDescription collection3 = OneLineSetups.publishedCollection();
 
         // When
         //...we approve it with non publisher credentials
         Response<String> responseScallywag = approve(collection1.id, Login.httpScallywag);
-        Response<String> responseAdministrator = approve(collection2.id, Login.httpAdministrator);
         Response<String> responseViewer = approve(collection3.id, Login.httpViewer);
 
         // Then
         // approve should fail and return Unauthorised
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseScallywag.statusLine.getStatusCode());
-        assertEquals(HttpStatus.UNAUTHORIZED_401, responseAdministrator.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, responseViewer.statusLine.getStatusCode());
     }
 
