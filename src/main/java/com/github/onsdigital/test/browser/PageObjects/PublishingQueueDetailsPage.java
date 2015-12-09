@@ -70,7 +70,7 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
         buttonSection.click();
 
         // click the acceptance alert dialog
-        acceptAlert();
+        acceptFlorenceAlert();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("section-head")));
 
@@ -87,7 +87,7 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
         buttonSection.click();
 
         // click the acceptance alert dialog
-        acceptAlert();
+        acceptFlorenceAlert();
 
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("hourglass")));
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementWithText(By.className("collections-section__head"), collectionName));

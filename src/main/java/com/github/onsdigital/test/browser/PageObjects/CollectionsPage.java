@@ -8,7 +8,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -269,7 +268,7 @@ public class CollectionsPage extends FlorencePage {
      */
     public CollectionsPage clickCreateCollectionExpectingError() {
         createCollectionButton.click();
-        this.acceptAlert();
+        this.acceptFlorenceAlert();
         return this;
     }
 

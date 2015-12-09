@@ -19,6 +19,8 @@ public class FlorencePage extends PageObject {
     By publishingQueueLocator = By.className("nav--admin__item--publish");
     By logoutLocator = By.className("nav--admin__item--logout");
 
+    By alertLocator = By.className("sweet-alert");
+
     WebElement collectionsMenuLink;
     WebElement usersMenuLink;
     WebElement publishingQueueMenuLink;
@@ -82,5 +84,14 @@ public class FlorencePage extends PageObject {
         this.publishingQueueMenuLink.findElement(By.linkText("Publishing queue")).click();
 
         return new PublishingQueuePage(driver);
+    }
+
+    protected void acceptFlorenceAlert() {
+        getAlert().findElement(By.className("confirm")).click();
+    }
+
+    protected WebElement getAlert() {
+        WebElement alert = waitAndFind(alertLocator);
+        return alert;
     }
 }
