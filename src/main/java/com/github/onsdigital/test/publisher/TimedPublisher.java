@@ -1,18 +1,13 @@
 package com.github.onsdigital.test.publisher;
 
 
-import com.github.davidcarboni.cryptolite.Random;
-import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.Scripts;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Host;
-import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.Approve;
 import com.github.onsdigital.test.api.Publish;
 import com.github.onsdigital.test.api.ZebedeeHost;
-import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.api.oneliners.OneShot;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.CollectionDescription;
@@ -21,16 +16,11 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.POST;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -115,7 +105,7 @@ public class TimedPublisher {
             @Override
             public void run() {
                 try {
-                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id));
+                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id).setParameter("skipVerification", "true"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -160,7 +150,7 @@ public class TimedPublisher {
             @Override
             public void run() {
                 try {
-                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id));
+                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id).setParameter("skipVerification", "true"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -204,7 +194,7 @@ public class TimedPublisher {
             @Override
             public void run() {
                 try {
-                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id));
+                    OneShot.httpPublisher.justPost(ZebedeeHost.publish.addPathSegment(sample.id).setParameter("skipVerification", "true"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

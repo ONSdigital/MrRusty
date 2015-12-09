@@ -152,12 +152,15 @@ public class Publish {
     }
 
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("breakbeforefiletransfer", "true");
+        Endpoint endpoint = ZebedeeHost.publish
+                .addPathSegment(collectionID)
+                .setParameter("breakbeforefiletransfer", "true")
+                .setParameter("skipVerification", "true");
         return http.post(endpoint, null, String.class);
     }
 
     public static Response<String> publish(String collectionID, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID);
+        Endpoint endpoint = ZebedeeHost.publish.addPathSegment(collectionID).setParameter("skipVerification", "true");
         return http.post(endpoint, null, String.class);
     }
 
