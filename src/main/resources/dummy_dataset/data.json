@@ -1,43 +1,31 @@
 {
-  "downloads": [
-    {
-      "title": "Latest",
-      "xls": "http://www.ons.gov.uk/ons/rel/fdi/foreign-direct-investment/2012-ma4/rft-fdi-ma4-2012.xls"
-    }
-  ],
-  "section": {
-    "markdown": "Comprehensive dataset covering Foreign Direct Investment (FDI) Involving UK Companies."
-  },
-  "type": "dataset",
-  "uri": "/economy/investmentspensionsandtrusts/datasets/datacollectionoffdiflows",
-  "breadcrumb": [
-    {
-      "uri": "/"
-    },
-    {
-      "uri": "/economy"
-    },
-    {
-      "uri": "/economy/investmentspensionsandtrusts"
-    }
-  ],
+  "section": {},
+  "relatedDatasets": [],
+  "relatedDocuments": [],
+  "datasets": [{"uri": "/economy/environmentalaccounts/datasets/datasettestpage/2015"}],
+  "timeseries": false,
+  "alerts": [],
+  "relatedMethodology": [],
+  "relatedMethodologyArticle": [],
+  "topics": [],
+  "type": "dataset_landing_page",
+  "uri": "/economy/environmentalaccounts/datasets/datasettestpage",
   "description": {
-    "title": "Preliminary Estimate of GDP",
-    "summary": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK.",
-    "metaDescription": "Preliminary estimate for Gross Domestic Product (GDP) containing constant price Gross Value Added (GVA) data for the UK.",
-    "nationalStatistic": true,
-    "latestRelease": false,
+    "title": "dataset test page",
+    "summary": "",
+    "keywords": [],
+    "metaDescription": "",
+    "nationalStatistic": false,
     "contact": {
-      "email": "ios.enquiries@ons.gsi.gov.uk",
-      "name": "Robert Doody",
-      "telephone": "+44 (0)1633 455803"
+      "email": "",
+      "name": "",
+      "telephone": ""
     },
-    "releaseDate": "2015-07-27T23:00:00.000Z",
-    "nextRelease": "27 October 2015",
-    "datasetId": "CXNV",
+    "releaseDate": "2015-12-30T00:00:00.000Z",
+    "nextRelease": "",
+    "datasetId": "",
     "unit": "",
     "preUnit": "",
-    "source": "",
-    "sampleSize": "0"
+    "source": ""
   }
 }
