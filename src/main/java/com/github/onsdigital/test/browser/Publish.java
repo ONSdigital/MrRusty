@@ -1,19 +1,17 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
-import org.junit.Test;
 
-@DependsOn({Collections.class})
+//@DependsOn({Collections.class})
 public class Publish {
 
     Credentials publisher = SetupBeforeTesting.publisherCredentials;
 
-    @Test
+   // @Test
     public void shouldPublishContent() throws InterruptedException {
 
         // login and create a collection
@@ -64,7 +62,7 @@ public class Publish {
         publishingQueueDetailsPage.publishCollectionWithName(collectionName);
     }
 
-    @Test
+    //@Test
     public void shouldPublishScheduledCollection() {
         // login and create a collection
         String collectionName = Collection.createCollectionNameForTest();
