@@ -19,6 +19,8 @@ public class CollectionDescription extends CollectionBase {
     public boolean publishComplete;
     public String publishTransactionId;
 
+    public List<String> teams; // list of team Id's
+
     /**
      * events related to this collection
      */
