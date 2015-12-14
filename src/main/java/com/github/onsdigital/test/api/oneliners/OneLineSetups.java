@@ -24,8 +24,8 @@ public class OneLineSetups {
      * @return The collection's {@link CollectionDescription}
      * @throws IOException
      */
-    public static CollectionDescription publishedCollection() throws IOException {
-        CollectionDescription collection = Collection.createCollectionDescription();
+    public static CollectionDescription publishedCollection(Team... teams) throws IOException {
+        CollectionDescription collection = Collection.createCollectionDescription(teams);
         return Collection.post(collection, Login.httpPublisher).body;
     }
 
@@ -125,6 +125,14 @@ public class OneLineSetups {
         credentials.password = Random.password(8);
         Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
+
+        // Change the password as the user to remove the temporary password restrictions.
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.password = credentials.password;
+        changePasswordCredentials.oldPassword = credentials.password;
+        Response<String> login = new Http().post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        assertEquals(HttpStatus.OK_200, login.statusLine.getStatusCode());
 
         // Create a session
         Http http = Sessions.get(email);
