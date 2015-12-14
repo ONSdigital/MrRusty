@@ -4,6 +4,7 @@ package com.github.onsdigital.test.api;
  * Created by kanemorgan on 30/03/2015.
  */
 
+import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
@@ -12,18 +13,22 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionDescriptions;
+import com.github.onsdigital.test.json.Team;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import javax.ws.rs.GET;
 import java.io.IOException;
 
+import static com.github.onsdigital.test.api.oneliners.OneLineSetups.newSessionWithViewerPermissions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @Api
 @DependsOn({Login.class, Collection.class})
 public class Collections {
+
+
 
     /**
      * Test basic functionality
@@ -55,21 +60,26 @@ public class Collections {
     /**
      * Test functionality limiting view permissions by team
      * <p/>
-     * TODO
      */
     @GET
-    //@Test
+    @Test
     public void collectionListShouldBeLimitedToThoseWithViewPermissions() throws IOException {
 
         // Given
+        // A team + permissions for the team to access collection A + add alice to Alpha
+        String teamName = "Rusty_" + Random.id();
+        Teams.postTeam(teamName, Login.httpAdministrator);
+        Team team = Teams.getTeam(teamName, Login.httpAdministrator).body;
+
         // two collections A & B + one user Alice
-        // add Alice to team Alpha and give access to collection A
-        CollectionDescription collectionA = OneLineSetups.publishedCollection();
-        CollectionDescription collectionB = OneLineSetups.publishedCollection();
+        // add Alice to team and give access to collection A
+        CollectionDescription collectionA = OneLineSetups.publishedCollection(team);
+        OneLineSetups.publishedCollection(); // create another collection to ensure there are two collections in the system.
 
-        Http httpAlice = OneLineSetups.newSessionWithViewerPermissions();
-
-        // TODO create Alpha + permissions for Alpha to access collection A + add alice to Alpha
+        String aliceEmail = "Rusty_" + Random.id() + "@example.com";
+        Http httpAlice = newSessionWithViewerPermissions("Rusty", aliceEmail);
+        Response<Boolean> postMemberResponse = Teams.postMember(team.name, aliceEmail, Login.httpAdministrator);
+        assertEquals(HttpStatus.OK_200, postMemberResponse.statusLine.getStatusCode());
 
         // When
         // we get the list of collections for Alice

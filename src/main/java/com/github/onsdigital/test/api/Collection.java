@@ -10,6 +10,7 @@ import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionType;
+import com.github.onsdigital.test.json.Team;
 import com.github.onsdigital.test.json.page.base.PageDescription;
 import com.github.onsdigital.test.json.page.release.Release;
 import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
@@ -22,6 +23,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static com.github.onsdigital.test.AssertResponse.assertOk;
@@ -254,11 +256,19 @@ public class Collection {
         return http.post(ZebedeeHost.collection, collection, CollectionDescription.class);
     }
 
-    public static CollectionDescription createCollectionDescription() {
+    public static CollectionDescription createCollectionDescription(Team... teams) {
         CollectionDescription collection = new CollectionDescription();
         collection.name = createCollectionNameForTest();
         collection.publishDate = new Date();
         collection.type = CollectionType.manual;
+
+        if (teams.length > 0) {
+            if (collection.teams == null) collection.teams = new ArrayList<>();
+            for (Team team : teams) {
+                collection.teams.add(team.name);
+            }
+        }
+
         return collection;
     }
 
