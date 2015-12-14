@@ -3,10 +3,7 @@ package com.github.onsdigital.test.api;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.test.json.CollectionDescription;
-import com.github.onsdigital.test.json.CollectionDescriptions;
-import com.github.onsdigital.test.json.User;
-import com.github.onsdigital.test.json.UserList;
+import com.github.onsdigital.test.json.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
@@ -77,6 +74,25 @@ public class CleanUp {
             if (StringUtils.startsWithIgnoreCase(user.email, "rusty_")) {
                 System.out.println("Deleting user " + user.name + " with email " + user.email);
                 Login.httpAdministrator.delete(usersEndpoint.setParameter("email", user.email), String.class);
+            }
+        }
+    }
+
+    public static void cleanUpAllTeamsBeginningWithRusty() throws IOException {
+        Response<TeamList> teamListResponse = Teams.getTeamList(Login.httpAdministrator);
+
+        if (teamListResponse == null) {
+            return;
+        }
+
+        TeamList teamList = teamListResponse.body;
+
+
+        // Send a delete request for all those that begin with Rusty
+        for(Team team: teamList.teams) {
+            if (StringUtils.startsWithIgnoreCase(team.name, "rusty_")) {
+                System.out.println("Deleting team " + team.name);
+                Teams.deleteTeam(team.name, Login.httpAdministrator);
             }
         }
     }

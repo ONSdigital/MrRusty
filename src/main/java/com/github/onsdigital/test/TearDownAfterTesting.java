@@ -15,6 +15,7 @@ public class TearDownAfterTesting implements Teardown {
         try {
             CleanUp.cleanUpAllCollectionsBeginningWithRusty();
             CleanUp.cleanUpAllUsersBeginningWithRusty();
+            CleanUp.cleanUpAllTeamsBeginningWithRusty();
         } catch (Exception e) {
             e.printStackTrace();
         }
