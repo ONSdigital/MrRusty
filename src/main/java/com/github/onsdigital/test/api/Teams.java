@@ -432,4 +432,9 @@ public class Teams {
         Endpoint endpoint = ZebedeeHost.teams.addPathSegment(teamName).setParameter("email", email);
         return http.delete(endpoint, Boolean.class);
     }
+
+    public static void addMemberToTeam(Team team, User user) throws IOException {
+        Response<Boolean> postMemberResponse = Teams.postMember(team.name, user.email, Login.httpAdministrator);
+        assertEquals(HttpStatus.OK_200, postMemberResponse.statusLine.getStatusCode());
+    }
 }

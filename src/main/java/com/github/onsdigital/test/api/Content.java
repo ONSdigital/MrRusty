@@ -6,17 +6,23 @@ import com.github.davidcarboni.restolino.json.Serialiser;
 import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
+import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.EventType;
+import com.github.onsdigital.test.json.Team;
+import com.github.onsdigital.test.json.User;
+import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -226,7 +232,7 @@ public class Content {
     /**
      * Test that when a user starts editing a page then deletes their work when they
      * next get content it will return the currently published page
-     * <p/>
+     * <p>
      * WARNING: This needs to run with a genuine taxonomy node - REMOVED During content generation
      */
     @DELETE
@@ -286,7 +292,7 @@ public class Content {
 
     /**
      * Response from a get request
-     * <p/>
+     * <p>
      * To get body content as a string pair with getBody()
      *
      * @param collectionName the parent collection folder
@@ -326,5 +332,93 @@ public class Content {
         return http.get(contentEndpoint);
     }
 
+    @GET
+    @Test
+    public void contentShouldBeSeenByATeamMemberWhenTheCollectionIsCreatedBeforeTheUser() throws IOException {
 
+        // Given
+        // A team + permissions for the team to access collection A + add alice to Alpha
+        Team team = createTeam();
+        CollectionDescription collection = createCollection(team);
+        User viewer = Users.createTestViewerUser();
+        Teams.addMemberToTeam(team, viewer);
+        Http http = Sessions.get(viewer.email);
+
+        // When we save some content and get it
+        JsonObject content = getExamplePageContent();
+
+        String uri = Random.id() + ".json";
+        create(collection.id, content, uri, Login.httpPublisher);
+
+        // Then
+        // When we retrieve content we expect a 200 status and identical content
+        Response<Path> response = get(collection.id, uri, http);
+
+        // Then
+        // we expect alice to have access to one and only one collection and for that to be collection A
+        JsonObject newObject;
+        try (FileInputStream inputStream = new FileInputStream(response.body.toFile())) {
+            newObject = Serialiser.deserialise(inputStream, JsonObject.class);
+        }
+
+        // Then
+        // we expect alice to have access to one and only one collection and for that to be collection A
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+        assertEquals(Serialiser.serialise(content), Serialiser.serialise(newObject));
+    }
+
+    @GET
+    @Test
+    public void contentShouldBeSeenByATeamMember() throws IOException {
+
+        // Given
+        // A team + permissions for the team to access collection A + add alice to Alpha
+        User viewer = Users.createTestViewerUser();
+        Team team = createTeam();
+        Teams.addMemberToTeam(team, viewer);
+        CollectionDescription collection = createCollection(team);
+
+        Http http = Sessions.get(viewer.email);
+
+        // When we save some content and get it
+        JsonObject content = getExamplePageContent();
+        String uri = Random.id() + ".json";
+        create(collection.id, content, uri, Login.httpPublisher);
+
+        // Then
+        // When we retrieve content we expect a 200 status and identical content
+        Response<Path> response = get(collection.id, uri, http);
+
+        JsonObject jsonObject;
+        try (FileInputStream inputStream = new FileInputStream(response.body.toFile())) {
+            jsonObject = Serialiser.deserialise(inputStream, JsonObject.class);
+        }
+
+        // Then
+        // we expect alice to have access to one and only one collection and for that to be collection A
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+        assertEquals(Serialiser.serialise(jsonObject),
+                Serialiser.serialise(content));
+    }
+
+    private static JsonObject getExamplePageContent() throws IOException {
+        try (FileInputStream inputStream = new FileInputStream("src/main/resources/dummy_dataset/data.json")) {
+            return Serialiser.deserialise(inputStream, JsonObject.class);
+        }
+    }
+
+
+    private CollectionDescription createCollection(Team team) throws IOException {
+        CollectionDescription collection = OneLineSetups.publishedCollection(team);
+        OneLineSetups.publishedCollection(); // create another collection to ensure there are two collections in the system.
+        return collection;
+    }
+
+    private Team createTeam() throws IOException {
+        String teamName = "Rusty_" + Random.id();
+        Teams.postTeam(teamName, Login.httpAdministrator);
+        return Teams.getTeam(teamName, Login.httpAdministrator).body;
+    }
 }

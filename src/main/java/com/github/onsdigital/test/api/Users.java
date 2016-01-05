@@ -15,6 +15,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.test.api.oneliners.OneLineSetups.newSessionWithViewerPermissions;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -242,6 +243,12 @@ public class Users {
         User user = new User();
         user.email = generateRandomTestUserEmail();
         user.name = "Rusty";
+        return user;
+    }
+
+    public static User createTestViewerUser() throws IOException {
+        User user = createRandomTestUser();
+        newSessionWithViewerPermissions(user.name, user.email);
         return user;
     }
 
