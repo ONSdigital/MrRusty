@@ -22,9 +22,9 @@ public class SelectedPagePartial extends CollectionsPage {
     protected SelectedPagePartial initialisePage(WebElement section) {
         try {
             super.initialisePage();
-            editButton = find(editButtonLocator);
-            moveButton = find(moveButtonLocator);
-            deleteButton = find(deleteButtonLocator);
+            editButton = section.findElement(editButtonLocator);
+            moveButton = section.findElement(moveButtonLocator);
+            deleteButton = section.findElement(deleteButtonLocator);
 
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
