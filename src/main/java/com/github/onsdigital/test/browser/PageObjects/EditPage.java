@@ -1,6 +1,7 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
+import com.github.webdriverextensions.Bot;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -69,6 +70,31 @@ public class EditPage extends WorkspacePage {
         List<WebElement> textAreas = newSection.findElements(By.cssSelector("textarea"));
         WebElement titleEntry = textAreas.get(0);
         titleEntry.sendKeys(name);
+
+        return new PageSectionPartial(this.driver, newSection);
+    }
+
+    public PageSectionPartial getContentSection(int index) {
+
+        WebElement contentAccordion = waitAndFind(By.cssSelector("#section")); // find the content accordion
+
+        WebElement contentAccordionElement = contentAccordion.findElement(By.className("edit-section__head"));
+
+        if (Bot.attributeEquals("aria-expanded", "false", contentAccordionElement)) {
+            contentAccordion.findElement(By.cssSelector(".edit-section__head")).click(); // click the header to open it
+        }
+
+
+        contentAccordion = waitAndFind(By.cssSelector("#section")); // find the content accordion
+        // get a list of all sections then pick the section that we want.
+
+        waitAndFind(By.cssSelector(".edit-section__sortable-item"));
+        List<WebElement> sections = contentAccordion.findElements(By.cssSelector(".edit-section__sortable-item"));
+        WebElement newSection = sections.get(index);
+
+
+        newSection.getAttribute("innerHTML");
+        List<WebElement> textAreas = newSection.findElements(By.cssSelector("textarea"));
 
         return new PageSectionPartial(this.driver, newSection);
     }
