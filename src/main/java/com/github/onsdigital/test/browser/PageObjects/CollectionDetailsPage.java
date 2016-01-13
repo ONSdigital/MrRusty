@@ -28,7 +28,6 @@ public class CollectionDetailsPage extends CollectionsPage {
     protected CollectionDetailsPage initialisePage() {
         try {
             super.initialisePage();
-            //workOnCollectionButton = waitAndFind(workOnCollectionButtonLocator);
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
@@ -36,24 +35,35 @@ public class CollectionDetailsPage extends CollectionsPage {
         return this;
     }
 
+    /**
+     * Click the work on collection button and expect the browse screen to be loaded.
+     * @return
+     */
+    public BrowsePage clickWorkOnCollection() {
+        workOnCollectionButton = waitAndFind(workOnCollectionButtonLocator);
+        workOnCollectionButton.click();
+        return new BrowsePage(this.driver);
+    }
+
     public SelectedPagePartial clickCollectionPageByName(String pageName) {
 
 
-        List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list"));
+        List<WebElement> pages = driver.findElements(By.cssSelector(".collection-selected .section-content ul.page-list li"));
 
         for (WebElement page : pages) {
 
-            //System.out.println(page.getAttribute("innerHTML"));
+            System.out.println(page.getAttribute("innerHTML"));
 
             try {
                 WebElement pageSpan = page.findElement(By.tagName("span"));
-
+                System.out.println("pageSpan.getText() = " + pageSpan.getText());
                 if (pageSpan.getText().contains(pageName)) {
                     pageSpan.click();
                     return new SelectedPagePartial(this.driver, page);
                 }
             } catch (NotFoundException exception) {
                 // no pages in this page list - do nothing.
+                System.out.println("exception = " + exception.getMessage());
             }
 
         }
