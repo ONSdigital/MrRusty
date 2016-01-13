@@ -1,6 +1,7 @@
 package com.github.onsdigital.junit;
 
 import org.junit.internal.TextListener;
+import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
@@ -22,6 +23,13 @@ public class RustyListener extends TextListener {
     public RustyListener() {
         super(System.out);
     }
+
+
+    @Override
+    public void testStarted(Description description) {
+        System.out.println("Running test " + description.getMethodName() + " in class " + description.getClassName());
+    }
+
 
     /**
      * Collates the results of each testing round.
