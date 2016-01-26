@@ -11,6 +11,7 @@ public class MarkdownEditorPage extends PageObject {
 
     By chartButtonLocator = By.className("btn-markdown-editor-chart");
     By tableButtonLocator = By.className("btn-markdown-editor-table");
+    By imageButtonLocator = By.className("btn-markdown-editor-image");
     By cancelButtonLocator = By.className("btn-markdown-editor-cancel");
     By saveButtonLocator = By.className("btn-markdown-editor-save");
     By exitButtonLocator = By.className("btn-markdown-editor-exit");
@@ -18,6 +19,7 @@ public class MarkdownEditorPage extends PageObject {
 
     WebElement chartButton;
     WebElement tableButton;
+    WebElement imageButton;
     WebElement editor;
     WebElement cancelButton;
     WebElement saveButton;
@@ -33,6 +35,7 @@ public class MarkdownEditorPage extends PageObject {
             exitButton = find(exitButtonLocator);
             chartButton = find(chartButtonLocator);
             tableButton = find(tableButtonLocator);
+            imageButton = find(imageButtonLocator);
             editor = waitAndFind(editorLocator);
 
         } catch (NoSuchElementException exception) {
@@ -57,6 +60,18 @@ public class MarkdownEditorPage extends PageObject {
 
     public MarkdownEditorPage clickSave() {
         saveButton.click();
+        return this;
+    }
+
+    public ChartBuilderPage clickCreateChart() {
+        chartButton.click();
+        return new ChartBuilderPage (driver);
+    }
+
+    public MarkdownEditorPage fillChartAndSave () {
+        ChartBuilderPage chart = new ChartBuilderPage (driver);
+        chart.fillInChart();
+        chart.clickCreate();
         return this;
     }
 
