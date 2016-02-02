@@ -94,7 +94,7 @@ public class CollectionsPage extends FlorencePage {
      */
     public CollectionsPage populateFormWithDefaults(String name) {
         typeCollectionName(name);
-        selectTeamByIndex(1);
+//        selectTeamByIndex(1);
         selectManualPublish();
         return this;
     }

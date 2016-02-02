@@ -68,16 +68,14 @@ public class MarkdownEditorPage extends PageObject {
         return new ChartBuilderPage (driver);
     }
 
-    public MarkdownEditorPage fillChartAndSave () {
-        ChartBuilderPage chart = new ChartBuilderPage (driver);
-        chart.fillInChart();
-        chart.clickCreate();
-        return this;
-    }
-
     public TableBuilderPage clickCreateTable() {
         tableButton.click();
         return new TableBuilderPage(driver);
+    }
+
+    public ImageBuilderPage clickCreateImage() {
+        imageButton.click();
+        return new ImageBuilderPage(driver);
     }
 
     public EditPage clickSaveAndExit() {

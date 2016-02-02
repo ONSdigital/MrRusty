@@ -1,17 +1,20 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.davidcarboni.cryptolite.Random;
+import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
+import org.junit.Test;
 
-//@DependsOn({Collections.class})
+@DependsOn({Collections.class})
 public class Publish {
 
-    Credentials publisher = SetupBeforeTesting.publisherCredentials;
+//    Credentials publisher = SetupBeforeTesting.publisherCredentials;
+    Credentials publisher = SetupBeforeTesting.systemCredentials;
 
-   // @Test
+    @Test
     public void shouldPublishContent() throws InterruptedException {
 
         // login and create a collection
@@ -26,7 +29,16 @@ public class Publish {
 
         // add a new section to the page and add markdown content.
         MarkdownEditorPage editorPage = editPage.addContentSection(Random.id().substring(0, 5)).clickEditPage();
+        editorPage.clickCreateChart()
+                .fillInChart()
+                .clickCreateChartFromMarkdown()
+                .clickCreateImage()
+                .fillInImage()
+                .clickCreateImageFromMarkdown();
         editPage = editorPage.typeContent("omg this is content!").clickSaveAndExit();
+
+        // add an external link
+        editPage.createRelatedLink().clickSave();
 
         // submit the page for review.
         collectionsPage = editPage.clickSubmitForReview();

@@ -2,10 +2,8 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.selenium.PageObjectException;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.internal.WrapsDriver;
 import org.openqa.selenium.support.ui.Select;
 
 public class ChartBuilderPage extends PageObject {
@@ -53,8 +51,6 @@ public class ChartBuilderPage extends PageObject {
     By chartDecPlacesEntryLocator = By.id("chart-decimal-places");
     By chartXAxisEntryLocator = By.id("chart-x-axis-label");
     By chartNotesEntryLocator = By.id("chart-notes");
-    By fileEntryLocator = By.id("files");
-    By submitButtonLocator = By.id("files");
     By createButtonLocator = By.className("btn-chart-builder-create");
     By cancelButtonLocator = By.className("btn-chart-builder-cancel");
 
@@ -71,7 +67,6 @@ public class ChartBuilderPage extends PageObject {
     WebElement chartXAxisEntry;
     WebElement chartNotesEntry;
     WebElement fileEntry;
-    WebElement submitButton;
     WebElement createButton;
     WebElement cancelButton;
 
@@ -82,8 +77,6 @@ public class ChartBuilderPage extends PageObject {
         try {
             cancelButton = waitAndFind(cancelButtonLocator);
             createButton = find(createButtonLocator);
-            submitButton = find(submitButtonLocator);
-            fileEntry = find(fileEntryLocator);
             chartNameEntry = find(chartNameEntryLocator);
             chartSubtitleEntry = find(chartSubtitleEntryLocator);
             chartSourceEntry = find(chartSourceEntryLocator);
@@ -111,14 +104,24 @@ public class ChartBuilderPage extends PageObject {
         initialisePage();
     }
 
-    public MarkdownEditorPage clickCancel() {
+    public MarkdownEditorPage clickCancelChartFromMarkdown() {
         cancelButton.click();
         return new MarkdownEditorPage(driver);
     }
 
-    public MarkdownEditorPage clickCreate() {
+    public WorkspacePage clickCancelChartFromMenu() {
+        cancelButton.click();
+        return new WorkspacePage(driver);
+    }
+
+    public MarkdownEditorPage clickCreateChartFromMarkdown() {
         createButton.click();
         return new MarkdownEditorPage(driver);
+    }
+
+    public WorkspacePage clickCreateChartFromMenu() {
+        createButton.click();
+        return new WorkspacePage(driver);
     }
 
     public ChartBuilderPage typeChartName(String chartName) {
@@ -141,9 +144,17 @@ public class ChartBuilderPage extends PageObject {
         return this;
     }
 
-    public ChartBuilderPage typeDataName(String chartData) {
-        chartDataEntry.sendKeys(chartData);
-        return this;
+    public void setAttribute(WebElement element) {
+        WrapsDriver wd = (WrapsDriver) element;
+        JavascriptExecutor js = (JavascriptExecutor) wd.getWrappedDriver();
+        js.executeScript("document.getElementById('chart-data').value='date\\tJuice\\tTravel\\n2000-01-01\\t106.3\\t" +
+                "49.843099\\n2000-02-01\\t106.0\\t49.931931\\n2000-03-01\\t105.4\\t61.478163\\n2000-04-01\\t101.8\\t" +
+                "58.981617\\n2000-05-01\\t95.9\\t61.223861\\n2000-06-01\\t94.1\\t65.601574\\n2000-07-01\\t102.0\\t" +
+                "67.89832'");
+    }
+
+    public void pasteData() {
+        setAttribute(chartDataEntry);
     }
 
     public ChartBuilderPage typeAltTextName(String chartAltText) {
@@ -192,14 +203,7 @@ public class ChartBuilderPage extends PageObject {
         chart.typeSubtitleName("Test chart subtitle");
         chart.typeSourceName("ONS test data");
         chart.typeUnitName("Some testing unit");
-        chart.typeDataName("date\tJuice\tTravel\n" +
-                "2000-01-01\t106.3\t49.843099\n" +
-                "2000-02-01\t106.0\t49.931931\n" +
-                "2000-03-01\t105.4\t61.478163\n" +
-                "2000-04-01\t101.8\t58.981617\n" +
-                "2000-05-01\t95.9\t61.223861\n" +
-                "2000-06-01\t94.1\t65.601574\n" +
-                "2000-07-01\t102.0\t67.89832");
+        chart.pasteData();
         chart.typeAltTextName("Chart description for accesibility");
         chart.selectType("line");
         chart.selectAspectRatio("0.56");
