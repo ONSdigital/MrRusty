@@ -1,6 +1,8 @@
 package com.github.onsdigital.http;
 
-import com.github.davidcarboni.restolino.json.Serialiser;
+import com.github.onsdigital.test.json.serialiser.IsoDateSerializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -25,6 +27,7 @@ import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by david on 25/03/2015.
@@ -34,7 +37,10 @@ public class Http implements AutoCloseable {
     private CloseableHttpClient httpClient;
     private ArrayList<Header> headers = new ArrayList<>();
 
+
     private static SSLContext sslContext;
+    private Gson gson;
+
     /**
      * Sends a GET request and returns the response.
      *
@@ -439,11 +445,21 @@ public class Http implements AutoCloseable {
         // Add the request message if there is one
         if (requestMessage != null) {
             // Send the message
-            String message = Serialiser.serialise(requestMessage);
+            String message = getGson().toJson(requestMessage);
             result = new StringEntity(message);
         }
 
         return result;
+    }
+
+    private Gson getGson() {
+        if (gson == null) {
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.registerTypeAdapter(Date.class, new IsoDateSerializer());
+            return gsonBuilder.create();
+        }
+
+        return gson;
     }
 
     /**
@@ -462,7 +478,7 @@ public class Http implements AutoCloseable {
         if (entity != null) {
             try (InputStream inputStream = entity.getContent()) {
                 try {
-                    body = Serialiser.deserialise(inputStream, responseClass);
+                    body = getGson().fromJson(IOUtils.toString(inputStream), responseClass);
                 } catch (JsonSyntaxException e) {
                     // This can happen if an error HTTP code is received and the
                     // body of the response doesn't contain the expected object:
