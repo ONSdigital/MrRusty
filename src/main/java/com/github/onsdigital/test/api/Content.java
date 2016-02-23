@@ -403,6 +403,20 @@ public class Content {
                 Serialiser.serialise(content));
     }
 
+    @POST
+    @Test
+    public void shouldErrorWhenSavingContentToAnApprovedCollection() throws IOException {
+
+        // Given
+        // an approved collection
+        CollectionDescription collection = OneLineSetups.publishedCollection();
+        Approve.approve(collection.id, Login.httpPublisher);
+
+        // When we attempt to save data.
+        Response<String> response = create(collection.id, "content", "some/content/data.json", Login.httpPublisher);
+        assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
+    }
+
     private static JsonObject getExamplePageContent() throws IOException {
         try (FileInputStream inputStream = new FileInputStream("src/main/resources/dummy_dataset/data.json")) {
             return Serialiser.deserialise(inputStream, JsonObject.class);
