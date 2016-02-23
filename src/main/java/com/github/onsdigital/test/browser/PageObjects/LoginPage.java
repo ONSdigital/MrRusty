@@ -2,7 +2,10 @@ package com.github.onsdigital.test.browser.PageObjects;
 
 import com.github.onsdigital.selenium.PageObjectException;
 import com.github.onsdigital.test.json.Credentials;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class LoginPage extends FlorencePage {
 
@@ -10,9 +13,20 @@ public class LoginPage extends FlorencePage {
     By passwordLocator = By.id("password");
     By loginButtonLocator = By.className("btn-florence-login");
 
+    By currentPasswordLocator = By.id("password-old");
+    By newPasswordLocator = By.id("password-new");
+    By confirmPasswordLocator = By.id("password-confirm");
+    By updatePasswordButtonLocator = By.id("update-password");
+
+
     WebElement usernameInput;
     WebElement passwordInput;
     WebElement loginButton;
+
+    WebElement currentPassword;
+    WebElement passwordNew;
+    WebElement confirmPassword;
+    WebElement updatePassword;
 
     public LoginPage() {
         super();
@@ -68,6 +82,13 @@ public class LoginPage extends FlorencePage {
         return clickLogin();
     }
 
+    public LoginPage loginLogin(String username, String password) {
+        typeUsername(username);
+        typePassword(password);
+        loginButton.click();
+        return new LoginPage(driver);
+    }
+
     /**
      * Simulate clicking the login button on the login page expecting it to fail.
      */
@@ -103,6 +124,27 @@ public class LoginPage extends FlorencePage {
      */
     public CollectionsPage clickLogin() {
         passwordInput.submit();
+        return new CollectionsPage(driver);
+    }
+
+    /**
+     * Simulate compulsory change of password for new user
+     */
+    public CollectionsPage changePassword(String oldPassword, String newPassword) {
+        currentPassword = waitAndFind(currentPasswordLocator);
+        passwordNew = find(newPasswordLocator);
+        confirmPassword = find(confirmPasswordLocator);
+        updatePassword = find(updatePasswordButtonLocator);
+
+        currentPassword.sendKeys(oldPassword);
+        passwordNew.sendKeys(newPassword);
+        confirmPassword.sendKeys(newPassword);
+        updatePassword.click();
+
+        By confirmButtonLocator = By.className("confirm");
+        WebElement confirmButton = waitAndFind(confirmButtonLocator);
+        confirmButton.click();
+
         return new CollectionsPage(driver);
     }
 }

@@ -119,6 +119,22 @@ public class EditPage extends WorkspacePage {
         return this;
     }
 
+    public EditPage createRelatedLink() {
+        By relatedLinksLocator = By.cssSelector("#link .edit-section__head");
+        WebElement relatedLinkAccordion;
+        relatedLinkAccordion = waitAndFind(relatedLinksLocator);
+        relatedLinkAccordion.click();
+        scrollTo("#link");
+
+        waitAndFind(By.cssSelector("#add-link")).click();
+
+        waitAndFind(By.cssSelector("#uri-input")).sendKeys("http://google.com");
+        find(By.id("uri-title")).sendKeys("Google");
+        find(By.className("btn-uri-get")).click();
+
+        return this;
+    }
+
     public CollectionsPage clickSubmitForReview() {
         WebElement submitForReviewButton = find(submitForReviewButtonLocator);
         submitForReviewButton.click();

@@ -16,6 +16,7 @@ public class FlorencePage extends PageObject {
 
     By collectionsLocator = By.className("nav--admin__item--collections");
     By usersLocator = By.className("nav--admin__item--users");
+    By teamsLocator = By.className("nav--admin__item--teams");
     By publishingQueueLocator = By.className("nav--admin__item--publish");
     By logoutLocator = By.className("nav--admin__item--logout");
 
@@ -23,6 +24,7 @@ public class FlorencePage extends PageObject {
 
     WebElement collectionsMenuLink;
     WebElement usersMenuLink;
+    WebElement teamsMenuLink;
     WebElement publishingQueueMenuLink;
 
     protected FlorencePage() {
@@ -79,6 +81,18 @@ public class FlorencePage extends PageObject {
         return new CollectionsPage(driver);
     }
 
+    public TeamsPage clickTeamsMenuLink() {
+        teamsMenuLink = waitAndFind(teamsLocator);
+        this.teamsMenuLink.click();
+        return new TeamsPage(driver);
+    }
+
+    public UsersPage clickUsersMenuLink() {
+        usersMenuLink = waitAndFind(usersLocator);
+        this.usersMenuLink.click();
+        return new UsersPage(driver);
+    }
+
     public PublishingQueuePage clickPublishingQueueMenuLink() {
         publishingQueueMenuLink = waitAndFind(publishingQueueLocator);
         this.publishingQueueMenuLink.findElement(By.linkText("Publishing queue")).click();
@@ -94,4 +108,5 @@ public class FlorencePage extends PageObject {
         WebElement alert = waitAndFind(alertLocator);
         return alert;
     }
+
 }

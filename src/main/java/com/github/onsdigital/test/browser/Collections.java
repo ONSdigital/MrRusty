@@ -17,7 +17,7 @@ import java.util.Date;
 @DependsOn({Login.class})
 public class Collections {
 
-    Credentials publisher = SetupBeforeTesting.publisherCredentials;
+    Credentials publisher = SetupBeforeTesting.systemCredentials;
 
     @POST
     @Test
