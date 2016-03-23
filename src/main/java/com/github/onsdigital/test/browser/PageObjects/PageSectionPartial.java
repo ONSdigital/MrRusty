@@ -20,8 +20,8 @@ public class PageSectionPartial extends EditPage {
     protected PageSectionPartial initialisePage(WebElement section) {
         try {
             super.initialisePage();
-            editButton = find(editButtonLocator);
-            deleteButton = find(deleteButtonLocator);
+            editButton = section.findElement(editButtonLocator);
+            deleteButton = section.findElement(deleteButtonLocator);
 
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
