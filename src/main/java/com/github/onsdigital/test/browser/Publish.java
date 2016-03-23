@@ -31,10 +31,10 @@ public class Publish {
         MarkdownEditorPage editorPage = editPage.addContentSection(Random.id().substring(0, 5)).clickEditPage();
         editorPage.clickCreateChart()
                 .fillInChart()
-                .clickCreateChartFromMarkdown()
-                .clickCreateImage()
-                .fillInImage()
-                .clickCreateImageFromMarkdown();
+                .clickCreateChartFromMarkdown();
+//        .clickCreateImage()
+//                .fillInImage()
+//                .clickCreateImageFromMarkdown();
         editPage = editorPage.typeContent("omg this is content!").clickSaveAndExit();
 
         // add an external link
