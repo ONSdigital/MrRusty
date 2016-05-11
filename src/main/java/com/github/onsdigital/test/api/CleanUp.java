@@ -22,12 +22,11 @@ public class CleanUp {
         Endpoint endpoint = ZebedeeHost.collections;
         Response<CollectionDescriptions> getResponse = Login.httpPublisher.get(endpoint, CollectionDescriptions.class);
 
-        if (getResponse == null) {
-            return;
-        }
+        if (getResponse == null) return;
 
         CollectionDescriptions descriptions = getResponse.body;
 
+        if (descriptions == null) return;
 
         // Send a delete request for all those that begin with Rusty
         for(CollectionDescription description: descriptions) {
