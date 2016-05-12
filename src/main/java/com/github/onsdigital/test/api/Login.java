@@ -1,21 +1,22 @@
 package com.github.onsdigital.test.api;
 
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
-import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.AssertResponse;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Credentials;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.test.AssertResponse.assertBodyNotEmpty;
+import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.*;
 
 /**
@@ -24,44 +25,8 @@ import static org.junit.Assert.*;
  */
 @Api
 @DependsOn({})
-public class Login {
+public class Login extends ZebedeeApiTest {
 
-    public static Http httpAdministrator;
-    public static Http httpPublisher;
-    public static Http httpSecondSetOfEyes;
-    public static Http httpThirdSetOfEyes;
-    public static Http httpViewer;
-    public static Http httpScallywag;
-    private static String tokenAdministrator;
-    private static String tokenPublisher;
-    private static String tokenSecondSetOfEyes;
-    private static String tokenThirdSetOfEyes;
-    private static String tokenViewer;
-
-    /**
-     * Gets a reference to the admin {@link Http} instance for use in these tests.
-     */
-    @BeforeClass
-    public static void getHttp() {
-        httpAdministrator = Sessions.get("administrator");
-        httpPublisher = Sessions.get("publisher");
-        httpSecondSetOfEyes = Sessions.get("secondSetOfEyes");
-        httpThirdSetOfEyes = Sessions.get("thirdSetOfEyes");
-        httpViewer = Sessions.get("viewer");
-        httpScallywag = Sessions.get("scallywag");
-    }
-
-    /**
-     * Saves the token from the admin login to the {@link Http} instance so that it can be used in other tests.
-     */
-    @AfterClass
-    public static void setToken() {
-        httpAdministrator.addHeader("x-florence-token", tokenAdministrator);
-        httpPublisher.addHeader("x-florence-token", tokenPublisher);
-        httpSecondSetOfEyes.addHeader("x-florence-token", tokenSecondSetOfEyes);
-        httpThirdSetOfEyes.addHeader("x-florence-token", tokenThirdSetOfEyes);
-        httpViewer.addHeader("x-florence-token", tokenViewer);
-    }
 
     /**
      * Tests login using the administrator credentials.
@@ -74,12 +39,11 @@ public class Login {
 
         // Given
         // Correct admin credentials
-        Credentials credentials = SetupBeforeTesting.adminCredentials;
+        Credentials credentials = Context.adminCredentials;
 
         // When
         // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
-        tokenAdministrator = response.body;
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // The request should succeed
@@ -96,27 +60,12 @@ public class Login {
     @Test
     public void shouldLogInAsPublisher() throws IOException {
 
-        // Given
-        // Correct admin credentials
-        Credentials credentials = SetupBeforeTesting.publisherCredentials;
+        // When we attempt to log in as a publisher
+        Response<String> response = context.getPublisher().post(ZebedeeHost.login, Context.publisherCredentials, String.class);
 
-        // When
-        // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
-        tokenPublisher = response.body;
-
-        // Then
-        // The request should succeed
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
-        assertTrue(StringUtils.isNotBlank(response.body));
-
-        // ----------------------- Setup second set of eyes
-        credentials = SetupBeforeTesting.secondSetOfEyesCredentials;
-        tokenSecondSetOfEyes = httpAdministrator.post(ZebedeeHost.login, credentials, String.class).body;
-        // ----------------------- Setup third set of eyes
-
-        credentials = SetupBeforeTesting.thirdSetOfEyesCredentials;
-        tokenThirdSetOfEyes = httpAdministrator.post(ZebedeeHost.login, credentials, String.class).body;
+        // Then the request should succeed
+        assertBodyNotEmpty(response);
+        assertOk(response);
     }
 
     /**

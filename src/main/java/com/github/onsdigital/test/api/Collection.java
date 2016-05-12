@@ -8,6 +8,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionType;
 import com.github.onsdigital.test.json.Team;
@@ -32,9 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 @Api
 @DependsOn(com.github.onsdigital.test.api.Permissions.class)
-public class Collection {
-
-    private static Http http = Login.httpAdministrator;
+public class Collection extends ZebedeeApiTest{
 
     public Collection() {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()

@@ -4,7 +4,6 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
-import com.github.onsdigital.junit.Setup;
 import com.github.onsdigital.test.api.ZebedeeHost;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.Credentials;
@@ -14,9 +13,11 @@ import com.github.onsdigital.test.json.User;
 import java.io.IOException;
 
 /**
- * Created by david on 17/04/2015.
+ * Test context. Reusable data for tests thats lazy loaded. 
+ * 
+ * I.e. log in for particular users handled here will not reattempt login if already logged in.
  */
-public class SetupBeforeTesting implements Setup {
+public class Context {
 
     Http systemSession = Sessions.get("system");
 
@@ -35,8 +36,8 @@ public class SetupBeforeTesting implements Setup {
     public static User thirdSetOfEyesUser = user("Dai Griffiths", "dg@magicroundabout.ons.gov.uk");
     public static Credentials thirdSetOfEyesCredentials = credentials(thirdSetOfEyesUser.email, Random.password(8), false);
 
-    public static User contentOwnerUser = user("Stacy To", "statto@magicroundabout.ons.gov.uk");
-    public static Credentials contentOwnerCredentials = credentials(contentOwnerUser.email, Random.password(8), false);
+    public static User viewerUser = user("Stacy To", "statto@magicroundabout.ons.gov.uk");
+    public static Credentials viewerCredentials = credentials(viewerUser.email, Random.password(8), false);
 
     public static User newUserWithTemporaryPassword = user("New guy", "new@magicroundabout.ons.gov.uk");
     public static Credentials newUserCredentials = credentials(newUserWithTemporaryPassword.email, Random.password(8), true);
@@ -44,12 +45,49 @@ public class SetupBeforeTesting implements Setup {
     public static User scallywagUser = user("Ha Querr", "script.kiddie@bluecat.com");
     public static Credentials scallywagCredentials = credentials(scallywagUser.email, Random.password(8), false);
 
-    @Override
+    private Http administrator;
+    private Http publisher;
+    private Http secondSetOfEyes;
+    private Http thirdSetOfEyes;
+    private Http viewer;
+    private Http scallywag;
+    
+    private String tokenAdministrator;
+    private String tokenPublisher;
+    private String tokenSecondSetOfEyes;
+    private String tokenThirdSetOfEyes;
+    private String tokenViewer;
+
+    public Context() {
+        administrator = Sessions.get("administrator");
+        publisher = Sessions.get("publisher");
+        secondSetOfEyes = Sessions.get("secondSetOfEyes");
+        thirdSetOfEyes = Sessions.get("thirdSetOfEyes");
+        viewer = Sessions.get("viewer");
+        scallywag = Sessions.get("scallywag");
+    }
+
     public void setup() throws Exception {
         loginAsSystemOwner();
         createUsers();
         setPasswords();
         setPermissions();
+        loginUsers();
+    }
+
+    private void loginUsers() throws IOException {
+        tokenAdministrator =  getAdministrator().post(ZebedeeHost.login, adminCredentials, String.class).body;
+        tokenPublisher = getPublisher().post(ZebedeeHost.login, publisherCredentials, String.class).body;
+        tokenSecondSetOfEyes = getSecondSetOfEyes().post(ZebedeeHost.login, secondSetOfEyesCredentials, String.class).body;
+        tokenThirdSetOfEyes = getThirdSetOfEyes().post(ZebedeeHost.login, thirdSetOfEyesCredentials, String.class).body;
+
+        tokenViewer = getViewer().post(ZebedeeHost.login, view, String.class);
+
+        administrator.addHeader("x-florence-token", tokenAdministrator);
+        publisher.addHeader("x-florence-token", tokenPublisher);
+        secondSetOfEyes.addHeader("x-florence-token", tokenSecondSetOfEyes);
+        thirdSetOfEyes.addHeader("x-florence-token", tokenThirdSetOfEyes);
+        viewer.addHeader("x-florence-token", tokenViewer);
     }
 
     private void loginAsSystemOwner() throws IOException {
@@ -90,9 +128,9 @@ public class SetupBeforeTesting implements Setup {
         }
 
         // Content Owner
-        Response<User> contentOwner = systemSession.post(ZebedeeHost.users, contentOwnerUser, User.class);
+        Response<User> contentOwner = systemSession.post(ZebedeeHost.users, viewerUser, User.class);
         if (admin.statusLine.getStatusCode() != 409) {
-            checkOk(contentOwner, "Unable to create content owner user " + contentOwnerUser);
+            checkOk(contentOwner, "Unable to create content owner user " + viewerUser);
         }
 
         // New user with temp password
@@ -116,7 +154,7 @@ public class SetupBeforeTesting implements Setup {
         setUserPassword(publisherCredentials);
         setUserPassword(secondSetOfEyesCredentials);
         setUserPassword(thirdSetOfEyesCredentials);
-        setUserPassword(contentOwnerCredentials);
+        setUserPassword(viewerCredentials);
         setUserPassword(newUserCredentials);
 
         Response<String> admin = systemSession.post(ZebedeeHost.password, newUserCredentials, String.class);
@@ -175,7 +213,7 @@ public class SetupBeforeTesting implements Setup {
 
         // Add content user to the economy team
         Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
-        Response<Boolean> addUser = systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", contentOwnerUser.email), "", Boolean.class);
+        Response<Boolean> addUser = systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", viewerUser.email), "", Boolean.class);
 
         // new user
         PermissionDefinition newUserPermissionDefinition = permission(newUserWithTemporaryPassword, false, true);
@@ -190,7 +228,7 @@ public class SetupBeforeTesting implements Setup {
      * @param email The user's email
      * @return A {@link User} containing the given details.
      */
-    public static User user(String name, String email) {
+    private static User user(String name, String email) {
         User user = new User();
         user.name = name;
         user.email = email;
@@ -205,11 +243,11 @@ public class SetupBeforeTesting implements Setup {
      * @param password The password
      * @return A {@link Credentials} instance containing the given details.
      */
-    public static Credentials credentials(String email, String password) {
+    private static Credentials credentials(String email, String password) {
         return credentials(email, password, null);
     }
 
-    public static Credentials credentials(String email, String password, Boolean temporaryPassword) {
+    private static Credentials credentials(String email, String password, Boolean temporaryPassword) {
         Credentials credentials = new Credentials();
         credentials.email = email;
         credentials.password = password;
@@ -227,5 +265,29 @@ public class SetupBeforeTesting implements Setup {
         if (response.statusLine.getStatusCode() != 200) {
             throw new RuntimeException(message + " (response code: " + response.statusLine.getStatusCode() + ")");
         }
+    }
+
+    public Http getAdministrator() {
+        return administrator;
+    }
+
+    public Http getPublisher() {
+        return publisher;
+    }
+
+    public Http getSecondSetOfEyes() {
+        return secondSetOfEyes;
+    }
+
+    public Http getThirdSetOfEyes() {
+        return thirdSetOfEyes;
+    }
+
+    public Http getViewer() {
+        return viewer;
+    }
+
+    public Http getScallywag() {
+        return scallywag;
     }
 }

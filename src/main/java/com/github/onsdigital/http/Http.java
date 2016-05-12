@@ -37,7 +37,6 @@ public class Http implements AutoCloseable {
     private CloseableHttpClient httpClient;
     private ArrayList<Header> headers = new ArrayList<>();
 
-
     private static SSLContext sslContext;
     private Gson gson;
 
