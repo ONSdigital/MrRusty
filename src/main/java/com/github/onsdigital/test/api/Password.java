@@ -4,11 +4,12 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
+import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
-import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Credentials;
+import com.github.onsdigital.test.json.PermissionDefinition;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class Password extends ZebedeeApiTest {
 
         // Given
         // A user with credentials
-        OneLineSetups.newSessionWithPublisherPermissions(context, "Rusty", credentials.email, Random.password(8));
+        newSessionWithPublisherPermissions(context, "Rusty", credentials.email, Random.password(8));
 
         // When
         // We attempt to create a new password
@@ -81,7 +82,7 @@ public class Password extends ZebedeeApiTest {
         // A user with credentials
         User self = Context.user("Rusty", "Rusty_" + Random.id() + "@example.com");
         String password = Random.password(8);
-        Http httpSelf = OneLineSetups.newSessionWithPublisherPermissions(context, self.name, self.email, password);
+        Http httpSelf = newSessionWithPublisherPermissions(context, self.name, self.email, password);
 
         Credentials updateCredentials = Context.credentials(self.email, Random.password(8));
         updateCredentials.oldPassword = password;
@@ -149,4 +150,50 @@ public class Password extends ZebedeeApiTest {
         assertEquals(HttpStatus.UNAUTHORIZED_401, response1.statusLine.getStatusCode());
     }
 
+    private static Http newSessionWithPublisherPermissions(Context context, String name, String email, String password) throws IOException {
+        // Given
+        // A user with no email address
+        User user = new User();
+        user.email = email;
+        user.name = name;
+
+        // Post the user
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+        // Set their password
+        Credentials credentials = new Credentials();
+        credentials.email = user.email;
+        credentials.password = password;
+        Response<String> responsePassword = context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
+        assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
+
+        // Assign them publisher permissions
+        PermissionDefinition definition = new PermissionDefinition();
+        definition.email = user.email;
+        definition.editor = true;
+        Response<String> permissionResponse = context.getAdministrator().post(ZebedeeHost.permission, definition, String.class);
+        assertEquals(HttpStatus.OK_200, permissionResponse.statusLine.getStatusCode());
+
+        // Change the password as the user to remove the temporary password restrictions.
+        Credentials changePasswordCredentials = new Credentials();
+        changePasswordCredentials.email = credentials.email;
+        changePasswordCredentials.password = credentials.password;
+        changePasswordCredentials.oldPassword = credentials.password;
+        Response<String> login = new Http().post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        assertEquals(HttpStatus.OK_200, login.statusLine.getStatusCode());
+
+        // Create a session
+        Http http = Sessions.get(email);
+
+        // Log the user in
+        Response<String> responseLogin = http.post(ZebedeeHost.login, credentials, String.class);
+        assertEquals(HttpStatus.OK_200, responseLogin.statusLine.getStatusCode());
+        String token = responseLogin.body;
+
+        // Add their session token
+        http.addHeader("x-florence-token", token);
+
+        return http;
+    }
 }

@@ -153,57 +153,6 @@ public class OneLineSetups {
         return http;
     }
 
-
-    public static Http newSessionWithPublisherPermissions(Context context, String name, String email, String password) throws IOException {
-        // Given
-        // A user with no email address
-        User user = new User();
-        user.email = email;
-        user.name = name;
-
-        // Post the user
-        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
-
-        // Set their password
-        Credentials credentials = new Credentials();
-        credentials.email = user.email;
-        credentials.password = password;
-        Response<String> responsePassword = context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
-        assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
-
-        // Assign them publisher permissions
-        PermissionDefinition definition = new PermissionDefinition();
-        definition.email = user.email;
-        definition.editor = true;
-        Response<String> permissionResponse = context.getAdministrator().post(ZebedeeHost.permission, definition, String.class);
-        assertEquals(HttpStatus.OK_200, permissionResponse.statusLine.getStatusCode());
-
-        // Change the password as the user to remove the temporary password restrictions.
-        Credentials changePasswordCredentials = new Credentials();
-        changePasswordCredentials.email = credentials.email;
-        changePasswordCredentials.password = credentials.password;
-        changePasswordCredentials.oldPassword = credentials.password;
-        Response<String> login = new Http().post(ZebedeeHost.password, changePasswordCredentials, String.class);
-        assertEquals(HttpStatus.OK_200, login.statusLine.getStatusCode());
-
-        // Create a session
-        Http http = Sessions.get(email);
-
-        // Log the user in
-        Response<String> responseLogin = http.post(ZebedeeHost.login, credentials, String.class);
-        assertEquals(HttpStatus.OK_200, responseLogin.statusLine.getStatusCode());
-        String token = responseLogin.body;
-
-        // Add their session token
-        http.addHeader("x-florence-token", token);
-
-        return http;
-    }
-    public static Http newSessionWithPublisherPermissions(Context context) throws IOException {
-        return newSessionWithPublisherPermissions(context, "Rusty", "Rusty_" + Random.id() + "@example.com", Random.password(8));
-    }
-
     public static User newActiveUserWithViewerPermissions(Context context, String name, String email) throws IOException {
         // Create the user
         User user = new User();
