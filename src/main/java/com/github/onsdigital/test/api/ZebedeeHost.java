@@ -17,13 +17,11 @@ public class ZebedeeHost {
     public static final Endpoint collection = new Endpoint(zebedeeHost, "collection");
     public static final Endpoint content = new Endpoint(zebedeeHost, "content");
     public static final Endpoint data = new Endpoint(zebedeeHost, "data");
-    public static final Endpoint transfer = new Endpoint(zebedeeHost, "transfer");
     public static final Endpoint browse = new Endpoint(zebedeeHost, "browse");
     public static final Endpoint complete = new Endpoint(zebedeeHost, "complete");
     public static final Endpoint review = new Endpoint(zebedeeHost, "review");
     public static final Endpoint teams = new Endpoint(zebedeeHost, "teams");
     public static final Endpoint dataservices = new Endpoint(zebedeeHost, "dataservices");
-    public static final Endpoint cleanup = new Endpoint(zebedeeHost, "cleanup");
     public static final Endpoint publish = new Endpoint(zebedeeHost, "publish");
     public static final Endpoint collectionBrowseTree = new Endpoint(zebedeeHost, "collectionBrowseTree");
     public static final Endpoint collectionDetails = new Endpoint(zebedeeHost, "collectionDetails");
