@@ -1,7 +1,7 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.BrowsePage;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
@@ -17,7 +17,7 @@ import java.util.Date;
 @DependsOn({Login.class})
 public class Collections {
 
-    Credentials publisher = SetupBeforeTesting.systemCredentials;
+    Credentials publisher = Context.publisherCredentials;
 
     @POST
     @Test

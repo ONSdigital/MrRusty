@@ -5,8 +5,9 @@ import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
@@ -24,11 +25,11 @@ import static org.junit.Assert.assertEquals;
 
 @Api
 @DependsOn(Users.class)
-public class Password {
+public class Password extends ZebedeeApiTest {
 
     private User user;
     private Credentials credentials;
-    Http http = Login.httpAdministrator;
+    Http http = context.getAdministrator();
 
     @Before
     public void setUp() throws Exception {
@@ -49,21 +50,21 @@ public class Password {
 
         // Given
         // A user with credentials
-        OneLineSetups.newSessionWithPublisherPermissions("Rusty", credentials.email, Random.password(8));
+        OneLineSetups.newSessionWithPublisherPermissions(context, "Rusty", credentials.email, Random.password(8));
 
         // When
         // We attempt to create a new password
-        Response<String> response = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
 
         // Then
         // The request should succeed
         // the new password should be temporary and lastAdmin should be recorded
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        User updated = Users.get(credentials.email, Login.httpPublisher).body;
+        User updated = Users.get(credentials.email, context.getPublisher()).body;
         assertEquals(Boolean.TRUE, updated.temporaryPassword);
 
-        String email = SetupBeforeTesting.adminCredentials.email;
+        String email = Context.adminCredentials.email;
         assertEquals(email, updated.lastAdmin);
     }
 
@@ -78,11 +79,11 @@ public class Password {
 
         // Given
         // A user with credentials
-        User self = SetupBeforeTesting.user("Rusty", "Rusty_" + Random.id() + "@example.com");
+        User self = Context.user("Rusty", "Rusty_" + Random.id() + "@example.com");
         String password = Random.password(8);
-        Http httpSelf = OneLineSetups.newSessionWithPublisherPermissions(self.name, self.email, password);
+        Http httpSelf = OneLineSetups.newSessionWithPublisherPermissions(context, self.name, self.email, password);
 
-        Credentials updateCredentials = SetupBeforeTesting.credentials(self.email, Random.password(8));
+        Credentials updateCredentials = Context.credentials(self.email, Random.password(8));
         updateCredentials.oldPassword = password;
 
         // When
@@ -94,7 +95,7 @@ public class Password {
         // the new password should be temporary and lastAdmin should be recorded
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        User updated = Users.get(self.email, Login.httpPublisher).body;
+        User updated = Users.get(self.email, context.getPublisher()).body;
         assertEquals(Boolean.FALSE, updated.temporaryPassword);
 
         assertEquals(self.email.toLowerCase(), updated.lastAdmin.toLowerCase());
@@ -116,11 +117,11 @@ public class Password {
         // When
         // We attempt to create a duplicate user
         Credentials changePasswordCredentials = new Credentials();
-        changePasswordCredentials.email = SetupBeforeTesting.adminUser.email;
+        changePasswordCredentials.email = Context.adminUser.email;
         changePasswordCredentials.password = credentials.password;
         changePasswordCredentials.oldPassword = credentials.password;
-        Response<String> response1 = Login.httpViewer.post(ZebedeeHost.password, changePasswordCredentials, String.class);
-        Response<String> response3 = Login.httpScallywag.post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        Response<String> response1 = context.getViewer().post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        Response<String> response3 = context.getScallyWag().post(ZebedeeHost.password, changePasswordCredentials, String.class);
 
         // Then
         // Each request should fail
@@ -138,10 +139,10 @@ public class Password {
         // When
         // We attempt to create a duplicate user
         Credentials changePasswordCredentials = new Credentials();
-        changePasswordCredentials.email = SetupBeforeTesting.publisherCredentials.email;
+        changePasswordCredentials.email = Context.publisherCredentials.email;
         changePasswordCredentials.password = "wrong password";
         changePasswordCredentials.oldPassword = "new password";
-        Response<String> response1 = Login.httpPublisher.post(ZebedeeHost.password, changePasswordCredentials, String.class);
+        Response<String> response1 = context.getPublisher().post(ZebedeeHost.password, changePasswordCredentials, String.class);
 
         // Then
         // Each request should fail

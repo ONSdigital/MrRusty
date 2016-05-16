@@ -2,7 +2,7 @@ package com.github.onsdigital.test.browser;
 
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
@@ -11,8 +11,8 @@ import org.junit.Test;
 @DependsOn({Collections.class})
 public class Publish {
 
-//    Credentials publisher = SetupBeforeTesting.publisherCredentials;
-    Credentials publisher = SetupBeforeTesting.systemCredentials;
+//    Credentials publisher = Context.publisherCredentials;
+    Credentials publisher = Context.systemCredentials;
 
     @Test
     public void shouldPublishContent() throws InterruptedException {
@@ -44,7 +44,7 @@ public class Publish {
         collectionsPage = editPage.clickSubmitForReview();
 
         // login as the second set of eyes.
-        collectionsPage.clickLogoutMenuLink().login(SetupBeforeTesting.secondSetOfEyesCredentials);
+        collectionsPage.clickLogoutMenuLink().login(Context.secondSetOfEyesCredentials);
 
         // select the page to be reviewed.
         collectionsPage.clickCollectionByName(collectionName)
@@ -94,7 +94,7 @@ public class Publish {
         collectionsPage = editPage.clickSubmitForReview();
 
         // login as the second set of eyes.
-        collectionsPage.clickLogoutMenuLink().login(SetupBeforeTesting.secondSetOfEyesCredentials);
+        collectionsPage.clickLogoutMenuLink().login(Context.secondSetOfEyesCredentials);
 
         // select the page to be reviewed.
         collectionsPage.clickCollectionByName(collectionName)

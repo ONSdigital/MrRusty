@@ -50,7 +50,7 @@ public class Context {
     private Http secondSetOfEyes;
     private Http thirdSetOfEyes;
     private Http viewer;
-    private Http scallywag;
+    private Http scallyWag;
     
     private String tokenAdministrator;
     private String tokenPublisher;
@@ -64,7 +64,7 @@ public class Context {
         secondSetOfEyes = Sessions.get("secondSetOfEyes");
         thirdSetOfEyes = Sessions.get("thirdSetOfEyes");
         viewer = Sessions.get("viewer");
-        scallywag = Sessions.get("scallywag");
+        scallyWag = Sessions.get("scallywag");
     }
 
     public void setup() throws Exception {
@@ -80,8 +80,7 @@ public class Context {
         tokenPublisher = getPublisher().post(ZebedeeHost.login, publisherCredentials, String.class).body;
         tokenSecondSetOfEyes = getSecondSetOfEyes().post(ZebedeeHost.login, secondSetOfEyesCredentials, String.class).body;
         tokenThirdSetOfEyes = getThirdSetOfEyes().post(ZebedeeHost.login, thirdSetOfEyesCredentials, String.class).body;
-
-        tokenViewer = getViewer().post(ZebedeeHost.login, view, String.class);
+        tokenViewer = getViewer().post(ZebedeeHost.login, viewerCredentials, String.class).body;
 
         administrator.addHeader("x-florence-token", tokenAdministrator);
         publisher.addHeader("x-florence-token", tokenPublisher);
@@ -228,7 +227,7 @@ public class Context {
      * @param email The user's email
      * @return A {@link User} containing the given details.
      */
-    private static User user(String name, String email) {
+    public static User user(String name, String email) {
         User user = new User();
         user.name = name;
         user.email = email;
@@ -243,7 +242,7 @@ public class Context {
      * @param password The password
      * @return A {@link Credentials} instance containing the given details.
      */
-    private static Credentials credentials(String email, String password) {
+    public static Credentials credentials(String email, String password) {
         return credentials(email, password, null);
     }
 
@@ -287,7 +286,7 @@ public class Context {
         return viewer;
     }
 
-    public Http getScallywag() {
-        return scallywag;
+    public Http getScallyWag() {
+        return scallyWag;
     }
 }

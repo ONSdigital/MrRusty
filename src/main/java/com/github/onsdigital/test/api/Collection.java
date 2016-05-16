@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 
 @Api
 @DependsOn(com.github.onsdigital.test.api.Permissions.class)
-public class Collection extends ZebedeeApiTest{
+public class Collection extends ZebedeeApiTest {
 
     public Collection() {
         // Set ISO date formatting in Gson to match Javascript Date.toISODate()
@@ -42,7 +42,7 @@ public class Collection extends ZebedeeApiTest{
 
     /**
      * Test basic functionality
-     * <p/>
+     * <p>
      * Create with publisher permissions should return {@link HttpStatus#OK_200}
      */
     @POST
@@ -54,7 +54,7 @@ public class Collection extends ZebedeeApiTest{
 
         // When
         // we post as a publisher
-        Response<CollectionDescription> response = post(roundabout, Login.httpPublisher);
+        Response<CollectionDescription> response = post(roundabout, context.getPublisher());
 
         // Expect
         // a response of 200 - success
@@ -66,7 +66,7 @@ public class Collection extends ZebedeeApiTest{
 
     /**
      * Test basic functionality
-     * <p/>
+     * <p>
      * Create with publisher permissions should return {@link HttpStatus#OK_200}
      */
     @POST
@@ -77,28 +77,28 @@ public class Collection extends ZebedeeApiTest{
         Release release = CreateRelease();
         String releaseUri = release.getUri().toString() + "/data.json";
 
-        CollectionDescription announcementCollection = OneLineSetups.publishedCollection();
-        assertOk(Content.create(announcementCollection.id, release, releaseUri, Login.httpPublisher));
+        CollectionDescription announcementCollection = OneLineSetups.publishedCollection(context.getPublisher());
+        assertOk(Content.create(announcementCollection.id, release, releaseUri, context.getPublisher()));
 
-        assertOk(Complete.complete(announcementCollection.id, releaseUri, Login.httpPublisher));
-        assertOk(Review.review(announcementCollection.id, releaseUri, Login.httpSecondSetOfEyes));
-        assertOk(Approve.approve(announcementCollection.id, Login.httpPublisher));
-        Publish.publishAndWait(announcementCollection.id, Login.httpPublisher, 10);
+        assertOk(Complete.complete(announcementCollection.id, releaseUri, context.getPublisher()));
+        assertOk(Review.review(announcementCollection.id, releaseUri, context.getSecondSetOfEyes()));
+        assertOk(Approve.approve(announcementCollection.id, context.getPublisher()));
+        Publish.publishAndWait(context, announcementCollection.id, context.getPublisher(), 10);
 
         // When we create a new collection with the release URI.
         CollectionDescription releaseCollection = createCollectionDescription();
         releaseCollection.releaseUri = release.getUri();
-        releaseCollection = assertOk(Collection.post(releaseCollection, Login.httpPublisher)).body;
+        releaseCollection = assertOk(Collection.post(releaseCollection, context.getPublisher())).body;
 
         // Then the release page is added to the collection, and the release page is set to published
         assertEquals(release.getUri().toString(), releaseCollection.releaseUri.toString());
 
-        Release releasePage = assertOk(Content.get(releaseCollection.id, releaseUri, Login.httpPublisher, Release.class)).body;
+        Release releasePage = assertOk(Content.get(releaseCollection.id, releaseUri, context.getPublisher(), Release.class)).body;
         assertTrue(releasePage.getDescription().getPublished());
     }
 
     private Release CreateRelease() {
-        String releaseUri = "/releases/" + Random.id() ;
+        String releaseUri = "/releases/" + Random.id();
         Release release = new Release();
         release.setDescription(new PageDescription());
         release.getDescription().setPublished(false);
@@ -120,7 +120,7 @@ public class Collection extends ZebedeeApiTest{
 
         // When
         // we post using valid credentials
-        Response<CollectionDescription> response = post(anon, Login.httpPublisher);
+        Response<CollectionDescription> response = post(anon, context.getPublisher());
 
         // Expect
         // a response of 400 - Bad request
@@ -136,11 +136,11 @@ public class Collection extends ZebedeeApiTest{
 
         // Given
         // an existing collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we try and create an identical collection
-        Response<CollectionDescription> response = post(collection, Login.httpPublisher);
+        Response<CollectionDescription> response = post(collection, context.getPublisher());
 
         // Expect
         // a reponse of 409 - Conflict
@@ -161,8 +161,8 @@ public class Collection extends ZebedeeApiTest{
 
         // When
         // we post as anyone but a publisher
-        Response<CollectionDescription> responseScallywag = post(collection, Login.httpScallywag);
-        Response<CollectionDescription> responseViewer = post(collection, Login.httpViewer);
+        Response<CollectionDescription> responseScallywag = post(collection, context.getScallyWag());
+        Response<CollectionDescription> responseViewer = post(collection, context.getViewer());
 
         // Expect
         // a response of 401 - unauthorized
@@ -180,13 +180,13 @@ public class Collection extends ZebedeeApiTest{
         // a collection
         CollectionDescription collection = createCollectionDescription();
         CollectionDescription collectionAdmin = createCollectionDescription();
-        collection = assertOk(post(collection, Login.httpPublisher)).body;
-        collectionAdmin = assertOk(post(collectionAdmin, Login.httpPublisher)).body;
+        collection = assertOk(post(collection, context.getPublisher())).body;
+        collectionAdmin = assertOk(post(collectionAdmin, context.getPublisher())).body;
 
         // When
         // we attempt to retrieve it as an publisher
-        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
-        Response<CollectionDescription> responseAdmin = get(collectionAdmin.id, Login.httpAdministrator);
+        Response<CollectionDescription> response = get(collection.id, context.getPublisher());
+        Response<CollectionDescription> responseAdmin = get(collectionAdmin.id, context.getAdministrator());
 
         // We expect
         // a response of 200
@@ -202,21 +202,21 @@ public class Collection extends ZebedeeApiTest{
     public void collectionShouldBeDeletedWithPublisherPermissions() throws IOException {
         // Given
         //...a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
-        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
+        CollectionDescription collection2 = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         //...we delete it
-        delete(collection.id, Login.httpPublisher);
-        delete(collection2.id, Login.httpAdministrator);
+        delete(collection.id, context.getPublisher());
+        delete(collection2.id, context.getAdministrator());
 
 
         // We expect
         //...it to be entirely deleted
-        Response<CollectionDescription> response = get(collection.id, Login.httpPublisher);
+        Response<CollectionDescription> response = get(collection.id, context.getPublisher());
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
 
-        Response<CollectionDescription> responseAdmin = get(collection.id, Login.httpAdministrator);
+        Response<CollectionDescription> responseAdmin = get(collection.id, context.getAdministrator());
         assertEquals(HttpStatus.NOT_FOUND_404, responseAdmin.statusLine.getStatusCode());
     }
 
@@ -228,13 +228,13 @@ public class Collection extends ZebedeeApiTest{
     public void deleteShouldReturn401WithoutPublisherPermissions() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection1 = OneLineSetups.publishedCollection();
-        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection1 = OneLineSetups.publishedCollection(context.getPublisher());
+        CollectionDescription collection2 = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         //...we we try and delete them delete it
-        Response<String> deleteResponseScallywag = delete(collection1.id, Login.httpScallywag);
-        Response<String> deleteResponseViewer = delete(collection2.id, Login.httpViewer);
+        Response<String> deleteResponseScallywag = delete(collection1.id, context.getScallyWag());
+        Response<String> deleteResponseViewer = delete(collection2.id, context.getViewer());
 
         // Then
         // delete should fail with unauthorized returned
@@ -242,8 +242,8 @@ public class Collection extends ZebedeeApiTest{
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseScallywag.statusLine.getStatusCode());
         assertEquals(HttpStatus.UNAUTHORIZED_401, deleteResponseViewer.statusLine.getStatusCode());
 
-        assertEquals(HttpStatus.OK_200, get(collection1.id, Login.httpPublisher).statusLine.getStatusCode());
-        assertEquals(HttpStatus.OK_200, get(collection2.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection1.id, context.getPublisher()).statusLine.getStatusCode());
+        assertEquals(HttpStatus.OK_200, get(collection2.id, context.getPublisher()).statusLine.getStatusCode());
     }
 
     public static Response<String> delete(String name, Http http) throws IOException {

@@ -6,7 +6,9 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Team;
 import com.github.onsdigital.test.json.TeamList;
 import com.github.onsdigital.test.json.User;
@@ -27,14 +29,14 @@ import static org.junit.Assert.assertTrue;
 @DependsOn(Users.class)
 
 @Api
-public class Teams {
+public class Teams extends ZebedeeApiTest {
 
     /**
      * Test basic GET functionality
      *
      * Get team should return a team {@link HttpStatus#OK_200}
      *
-     * Required for OneLineSetups.newTeam()
+     * Required for createTeam(context)
      */
     @GET
     @Test
@@ -42,11 +44,11 @@ public class Teams {
         // Given
         // a team we have posted
         String teamName = "Rusty_" + Random.id();
-        postTeam(teamName, Login.httpAdministrator);
+        postTeam(teamName, context.getAdministrator());
 
         // When
         // we get the team
-        Response<Team> response = getTeam(teamName, Login.httpAdministrator);
+        Response<Team> response = getTeam(teamName, context.getAdministrator());
         Team returnedTeam = response.body;
 
         // Expect
@@ -59,20 +61,20 @@ public class Teams {
      *
      * Get team should return a team {@link HttpStatus#OK_200}
      *
-     * Required for OneLineSetups.newTeam()
+     * Required for createTeam(context)
      */
     @GET
     @Test
     public void canGetTeamList() throws IOException {
         // Given
         // a few random teams we have posted
-        Team[] teams = {OneLineSetups.newTeam(),
-                OneLineSetups.newTeam(),
-                OneLineSetups.newTeam()};
+        Team[] teams = {createTeam(context),
+                createTeam(context),
+                createTeam(context)};
 
         // When
         // we get the teams
-        Response<TeamList> response = getTeamList(Login.httpAdministrator);
+        Response<TeamList> response = getTeamList(context.getAdministrator());
         TeamList teamList = response.body;
 
         // Expect
@@ -102,7 +104,7 @@ public class Teams {
 
         // When
         // we get the team
-        Response<Team> response = getTeam(teamName, Login.httpAdministrator);
+        Response<Team> response = getTeam(teamName, context.getAdministrator());
 
         // Expect
         // a response of 404
@@ -118,7 +120,7 @@ public class Teams {
      *
      * Create team with admin permissions should return {@link HttpStatus#OK_200}
      *
-     * Required for OneLineSetups.newTeam()
+     * Required for createTeam(context)
      */
     @POST
     @Test
@@ -128,7 +130,7 @@ public class Teams {
 
         // When
         // we post as an administrator
-        Response<Boolean> response = postTeam(teamName, Login.httpAdministrator);
+        Response<Boolean> response = postTeam(teamName, context.getAdministrator());
 
         // Expect
         // a response of 200 - success
@@ -145,11 +147,11 @@ public class Teams {
     public void cannotCreateATeamIfTeamWithNameAlreadyExists() throws IOException {
         // Given
         // a team
-        Team team = OneLineSetups.newTeam();
+        Team team = createTeam(context);
 
         // When
         // we try to create an identical team
-        Response<Boolean> response = postTeam(team.name, Login.httpAdministrator);
+        Response<Boolean> response = postTeam(team.name, context.getAdministrator());
 
         // Expect
         // a response of Conflict 409
@@ -172,9 +174,9 @@ public class Teams {
 
         // When
         // we try to create an identical team
-        Response<Boolean> response1 = postTeam(teamName1, Login.httpPublisher);
-        Response<Boolean> response2 = postTeam(teamName1, Login.httpScallywag);
-        Response<Boolean> response3 = postTeam(teamName1, Login.httpViewer);
+        Response<Boolean> response1 = postTeam(teamName1, context.getPublisher());
+        Response<Boolean> response2 = postTeam(teamName1, context.getScallyWag());
+        Response<Boolean> response3 = postTeam(teamName1, context.getViewer());
 
         // Expect
         // a response of Unauthorized for each
@@ -197,18 +199,18 @@ public class Teams {
     public void canAssignAUserAsTeamMember() throws IOException {
         // Given
         // a team and a random user
-        Team team = OneLineSetups.newTeam();
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
+        Team team = createTeam(context);
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
 
         // When
         // we assign the user
-        Response<Boolean> response = postMember(team.name, user.email, Login.httpAdministrator);
+        Response<Boolean> response = postMember(team.name, user.email, context.getAdministrator());
 
         // Then
         // we expect a response of 200 and the team to have the user in it
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        Team retrieved = getTeam(team.name, Login.httpAdministrator).body;
+        Team retrieved = getTeam(team.name, context.getAdministrator()).body;
         assertEquals(1, retrieved.members.size());
         assertTrue(user.email.equalsIgnoreCase(retrieved.members.iterator().next()));
     }
@@ -222,14 +224,14 @@ public class Teams {
     public void cannotAssignATeamMemberToATeamIfNotAnAdministrator() throws IOException {
         // Given
         // a team and a user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
-        Team team = OneLineSetups.newTeam();
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+        Team team = createTeam(context);
 
         // When
         // we try to assign using other permission levels
-        Response<Boolean> response1 = postMember(team.name, user.email, Login.httpViewer);
-        Response<Boolean> response2 = postMember(team.name, user.email, Login.httpScallywag);
-        Response<Boolean> response3 = postMember(team.name, user.email, Login.httpPublisher);
+        Response<Boolean> response1 = postMember(team.name, user.email, context.getViewer());
+        Response<Boolean> response2 = postMember(team.name, user.email, context.getScallyWag());
+        Response<Boolean> response3 = postMember(team.name, user.email, context.getPublisher());
 
         // Expect
         // a response of Unauthorized 401
@@ -247,12 +249,12 @@ public class Teams {
     public void returnsNotFoundOnAssignTeamMemberToNonexistentTeam() throws IOException {
         // Given
         // a team
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
         String teamName = "Rusty_" + Random.id();
 
         // When
         // we try to create an identical team
-        Response<Boolean> response = postMember(teamName, user.email, Login.httpAdministrator);
+        Response<Boolean> response = postMember(teamName, user.email, context.getAdministrator());
 
         // Expect
         // a response of Conflict 409
@@ -271,12 +273,12 @@ public class Teams {
     public void canDeleteATeamAsAdministrator() throws IOException {
         // Given
         // a team
-        Team team = OneLineSetups.newTeam();
+        Team team = createTeam(context);
 
         // When
         // we delete it with admin privileges then try to retrieve
-        Response<Boolean> deleteResponse = deleteTeam(team.name, Login.httpAdministrator);
-        Response<Team> getResponse = getTeam(team.name, Login.httpAdministrator);
+        Response<Boolean> deleteResponse = deleteTeam(team.name, context.getAdministrator());
+        Response<Team> getResponse = getTeam(team.name, context.getAdministrator());
 
         // Then
         // the delete response to be successful and the get response to respond Not Found
@@ -293,15 +295,15 @@ public class Teams {
     public void cannotDeleteATeamIfNotAnAdministrator() throws IOException {
         // Given
         // some teams
-        Team team1 = OneLineSetups.newTeam();
-        Team team2 = OneLineSetups.newTeam();
-        Team team3 = OneLineSetups.newTeam();
+        Team team1 = createTeam(context);
+        Team team2 = createTeam(context);
+        Team team3 = createTeam(context);
 
         // When
         // We try to delete with alternate privileges
-        Response<Boolean> response1 = deleteTeam(team1.name, Login.httpPublisher);
-        Response<Boolean> response2 = deleteTeam(team2.name, Login.httpViewer);
-        Response<Boolean> response3 = deleteTeam(team3.name, Login.httpScallywag);
+        Response<Boolean> response1 = deleteTeam(team1.name, context.getPublisher());
+        Response<Boolean> response2 = deleteTeam(team2.name, context.getViewer());
+        Response<Boolean> response3 = deleteTeam(team3.name, context.getScallyWag());
 
         // Then
         // We expect each to return a failed result
@@ -323,7 +325,7 @@ public class Teams {
 
         // When
         // we try to delete the collection
-        Response<Boolean> response = deleteTeam(teamName, Login.httpAdministrator);
+        Response<Boolean> response = deleteTeam(teamName, context.getAdministrator());
 
         // Then
         // we expect a response of not found
@@ -340,14 +342,14 @@ public class Teams {
     public void canRemoveAMemberFromATeamAsAdministrator() throws IOException {
         // Given
         // a team with a user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
-        Team team = OneLineSetups.newTeam();
-        postMember(team.name, user.email, Login.httpAdministrator);
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+        Team team = createTeam(context);
+        postMember(team.name, user.email, context.getAdministrator());
 
         // When
         // we try to remove them from the team then recall then team
-        Response<Boolean> response = deleteTeamMember(team.name, user.email, Login.httpAdministrator);
-        Team teamAfter = getTeam(team.name, Login.httpAdministrator).body;
+        Response<Boolean> response = deleteTeamMember(team.name, user.email, context.getAdministrator());
+        Team teamAfter = getTeam(team.name, context.getAdministrator()).body;
 
         // Then
         // we expect a response of ok and the team to be without users
@@ -365,15 +367,15 @@ public class Teams {
     public void cannotRemoveAMemberFromATeamIfNotAnAdministrator() throws IOException {
         // Given
         // a team with a bunch of members
-        Team team = OneLineSetups.newTeam();
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
-        postMember(team.name, user.email, Login.httpAdministrator);
+        Team team = createTeam(context);
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+        postMember(team.name, user.email, context.getAdministrator());
 
         // When
         // we try to remove this user using alternate logins
-        Response<Boolean> response1 = deleteTeamMember(team.name, user.email, Login.httpPublisher);
-        Response<Boolean> response2 = deleteTeamMember(team.name, user.email, Login.httpViewer);
-        Response<Boolean> response3 = deleteTeamMember(team.name, user.email, Login.httpScallywag);
+        Response<Boolean> response1 = deleteTeamMember(team.name, user.email, context.getPublisher());
+        Response<Boolean> response2 = deleteTeamMember(team.name, user.email, context.getViewer());
+        Response<Boolean> response3 = deleteTeamMember(team.name, user.email, context.getScallyWag());
 
         // Then
         // we expect Unauthorized failure each time
@@ -391,12 +393,12 @@ public class Teams {
     public void cannotRemoveAMemberFromATeamWhichDoesntExist() throws IOException {
         // Given
         // a user and a team name
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
         String teamName = "Rusty_" + Random.id();
 
         // When
         // we try to remove this member from the team
-        Response<Boolean> response = deleteTeamMember(teamName, user.email, Login.httpAdministrator);
+        Response<Boolean> response = deleteTeamMember(teamName, user.email, context.getAdministrator());
 
         // Then
         // we should fail with a Not Found error
@@ -433,8 +435,42 @@ public class Teams {
         return http.delete(endpoint, Boolean.class);
     }
 
-    public static void addMemberToTeam(Team team, User user) throws IOException {
-        Response<Boolean> postMemberResponse = Teams.postMember(team.name, user.email, Login.httpAdministrator);
+    public static void addMemberToTeam(Http administrator, Team team, User user) throws IOException {
+        Response<Boolean> postMemberResponse = Teams.postMember(team.name, user.email, administrator);
         assertEquals(HttpStatus.OK_200, postMemberResponse.statusLine.getStatusCode());
+    }
+
+    /**
+     * Creates and posts an empty team
+     *
+     * @return The {@link Team}
+     *
+     * @throws IOException
+     */
+    public static Team createTeam(Context context) throws IOException {
+        // Post a new team with name
+        String teamName = "Rusty_" + Random.id();
+        Teams.postTeam(teamName, context.getAdministrator());
+        // Retrieve the created Team object
+        Team team = Teams.getTeam(teamName, context.getAdministrator()).body;
+        return team;
+    }
+    /**
+     * Creates and posts a team with members
+     *
+     * @param numberOfUsers the number of users to add to the team
+     *
+     * @return The {@link Team}
+     *
+     * @throws IOException
+     */
+    public static Team createTeam(Context context, int numberOfUsers) throws IOException {
+        // Post a new team with name
+        Team team = createTeam(context);
+        for(int i = 0; i < numberOfUsers; i++) {
+            User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+            Teams.postMember(team.name, user.email, context.getAdministrator());
+        }
+        return team;
     }
 }

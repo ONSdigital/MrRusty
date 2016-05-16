@@ -1,7 +1,7 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
 import com.github.onsdigital.test.json.Credentials;
@@ -24,7 +24,7 @@ public class Login {
     public void shouldLogInAsAdmin() throws IOException {
 
         // Given correct admin credentials
-        Credentials credentials = SetupBeforeTesting.adminCredentials;
+        Credentials credentials = Context.adminCredentials;
         LoginPage loginPage = new LoginPage();
 
         // When We submit the credentials on the login page.
@@ -42,7 +42,7 @@ public class Login {
     public void shouldLogInAsPublisher() throws IOException {
 
         // Given correct admin credentials
-        Credentials credentials = SetupBeforeTesting.publisherCredentials;
+        Credentials credentials = Context.publisherCredentials;
         LoginPage loginPage = new LoginPage();
 
         // When We submit the credentials on the login page.
@@ -60,7 +60,7 @@ public class Login {
     public void shouldLogout() throws IOException {
 
         // Given a user is logged in with correct credentials
-        Credentials credentials = SetupBeforeTesting.publisherCredentials;
+        Credentials credentials = Context.publisherCredentials;
         LoginPage loginPage = new LoginPage();
 
         CollectionsPage page = loginPage.login(credentials.email, credentials.password);

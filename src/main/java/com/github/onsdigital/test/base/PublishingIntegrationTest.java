@@ -1,7 +1,6 @@
 package com.github.onsdigital.test.base;
 
 import com.github.onsdigital.test.Context;
-import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.TearDownAfterTesting;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -17,7 +16,7 @@ public abstract class PublishingIntegrationTest {
     public static void oneTimeSetUp() throws Exception {
         System.out.println("Running test setup code...");
         hasSetupRun = true;
-        new SetupBeforeTesting().setup();
+        //new Context().setup();
     }
 
     @AfterClass

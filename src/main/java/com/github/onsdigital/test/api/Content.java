@@ -9,6 +9,7 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.EventType;
 import com.github.onsdigital.test.json.Team;
@@ -32,7 +33,7 @@ import static org.junit.Assert.*;
 
 @Api
 @DependsOn(com.github.onsdigital.test.api.Collection.class)
-public class Content {
+public class Content extends ZebedeeApiTest {
 
 
     /**
@@ -44,16 +45,16 @@ public class Content {
 
         // Given
         // an existing collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When - we create content
         String content = "{name:foo}";
         String uri = Random.id() + ".json";
-        create(collection.id, content, uri, Login.httpPublisher);
+        create(collection.id, content, uri, context.getPublisher());
 
         // Then
         // When we retrieve content we expect a 200 status and identical content
-        Response<Path> response = get(collection.id, uri, Login.httpPublisher);
+        Response<Path> response = get(collection.id, uri, context.getPublisher());
 
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode()); // check status
         assertEquals(content, Serialiser.deserialise(getBody(response), String.class)); // check the content
@@ -67,11 +68,11 @@ public class Content {
     public void shouldReturn400WhenNoUriIsSpecified() throws IOException {
 
         // Given - an existing collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When - content is added with no file url
         Endpoint contentEndpoint = ZebedeeHost.content.addPathSegment(collection.id);
-        Response<String> createResponse = Login.httpPublisher.post(contentEndpoint, "", String.class);
+        Response<String> createResponse = context.getPublisher().post(contentEndpoint, "", String.class);
 
         // Then - a 400 response code is returned
         assertEquals(HttpStatus.BAD_REQUEST_400, createResponse.statusLine.getStatusCode());
@@ -83,16 +84,16 @@ public class Content {
     @POST
     @Test
     public void filesOnlyEditableInOneCollection() throws IOException {
-        CollectionDescription collection1 = OneLineSetups.publishedCollection();
-        CollectionDescription collection2 = OneLineSetups.publishedCollection();
+        CollectionDescription collection1 = OneLineSetups.publishedCollection(context.getPublisher());
+        CollectionDescription collection2 = OneLineSetups.publishedCollection(context.getPublisher());
         String fileURI = Random.id() + ".json";
 
         // given the file exists in one collection
-        Response<String> response1 = create(collection1.id, "content", fileURI, Login.httpPublisher);
+        Response<String> response1 = create(collection1.id, "content", fileURI, context.getPublisher());
         assertEquals(HttpStatus.OK_200, response1.statusLine.getStatusCode());
 
         // we can't create it in another collection
-        Response<String> response = create(collection2.id, "content", fileURI, Login.httpPublisher);
+        Response<String> response = create(collection2.id, "content", fileURI, context.getPublisher());
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
@@ -104,14 +105,14 @@ public class Content {
     public void shouldUpdateContent() throws IOException {
         // Given
         // A file created in a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
         String fileUri = Random.id() + ".json";
-        create(collection.id, "content", fileUri, Login.httpPublisher);
+        create(collection.id, "content", fileUri, context.getPublisher());
 
         // When
         // We overwrite it's content and retrieve the file contents
-        create(collection.id, "new content", fileUri, Login.httpPublisher);
-        Response<Path> pathResponse = get(collection.id, fileUri, Login.httpPublisher);
+        create(collection.id, "new content", fileUri, context.getPublisher());
+        Response<Path> pathResponse = get(collection.id, fileUri, context.getPublisher());
 
         // We expect
         // The content should be the overwritten version
@@ -128,18 +129,18 @@ public class Content {
         // Given
         // A file, a taxonomy node, and a collection
         File file = new File("src/main/resources/snail.jpg");
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         String taxonomyNode = "economy/regionalaccounts/";
         String filename = Random.id() + ".jpg";
 
         // When
         // We attempt to upload the file to the taxonomy
-        upload(collection.id, taxonomyNode + filename, file, Login.httpPublisher);
+        upload(collection.id, taxonomyNode + filename, file, context.getPublisher());
 
         // Then
         // The file should be where we expect it to be and exist
-        Response<Path> response = download(collection.id, taxonomyNode + filename, Login.httpPublisher);
+        Response<Path> response = download(collection.id, taxonomyNode + filename, context.getPublisher());
         assertNotNull(response.body);
         assertTrue(Files.size(response.body) > 0);
     }
@@ -153,20 +154,20 @@ public class Content {
 
         // Given
         // We upload a file
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         File file = new File("src/main/resources/snail.jpg");
         String uri = "economy/regionalaccounts/" + Random.id() + ".jpg";
 
-        upload(collection.id, uri, file, Login.httpPublisher);
+        upload(collection.id, uri, file, context.getPublisher());
 
         // When
         // We attempt to delete the file from the taxonomy
-        delete(collection.id, uri, Login.httpPublisher);
+        delete(collection.id, uri, context.getPublisher());
 
         // Then
         //... the file should not exist
-        Response<Path> response = download(collection.id, uri, Login.httpPublisher);
+        Response<Path> response = download(collection.id, uri, context.getPublisher());
         assertNull(response);
     }
 
@@ -180,30 +181,30 @@ public class Content {
 
         // Given
         // We have a collection with content and an uploaded file
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
         String directory = "/economy/regionalaccounts/";
         String jsonUri = directory + Random.id() + ".json";
-        Content.create(collection.id, "thisisContent", jsonUri, Login.httpPublisher);
+        Content.create(collection.id, "thisisContent", jsonUri, context.getPublisher());
 
         File file = new File("src/main/resources/snail.jpg");
         String jpgUri = "/economy/regionalaccounts/" + Random.id() + ".jpg";
-        upload(collection.id, jpgUri, file, Login.httpPublisher);
+        upload(collection.id, jpgUri, file, context.getPublisher());
 
         // When
         // we attempt to delete the directory
-        delete(collection.id, directory, Login.httpPublisher);
+        delete(collection.id, directory, context.getPublisher());
 
         // Then
         // the files should not exist
-        Response<Path> jsonResponse = download(collection.id, jsonUri, Login.httpPublisher);
+        Response<Path> jsonResponse = download(collection.id, jsonUri, context.getPublisher());
         assertNull(jsonResponse);
 
-        Response<Path> jpgResponse = download(collection.id, jpgUri, Login.httpPublisher);
+        Response<Path> jpgResponse = download(collection.id, jpgUri, context.getPublisher());
         assertNull(jpgResponse);
 
         // And
         // A delete event should be present in the collection details
-        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
+        CollectionDescription updatedCollection = Collection.get(collection.id, context.getPublisher()).body;
         assertTrue(updatedCollection.eventsByUri.get(directory).hasEventForType(EventType.DELETED));
     }
 
@@ -216,16 +217,16 @@ public class Content {
 
         // Given
         // We upload a file
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
         String uri = collection.inProgressUris.get(0);
 
         // When
         // We delete the file from the taxonomy
-        delete(collection.id, uri, Login.httpPublisher);
+        delete(collection.id, uri, context.getPublisher());
 
         // Then
         //... the file should not appear in the collection GET method
-        Response<CollectionDescription> response = Collection.get(collection.id, Login.httpPublisher);
+        Response<CollectionDescription> response = Collection.get(collection.id, context.getPublisher());
         assertEquals(0, response.body.inProgressUris.size());
     }
 
@@ -242,19 +243,19 @@ public class Content {
         // Given
         // A specific collection for this test and a genuine website page
         //
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         String taxonomyNode = "/peoplepopulationandcommunity/birthsdeathsandmarriages/lifeexpectancies/timeseries/raid49/";
-        String initialData = getBody(get(collection.id, taxonomyNode + "data.json", Login.httpPublisher));
+        String initialData = getBody(get(collection.id, taxonomyNode + "data.json", context.getPublisher()));
 
         // When
         // We create a new page and then delete it
-        create(collection.id, "{'data': 'Dummy data'}", taxonomyNode + "data.json", Login.httpPublisher);
-        delete(collection.id, taxonomyNode + "data.json", Login.httpPublisher);
+        create(collection.id, "{'data': 'Dummy data'}", taxonomyNode + "data.json", context.getPublisher());
+        delete(collection.id, taxonomyNode + "data.json", context.getPublisher());
 
         // Then
         // the original file should be returned by Content GET
-        String response = getBody(get(collection.id, taxonomyNode + "data.json", Login.httpPublisher));
+        String response = getBody(get(collection.id, taxonomyNode + "data.json", context.getPublisher()));
         assertEquals(initialData, response);
     }
 
@@ -338,17 +339,17 @@ public class Content {
 
         // Given
         // A team + permissions for the team to access collection A + add alice to Alpha
-        Team team = createTeam();
+        Team team = Teams.createTeam(context);
         CollectionDescription collection = createCollection(team);
-        User viewer = Users.createTestViewerUser();
-        Teams.addMemberToTeam(team, viewer);
+        User viewer = Users.createTestViewerUser(context);
+        Teams.addMemberToTeam(context.getAdministrator(), team, viewer);
         Http http = Sessions.get(viewer.email);
 
         // When we save some content and get it
         JsonObject content = getExamplePageContent();
 
         String uri = Random.id() + ".json";
-        create(collection.id, content, uri, Login.httpPublisher);
+        create(collection.id, content, uri, context.getPublisher());
 
         // Then
         // When we retrieve content we expect a 200 status and identical content
@@ -374,9 +375,9 @@ public class Content {
 
         // Given
         // A team + permissions for the team to access collection A + add alice to Alpha
-        User viewer = Users.createTestViewerUser();
-        Team team = createTeam();
-        Teams.addMemberToTeam(team, viewer);
+        User viewer = Users.createTestViewerUser(context);
+        Team team = Teams.createTeam(context);
+        Teams.addMemberToTeam(context.getAdministrator(), team, viewer);
         CollectionDescription collection = createCollection(team);
 
         Http http = Sessions.get(viewer.email);
@@ -384,7 +385,7 @@ public class Content {
         // When we save some content and get it
         JsonObject content = getExamplePageContent();
         String uri = Random.id() + ".json";
-        create(collection.id, content, uri, Login.httpPublisher);
+        create(collection.id, content, uri, context.getPublisher());
 
         // Then
         // When we retrieve content we expect a 200 status and identical content
@@ -409,11 +410,11 @@ public class Content {
 
         // Given
         // an approved collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
-        Approve.approve(collection.id, Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
+        Approve.approve(collection.id, context.getPublisher());
 
         // When we attempt to save data.
-        Response<String> response = create(collection.id, "content", "some/content/data.json", Login.httpPublisher);
+        Response<String> response = create(collection.id, "content", "some/content/data.json", context.getPublisher());
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
     }
 
@@ -425,14 +426,8 @@ public class Content {
 
 
     private CollectionDescription createCollection(Team team) throws IOException {
-        CollectionDescription collection = OneLineSetups.publishedCollection(team);
-        OneLineSetups.publishedCollection(); // create another collection to ensure there are two collections in the system.
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher(), team);
+        OneLineSetups.publishedCollection(context.getPublisher()); // create another collection to ensure there are two collections in the system.
         return collection;
-    }
-
-    private Team createTeam() throws IOException {
-        String teamName = "Rusty_" + Random.id();
-        Teams.postTeam(teamName, Login.httpAdministrator);
-        return Teams.getTeam(teamName, Login.httpAdministrator).body;
     }
 }

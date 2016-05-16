@@ -1,7 +1,7 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
 import com.github.onsdigital.test.browser.PageObjects.UsersPage;
@@ -15,7 +15,7 @@ import java.io.IOException;
 @DependsOn({Login.class})
 public class Users {
 
-    Credentials publisher = SetupBeforeTesting.systemCredentials;
+    Credentials publisher = Context.systemCredentials;
 
     @POST
     @Test
@@ -26,11 +26,6 @@ public class Users {
 
         // Move to users page
         UsersPage usersPage = collectionsPage.clickUsersMenuLink();
-
-//        List<User> users = new ArrayList<>();
-//        for (User user : users) {
-//
-//        }
 
         User publisher1 = new User();
         usersPage.CreatePublisherUser(publisher1.name, publisher1.email, publisher1.password);
@@ -62,8 +57,5 @@ public class Users {
         // logging in with new user
         LoginPage loginPage = new LoginPage().loginLogin(user1.email.toLowerCase(), user1.password);
         loginPage.changePassword(user1.password, "set up new password");
-
     }
-
-
 }

@@ -7,7 +7,9 @@ import com.github.onsdigital.http.Host;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionType;
@@ -26,10 +28,10 @@ import static org.junit.Assert.*;
  */
 
 @Api
-@DependsOn({Approve.class, Transfer.class, Permissions.class})
-public class Publish {
+@DependsOn({Approve.class, Permissions.class})
+public class Publish extends ZebedeeApiTest {
+
     public static final Host florenceHost = new Host(Configuration.getFlorenceUrl());
-    public static final Endpoint florenceContent = new Endpoint(florenceHost, "");
 
     /**
      * Tests approval using simple collection setup and publisher credentials
@@ -37,12 +39,12 @@ public class Publish {
      * This is for original style files with type = "dataset"
      */
     @POST
-    //@Test
+    @Test
     public void dataPublisher_givenDataset_shouldPublishXls() throws IOException {
 
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         File jsonParent = new File("src/main/resources/dummy_dataset/data.json");
         File json = new File("src/main/resources/dummy_dataset/2015/data.json");
@@ -50,20 +52,20 @@ public class Publish {
 
 
         String baseUri = "/archive/" + Random.id() + "/datasets/dataset";
-        Content.upload(collection.id, baseUri + "/data.json", jsonParent, Login.httpPublisher);
-        Content.upload(collection.id, baseUri + "/2015/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, baseUri + "/2015/3a82caed.xls", csdb, Login.httpPublisher);
+        Content.upload(collection.id, baseUri + "/data.json", jsonParent, context.getPublisher());
+        Content.upload(collection.id, baseUri + "/2015/data.json", json, context.getPublisher());
+        Content.upload(collection.id, baseUri + "/2015/3a82caed.xls", csdb, context.getPublisher());
 
-        Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher);
-        Complete.complete(collection.id, baseUri + "/2015/data.json", Login.httpPublisher);
+        Complete.complete(collection.id, baseUri + "/data.json", context.getPublisher());
+        Complete.complete(collection.id, baseUri + "/2015/data.json", context.getPublisher());
 
-        Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes);
-        Review.review(collection.id, baseUri + "/2015/data.json", Login.httpSecondSetOfEyes);
-        Approve.approve(collection.id, Login.httpPublisher);
+        Review.review(collection.id, baseUri + "/data.json", context.getSecondSetOfEyes());
+        Review.review(collection.id, baseUri + "/2015/data.json", context.getSecondSetOfEyes());
+        Approve.approve(collection.id, context.getPublisher());
 
         // When
         // we approve it using publish credentials
-        Response<String> response = publishWithBreak(collection.id, Login.httpPublisher);
+        Response<String> response = publishWithBreak(collection.id, context.getPublisher());
 
         // Expect
         // a response of okay
@@ -81,27 +83,27 @@ public class Publish {
 
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         File jsonParent = new File("src/main/resources/dummy_timeseriesdataset/data.json");
         File json = new File("src/main/resources/dummy_timeseriesdataset/2015/data.json");
         File csdb = new File("src/main/resources/dummy_timeseriesdataset/2015/dummy_csdb.csdb");
 
         String baseUri = "/archive/" + Random.id() + "/datasets/timeseriesdataset";
-        Content.upload(collection.id, baseUri + "/data.json", jsonParent, Login.httpPublisher);
-        Content.upload(collection.id, baseUri + "/2015/data.json", json, Login.httpPublisher);
-        Content.upload(collection.id, baseUri + "/2015/CXNV.csdb", csdb, Login.httpPublisher);
+        Content.upload(collection.id, baseUri + "/data.json", jsonParent, context.getPublisher());
+        Content.upload(collection.id, baseUri + "/2015/data.json", json, context.getPublisher());
+        Content.upload(collection.id, baseUri + "/2015/CXNV.csdb", csdb, context.getPublisher());
 
-        assertOk(Complete.complete(collection.id, baseUri + "/data.json", Login.httpPublisher));
-        assertOk(Complete.complete(collection.id, baseUri + "/2015/data.json", Login.httpPublisher));
+        assertOk(Complete.complete(collection.id, baseUri + "/data.json", context.getPublisher()));
+        assertOk(Complete.complete(collection.id, baseUri + "/2015/data.json", context.getPublisher()));
 
-        assertOk(Review.review(collection.id, baseUri + "/data.json", Login.httpSecondSetOfEyes));
-        assertOk(Review.review(collection.id, baseUri + "/2015/data.json", Login.httpSecondSetOfEyes));
-        assertOk(Approve.approve(collection.id, Login.httpPublisher));
+        assertOk(Review.review(collection.id, baseUri + "/data.json", context.getSecondSetOfEyes()));
+        assertOk(Review.review(collection.id, baseUri + "/2015/data.json", context.getSecondSetOfEyes()));
+        assertOk(Approve.approve(collection.id, context.getPublisher()));
 
         // When
         // we approve it using publish credentials
-        Response<String> response = publishWithBreak(collection.id, Login.httpPublisher);
+        Response<String> response = publishWithBreak(collection.id, context.getPublisher());
 
         // Expect
         // a response of okay
@@ -113,19 +115,19 @@ public class Publish {
     public void zebedee_whenPublishCalled_shouldPostToTheDestination() throws IOException {
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/rusty/", 2);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, "/rusty/", 2);
 
         assertNotNull(collection);
 
-        assertEquals("Complete failed", HttpStatus.OK_200, Complete.completeAll(collection, Login.httpPublisher));
-        collection = Collection.get(collection.id, Login.httpPublisher).body;
+        assertEquals("Complete failed", HttpStatus.OK_200, Complete.completeAll(collection, context.getPublisher()));
+        collection = Collection.get(collection.id, context.getPublisher()).body;
 
-        assertEquals("Review failed", HttpStatus.OK_200, Review.reviewAll(collection, Login.httpSecondSetOfEyes));
-        assertEquals("Approve failed", HttpStatus.OK_200, Approve.approve(collection.id, Login.httpPublisher).statusLine.getStatusCode());
+        assertEquals("Review failed", HttpStatus.OK_200, Review.reviewAll(collection, context.getSecondSetOfEyes()));
+        assertEquals("Approve failed", HttpStatus.OK_200, Approve.approve(collection.id, context.getPublisher()).statusLine.getStatusCode());
 
         // When
         // we approve it using publish credentials
-        Response<String> response = publishWithBreak(collection.id, Login.httpPublisher);
+        Response<String> response = publishWithBreak(collection.id, context.getPublisher());
 
         // Expect
         // a response of okay
@@ -137,14 +139,14 @@ public class Publish {
     public void timedPublish_ifCollectionNotApproved_shouldRevertToManual() throws IOException, InterruptedException {
         // Given
         // a collection that we add files to and then
-        CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent("/rusty/", 2, 5);
+        CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent(context, "/rusty/", 2, 5);
 
         assertNotNull(collection);
 
         // When
         // we approve it using publish credentials
         Thread.sleep(6000);
-        collection = Collection.get(collection.id, Login.httpPublisher).body;
+        collection = Collection.get(collection.id, context.getPublisher()).body;
 
         // Expect
         // a response of okay
@@ -170,14 +172,14 @@ public class Publish {
      * @param httpPublisher
      * @throws IOException
      */
-    public static void publishAndWait(String collectionID, Http httpPublisher, int secondsToWait) throws IOException {
+    public static void publishAndWait(Context context, String collectionID, Http httpPublisher, int secondsToWait) throws IOException {
         publish(collectionID, httpPublisher);
 
         int count = 0;
         boolean published = false;
 
         while (count < secondsToWait) {
-            Response<CollectionDescription> response = Collection.get(collectionID, Login.httpPublisher);
+            Response<CollectionDescription> response = Collection.get(collectionID, context.getPublisher());
 
             if (response.statusLine.getStatusCode() == 404 || response.body.publishComplete) {
                 published = true;

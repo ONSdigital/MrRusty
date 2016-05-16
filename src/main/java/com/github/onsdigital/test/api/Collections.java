@@ -11,6 +11,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionDescriptions;
 import com.github.onsdigital.test.json.Team;
@@ -26,7 +27,7 @@ import static org.junit.Assert.fail;
 
 @Api
 @DependsOn({Login.class, Collection.class})
-public class Collections {
+public class Collections extends ZebedeeApiTest {
 
 
 
@@ -39,12 +40,12 @@ public class Collections {
 
         // Given
         // a new collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we get the list of collections
         Endpoint endpoint = ZebedeeHost.collections;
-        Response<CollectionDescriptions> getResponse = Login.httpPublisher.get(endpoint, CollectionDescriptions.class);
+        Response<CollectionDescriptions> getResponse = context.getPublisher().get(endpoint, CollectionDescriptions.class);
 
         // Then
         // we get the existing collection in the response
@@ -68,17 +69,17 @@ public class Collections {
         // Given
         // A team + permissions for the team to access collection A + add alice to Alpha
         String teamName = "Rusty_" + Random.id();
-        Teams.postTeam(teamName, Login.httpAdministrator);
-        Team team = Teams.getTeam(teamName, Login.httpAdministrator).body;
+        Teams.postTeam(teamName, context.getAdministrator());
+        Team team = Teams.getTeam(teamName, context.getAdministrator()).body;
 
         // two collections A & B + one user Alice
         // add Alice to team and give access to collection A
-        CollectionDescription collectionA = OneLineSetups.publishedCollection(team);
-        OneLineSetups.publishedCollection(); // create another collection to ensure there are two collections in the system.
+        CollectionDescription collectionA = OneLineSetups.publishedCollection(context.getPublisher(), team);
+        OneLineSetups.publishedCollection(context.getPublisher()); // create another collection to ensure there are two collections in the system.
 
         String aliceEmail = "Rusty_" + Random.id() + "@example.com";
-        Http httpAlice = newSessionWithViewerPermissions("Rusty", aliceEmail);
-        Response<Boolean> postMemberResponse = Teams.postMember(team.name, aliceEmail, Login.httpAdministrator);
+        Http httpAlice = newSessionWithViewerPermissions(context, "Rusty", aliceEmail);
+        Response<Boolean> postMemberResponse = Teams.postMember(team.name, aliceEmail, context.getAdministrator());
         assertEquals(HttpStatus.OK_200, postMemberResponse.statusLine.getStatusCode());
 
         // When

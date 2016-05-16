@@ -6,7 +6,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.*;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.Credentials;
@@ -38,8 +38,8 @@ public class ContentGenerator {
 
     static String collectionName = "generator";
 
-    public static User systemUser = SetupBeforeTesting.systemUser;
-    public static Credentials systemCredentials = SetupBeforeTesting.systemCredentials;
+    public static User systemUser = Context.systemUser;
+    public static Credentials systemCredentials = Context.systemCredentials;
 
     public static User adminUser = user("Content admin", "admin@contentgenerator.co.uk");
     public static Credentials adminCredentials = credentials(adminUser.email, Random.password(8));

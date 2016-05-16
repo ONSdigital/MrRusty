@@ -3,9 +3,7 @@ package com.github.onsdigital.test.api;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.AssertResponse;
 import com.github.onsdigital.test.Context;
-import com.github.onsdigital.test.SetupBeforeTesting;
 import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Credentials;
 import org.apache.commons.lang3.StringUtils;
@@ -20,13 +18,11 @@ import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.*;
 
 /**
- * Test cases for the {@link com.github.onsdigital.zebedee.api.Login} API
- * for initially logging in as the system owner.
+ * Test cases for Login API
  */
 @Api
 @DependsOn({})
 public class Login extends ZebedeeApiTest {
-
 
     /**
      * Tests login using the administrator credentials.
@@ -79,17 +75,16 @@ public class Login extends ZebedeeApiTest {
 
         // Given
         // Correct admin credentials
-        Credentials credentials = SetupBeforeTesting.contentOwnerCredentials;
+        Credentials credentials = Context.viewerCredentials;
 
         // When
         // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
-        tokenViewer = response.body;
+        Response<String> response = context.getViewer().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // The request should succeed
-        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
-        assertTrue(StringUtils.isNotBlank(response.body));
+        assertBodyNotEmpty(response);
+        assertOk(response);
     }
 
     /**
@@ -103,11 +98,11 @@ public class Login extends ZebedeeApiTest {
 
         // Given
         // Correct admin credentials
-        Credentials credentials = SetupBeforeTesting.scallywagCredentials;
+        Credentials credentials = Context.scallywagCredentials;
 
         // When
         // We attempt to log in
-        Response<String> response = httpScallywag.post(ZebedeeHost.login, credentials, String.class);
+        Response<String> response = context.getScallyWag().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // The request should succeed
@@ -125,11 +120,11 @@ public class Login extends ZebedeeApiTest {
 
         // Given
         // A missing email address in the credentials
-        Credentials credentials = credentials(null, SetupBeforeTesting.adminCredentials.password);
+        Credentials credentials = credentials(null, Context.adminCredentials.password);
 
         // When
         // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // We should get a bad request response
@@ -147,11 +142,11 @@ public class Login extends ZebedeeApiTest {
 
         // Given
         // A missing email address in the credentials
-        Credentials credentials = credentials(SetupBeforeTesting.adminCredentials.email, "incorrect");
+        Credentials credentials = credentials(Context.adminCredentials.email, "incorrect");
 
         // When
         // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // We should get an unauthorised response
@@ -169,7 +164,7 @@ public class Login extends ZebedeeApiTest {
 
         // When
         // We attempt to log in
-        Response<String> response = httpAdministrator.post(ZebedeeHost.login, SetupBeforeTesting.newUserCredentials, String.class);
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.login, Context.newUserCredentials, String.class);
 
         // Then
         // We should get an unauthorised response

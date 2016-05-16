@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 @DependsOn(Complete.class)
-public class Review {
+public class Review extends ZebedeeApiTest {
 
     /**
      *
@@ -28,21 +29,21 @@ public class Review {
 
         // Given
         // an existing piece of content that is set to complete by publisher Alice
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
         String filename = collection.inProgressUris.get(0);
 
-        Response<String> complete = Complete.complete(collection.id, filename, Login.httpPublisher);
+        Response<String> complete = Complete.complete(collection.id, filename, context.getPublisher());
 
         // When
         // publisher Bob calls review on the content
-        Response<String> response = review(collection.id, filename, Login.httpSecondSetOfEyes);
+        Response<String> response = review(collection.id, filename, context.getSecondSetOfEyes());
 
         // Then
         // We get the okay response code
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // and the content is listed under review when we get the collection.
-        CollectionDescription updatedCollection = Collection.get(collection.id, Login.httpPublisher).body;
+        CollectionDescription updatedCollection = Collection.get(collection.id, context.getPublisher()).body;
         assertTrue(updatedCollection.reviewedUris.contains(filename));
         assertFalse(updatedCollection.completeUris.contains(filename));
         assertFalse(updatedCollection.inProgressUris.contains(filename));
@@ -59,14 +60,14 @@ public class Review {
 
         // Given
         // an existing piece of content that is set to complete
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
         String filename = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.id, filename, Login.httpPublisher);
+        Complete.complete(collection.id, filename, context.getPublisher());
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.id, filename, Login.httpPublisher);
+        Response<String> response = review(collection.id, filename, context.getPublisher());
 
         // Then
         // We get the okay response code
@@ -82,15 +83,15 @@ public class Review {
 
         // Given
         // content that is set to complete
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(2);
-        Complete.complete(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
-        Complete.complete(collection.id, collection.inProgressUris.get(1), Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 2);
+        Complete.complete(collection.id, collection.inProgressUris.get(0), context.getPublisher());
+        Complete.complete(collection.id, collection.inProgressUris.get(1), context.getPublisher());
 
         // When
         // we call review on the content with different users
 
-        Response<String> response2 = review(collection.id, collection.inProgressUris.get(0), Login.httpViewer);
-        Response<String> response3 = review(collection.id, collection.inProgressUris.get(1), Login.httpScallywag);
+        Response<String> response2 = review(collection.id, collection.inProgressUris.get(0), context.getViewer());
+        Response<String> response3 = review(collection.id, collection.inProgressUris.get(1), context.getScallyWag());
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.UNAUTHORIZED_401, response2.statusLine.getStatusCode());
@@ -105,12 +106,12 @@ public class Review {
     public void shouldReturnNotFoundIfNoSuchFile() throws IOException {
 
         // Given - a collection + a random file name
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         String filename = Random.id() + ".json";
 
         // When - we call review on the content
-        Response<String> response = review(collection.name, filename, Login.httpSecondSetOfEyes);
+        Response<String> response = review(collection.name, filename, context.getSecondSetOfEyes());
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.NOT_FOUND_404, response.statusLine.getStatusCode());
@@ -125,11 +126,11 @@ public class Review {
 
         // Given
         // a collection with a file not listed as complete
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
 
         // When
         // we call review on the content
-        Response<String> response = review(collection.id, collection.inProgressUris.get(0), Login.httpSecondSetOfEyes);
+        Response<String> response = review(collection.id, collection.inProgressUris.get(0), context.getSecondSetOfEyes());
 
         // Then - We get the expected response code
         assertEquals(HttpStatus.BAD_REQUEST_400, response.statusLine.getStatusCode());
@@ -144,12 +145,12 @@ public class Review {
 
         // Given
         // a collection that has complete content in a directory
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
-        Complete.complete(collection.id, collection.inProgressUris.get(0), Login.httpPublisher);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, "/directory/", 1);
+        Complete.complete(collection.id, collection.inProgressUris.get(0), context.getPublisher());
 
         // When
         // we call review on the directory alone
-        Response<String> response = review(collection.id, "/directory/", Login.httpSecondSetOfEyes);
+        Response<String> response = review(collection.id, "/directory/", context.getSecondSetOfEyes());
 
 
         // Then
@@ -165,15 +166,15 @@ public class Review {
 
         // Given
         // a uri that is already set to review.
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent("/directory/", 1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, "/directory/", 1);
         String uri = collection.inProgressUris.get(0);
 
-        Complete.complete(collection.id, uri, Login.httpPublisher);
-        review(collection.id, uri, Login.httpSecondSetOfEyes); // Review
+        Complete.complete(collection.id, uri, context.getPublisher());
+        review(collection.id, uri, context.getSecondSetOfEyes()); // Review
 
         // When
         // we call review on the content again
-        Response<String> response = review(collection.id, uri, Login.httpThirdSetOfEyes);
+        Response<String> response = review(collection.id, uri, context.getThirdSetOfEyes());
 
         // Then
         // We get a bad request error code

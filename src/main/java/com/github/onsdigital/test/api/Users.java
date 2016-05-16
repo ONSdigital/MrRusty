@@ -6,6 +6,8 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.Context;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.User;
 import org.eclipse.jetty.http.HttpStatus;
@@ -23,7 +25,7 @@ import static org.junit.Assert.assertEquals;
  */
 @Api
 @DependsOn(com.github.onsdigital.test.api.Login.class)
-public class Users {
+public class Users extends ZebedeeApiTest {
     private User user;
 
     /**
@@ -41,7 +43,7 @@ public class Users {
 
         // When
         // We attempt to create a user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
 
         // Then
         // We should get no conflict
@@ -63,13 +65,13 @@ public class Users {
         // When
         // We attempt to create a user with each alternate
         user.email = generateRandomTestUserEmail();
-        Response<User> response1 = Login.httpPublisher.post(ZebedeeHost.users, user, User.class);
+        Response<User> response1 = context.getPublisher().post(ZebedeeHost.users, user, User.class);
 
         user.email = generateRandomTestUserEmail();
-        Response<User> response2 = Login.httpScallywag.post(ZebedeeHost.users, user, User.class);
+        Response<User> response2 = context.getScallyWag().post(ZebedeeHost.users, user, User.class);
 
         user.email = generateRandomTestUserEmail();
-        Response<User> response3 = Login.httpViewer.post(ZebedeeHost.users, user, User.class);
+        Response<User> response3 = context.getViewer().post(ZebedeeHost.users, user, User.class);
 
         // Then
         // We should get no conflict
@@ -91,13 +93,13 @@ public class Users {
         // Given
         // A new user
         User inactive = createRandomTestUser();
-        Login.httpAdministrator.post(ZebedeeHost.users, inactive, User.class);
+        context.getAdministrator().post(ZebedeeHost.users, inactive, User.class);
 
         // When
         // We attempt to log in with that user
         Credentials credentials = new Credentials();
         credentials.email = inactive.email;
-        Response<String> response = Login.httpAdministrator.post(ZebedeeHost.login, credentials, String.class);
+        Response<String> response = context.getAdministrator().post(ZebedeeHost.login, credentials, String.class);
 
         // Then
         // We should get unauthorized:
@@ -116,12 +118,12 @@ public class Users {
         // Given
         // An existing user
         User user = createRandomTestUser();
-        Response<User> create = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> create = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
         assertEquals(HttpStatus.OK_200, create.statusLine.getStatusCode());
 
         // When
         // We attempt to create a duplicate user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
 
         // Then
         // We should get a conflict
@@ -144,7 +146,7 @@ public class Users {
 
         // When
         // We attempt to create the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
 
         // Then
         // We should get a bad request
@@ -167,7 +169,7 @@ public class Users {
 
         // When
         // We attempt to create the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
 
         // Then
         // We should get a bad request
@@ -180,17 +182,17 @@ public class Users {
         // Given
         // A created user
         User deleteUser = createRandomTestUser();
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, deleteUser, User.class);
 
         // When
         // we delete the user
-        Response<String> delete = delete(deleteUser.email, Login.httpAdministrator);
+        Response<String> delete = delete(deleteUser.email, context.getAdministrator());
 
         // Then
         // the delete should go through & the user should not exist
         assertEquals(HttpStatus.OK_200, delete.statusLine.getStatusCode());
 
-        Response<User> userResponse = get(deleteUser.email, Login.httpPublisher);
+        Response<User> userResponse = get(deleteUser.email, context.getPublisher());
         assertEquals(HttpStatus.NOT_FOUND_404, userResponse.statusLine.getStatusCode());
     }
 
@@ -203,7 +205,7 @@ public class Users {
 
         // When
         // we delete the user
-        Response<String> delete = delete(email, Login.httpAdministrator);
+        Response<String> delete = delete(email, context.getAdministrator());
 
         // Then
         // the delete should return Not found
@@ -216,17 +218,17 @@ public class Users {
         // Given
         // A created user
         User deleteUser = createRandomTestUser();
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, deleteUser, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, deleteUser, User.class);
 
         // When
         // we delete the user using a non admin login
-        Response<String> delete = delete(deleteUser.email, Login.httpPublisher);
+        Response<String> delete = delete(deleteUser.email, context.getPublisher());
 
         // Then
         // the delete should go through & the user should not exist
         assertEquals(HttpStatus.UNAUTHORIZED_401, delete.statusLine.getStatusCode());
 
-        Response<User> userResponse = get(deleteUser.email, Login.httpPublisher);
+        Response<User> userResponse = get(deleteUser.email, context.getPublisher());
         assertEquals(HttpStatus.OK_200, userResponse.statusLine.getStatusCode());
     }
 
@@ -246,9 +248,9 @@ public class Users {
         return user;
     }
 
-    public static User createTestViewerUser() throws IOException {
+    public static User createTestViewerUser(Context context) throws IOException {
         User user = createRandomTestUser();
-        newSessionWithViewerPermissions(user.name, user.email);
+        newSessionWithViewerPermissions(context, user.name, user.email);
         return user;
     }
 

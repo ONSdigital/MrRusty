@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.ChartObject;
 import org.junit.Test;
 
@@ -24,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  */
 @Api
 @DependsOn(Permissions.class) // Doesn't really but I am using the http.post function for convenience
-public class DataServices {
+public class DataServices extends ZebedeeApiTest {
 
     /**
      * Test basic functionality for a ChartObject file
@@ -71,9 +72,9 @@ public class DataServices {
     }
 
 
-    public static Response<Path> upload(File file, String input, String output) throws IOException {
+    public Response<Path> upload(File file, String input, String output) throws IOException {
         // Get an http (which one doesn't matter)
-        Http http = Login.httpPublisher;
+        Http http = context.getPublisher();
 
         // Get the content endpoint
         Endpoint contentEndpoint = ZebedeeHost.dataservices.setParameter("input", input).setParameter("output", output);

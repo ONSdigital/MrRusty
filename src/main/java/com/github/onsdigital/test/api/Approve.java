@@ -8,6 +8,7 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -23,9 +24,9 @@ import static org.junit.Assert.assertEquals;
 
 @Api
 @DependsOn(com.github.onsdigital.test.api.Content.class)
-public class Approve {
+public class Approve  extends ZebedeeApiTest {
 
-    Http http = Login.httpPublisher;
+    private final Http publisher = context.getPublisher();
 
     /**
      * Tests approval using simple collection setup and publisher credentials
@@ -37,11 +38,11 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(collection.id, Login.httpPublisher);
+        Response<String> response = approve(collection.id, publisher);
 
         // Expect
         // a response of okay
@@ -58,16 +59,16 @@ public class Approve {
 
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we approve it using admin credentials and get an okay
-        Response<String> response = approve(collection.id, Login.httpPublisher);
+        Response<String> response = approve(collection.id, publisher);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Expect
         // the collection is now approved
-        CollectionDescription collectionDescription = Collection.get(collection.id, Login.httpPublisher).body;
+        CollectionDescription collectionDescription = Collection.get(collection.id, publisher).body;
         assertEquals(true, collectionDescription.approvedStatus);
     }
 
@@ -80,7 +81,7 @@ public class Approve {
     public void shouldRespondUnauthorizedIfCredentialsAreNotProvided() throws IOException {
         // Given
         // a session that has no credentials and a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we approve it without credentials
@@ -101,13 +102,13 @@ public class Approve {
     public void shouldRespondUnauthorizedIfPermissionsDoNotAllowApproval() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection1 = OneLineSetups.publishedCollection();
-        CollectionDescription collection3 = OneLineSetups.publishedCollection();
+        CollectionDescription collection1 = OneLineSetups.publishedCollection(context.getPublisher());
+        CollectionDescription collection3 = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         //...we approve it with non publisher credentials
-        Response<String> responseScallywag = approve(collection1.id, Login.httpScallywag);
-        Response<String> responseViewer = approve(collection3.id, Login.httpViewer);
+        Response<String> responseScallywag = approve(collection1.id, context.getScallyWag());
+        Response<String> responseViewer = approve(collection3.id, context.getViewer());
 
         // Then
         // approve should fail and return Unauthorised
@@ -128,7 +129,7 @@ public class Approve {
 
         // When
         // we approve it using admin credentials
-        Response<String> response = approve(randomCollectionName, http);
+        Response<String> response = approve(randomCollectionName, publisher);
 
         // Expect
         // a bad request response
@@ -144,11 +145,11 @@ public class Approve {
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context,1);
 
         // When
         // we try to approve it using appropriate credentials
-        Response<String> response = approve(collection.id, Login.httpPublisher);
+        Response<String> response = approve(collection.id, publisher);
 
         // We expect
         // the resource is in progress so the collection will not be approved

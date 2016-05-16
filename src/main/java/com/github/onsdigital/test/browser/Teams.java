@@ -1,7 +1,7 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
-import com.github.onsdigital.test.SetupBeforeTesting;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.browser.model.User;
@@ -14,7 +14,7 @@ import java.io.IOException;
 @DependsOn({Login.class})
 public class Teams {
 
-    Credentials publisher = SetupBeforeTesting.systemCredentials;
+    Credentials publisher = Context.systemCredentials;
 
 
     @POST

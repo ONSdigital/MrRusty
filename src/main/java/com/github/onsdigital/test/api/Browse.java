@@ -6,6 +6,7 @@ import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.DirectoryListing;
 import org.eclipse.jetty.http.HttpStatus;
@@ -19,23 +20,26 @@ import static org.junit.Assert.assertEquals;
 
 @Api
 @DependsOn({Login.class, Collection.class})
-public class Browse {
+public class Browse  extends ZebedeeApiTest {
+
+    private Http publisher = context.getPublisher();
 
     /**
      * Test basic functionality
      *
      *
+     * 
      */
     @GET
     @Test
     public void shouldReturn200WithValidCollectionName() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we call browse
-        Response<DirectoryListing> getResponse = browse(collection.id, Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, publisher);
 
         // Expect
         // a correct call
@@ -54,7 +58,7 @@ public class Browse {
 
         // When
         // we call get without a collection specified
-        Response<DirectoryListing> getResponse = Login.httpPublisher.get(ZebedeeHost.browse, DirectoryListing.class);
+        Response<DirectoryListing> getResponse = publisher.get(ZebedeeHost.browse, DirectoryListing.class);
 
         // Expect
         // Response of {@link HttpStatus#BAD_REQUEST_400}
@@ -70,11 +74,11 @@ public class Browse {
     public void shouldReturnNotFoundWithInvalidURI() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse = browse(collection.id, "/invalidUri", Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, "/invalidUri", publisher);
 
         // Expect
         // response of {@link HttpStatus#NOT_FOUND_404}
@@ -90,12 +94,12 @@ public class Browse {
     public void shouldReturnBadRequestWhenURIisFileNotDirectory() throws IOException {
         // Given
         // a collection with a file in it
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
         String uri = collection.inProgressUris.get(0);
 
         // When
         // we try to browse for a file not the directory
-        Response<DirectoryListing> getResponse = browse(collection.id, uri, Login.httpPublisher);
+        Response<DirectoryListing> getResponse = browse(collection.id, uri, publisher);
 
         // Then
         // we expect a bad request response
@@ -112,11 +116,11 @@ public class Browse {
     public void shouldReturn401ForAdminUser() throws IOException {
         // Given
         // a collection
-        CollectionDescription collection = OneLineSetups.publishedCollection();
+        CollectionDescription collection = OneLineSetups.publishedCollection(context.getPublisher());
 
         // When
         // we call get
-        Response<DirectoryListing> getResponse =  browse(collection.id, Login.httpAdministrator);
+        Response<DirectoryListing> getResponse =  browse(collection.id, context.getAdministrator());
 
         // Expect
         // a correct call

@@ -1,20 +1,17 @@
 package com.github.onsdigital.test.api;
 
-import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
-import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
+import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.PermissionDefinition;
-import com.github.onsdigital.test.json.Team;
 import com.github.onsdigital.test.json.User;
 import org.apache.commons.lang.BooleanUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
@@ -26,7 +23,7 @@ import static org.junit.Assert.assertTrue;
  */
 @Api
 @DependsOn(com.github.onsdigital.test.api.Login.class)
-public class Permissions {
+public class Permissions extends ZebedeeApiTest {
 
     /**
      *
@@ -39,17 +36,17 @@ public class Permissions {
     public void canAddAdminPermissions() throws IOException {
         // Given
         // a simple user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
 
         // When
         // admin assigns permissions
-        Response<String> response = postPermission(permission(user.email, Boolean.TRUE, null), Login.httpAdministrator);
+        Response<String> response = postPermission(permission(user.email, Boolean.TRUE, null), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        PermissionDefinition permissions = getPermissions(user.email, Login.httpAdministrator).body;
+        PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
         assertTrue(BooleanUtils.isTrue(permissions.admin));
     }
 
@@ -64,18 +61,18 @@ public class Permissions {
     public void canRemoveAdminPermissions() throws IOException {
         // Given
         // an admin user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
-        postPermission(permission(user.email, Boolean.TRUE, null), Login.httpAdministrator);
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+        postPermission(permission(user.email, Boolean.TRUE, null), context.getAdministrator());
 
         // When
         // admin revokes permissions
-        Response<String> response = postPermission(permission(user.email, Boolean.FALSE, null), Login.httpAdministrator);
+        Response<String> response = postPermission(permission(user.email, Boolean.FALSE, null), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        PermissionDefinition permissions = getPermissions(user.email, Login.httpAdministrator).body;
+        PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
         assertTrue(BooleanUtils.isFalse(permissions.admin));
     }
 
@@ -90,17 +87,17 @@ public class Permissions {
     public void canAddPublisherPermissions() throws IOException {
         // Given
         // a simple user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
 
         // When
         // admin assigns permissions
-        Response<String> response = postPermission(permission(user.email, null, Boolean.TRUE), Login.httpAdministrator);
+        Response<String> response = postPermission(permission(user.email, null, Boolean.TRUE), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        PermissionDefinition permissions = getPermissions(user.email, Login.httpAdministrator).body;
+        PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
         assertTrue(BooleanUtils.isTrue(permissions.editor));
     }
 
@@ -115,19 +112,19 @@ public class Permissions {
     public void canRemovePublisherPermissions() throws IOException {
         // Given
         // an admin user
-        User user = OneLineSetups.newActiveUserWithViewerPermissions();
-        postPermission(permission(user.email, null, Boolean.TRUE), Login.httpAdministrator);
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+        postPermission(permission(user.email, null, Boolean.TRUE), context.getAdministrator());
 
         // When
         // admin revokes permissions
         PermissionDefinition permission = permission(user.email, null, Boolean.FALSE);
-        Response<String> response = postPermission(permission, Login.httpAdministrator);
+        Response<String> response = postPermission(permission, context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
-        PermissionDefinition permissions = getPermissions(user.email, Login.httpAdministrator).body;
+        PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
         assertTrue(BooleanUtils.isFalse(permissions.editor));
     }
 

@@ -4,6 +4,7 @@ import com.github.davidcarboni.cryptolite.Random;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.*;
 import com.github.onsdigital.test.json.*;
 import org.eclipse.jetty.http.HttpStatus;
@@ -24,9 +25,9 @@ public class OneLineSetups {
      * @return The collection's {@link CollectionDescription}
      * @throws IOException
      */
-    public static CollectionDescription publishedCollection(Team... teams) throws IOException {
+    public static CollectionDescription publishedCollection(Http publisher, Team... teams) throws IOException {
         CollectionDescription collection = Collection.createCollectionDescription(teams);
-        return Collection.post(collection, Login.httpPublisher).body;
+        return Collection.post(collection, publisher).body;
     }
 
     /**
@@ -37,22 +38,25 @@ public class OneLineSetups {
      * @return The collection's {@link CollectionDescription}
      * @throws IOException
      */
-    public static CollectionDescription publishedCollectionWithContent(int fileCount) throws IOException {
-        return publishedCollectionWithContent( "", fileCount);
+    public static CollectionDescription publishedCollectionWithContent(Context context, int fileCount) throws IOException {
+        return publishedCollectionWithContent(context, "", fileCount);
     }
 
     /**
      * Returns a CollectionDescription with randomly generated content in a specific folder
      *
-     * @param fileCount the number of files to generate
+     *
+     * @param context
      * @param directory the parent directory (taxonomy node) for the content
      *                  <p>requires backslashes</p>
+     * @param fileCount the number of files to generate
      * @return The collection's {@link CollectionDescription}
      * @throws IOException
      */
-    public static CollectionDescription publishedCollectionWithContent(String directory, int fileCount) throws IOException {
+    public static CollectionDescription publishedCollectionWithContent(Context context, String directory, int fileCount) throws IOException {
         CollectionDescription collection = Collection.createCollectionDescription();
-        collection = Collection.post(collection, Login.httpPublisher).body;
+        Http publisher = context.getPublisher();
+        collection = Collection.post(collection, publisher).body;
 
         for(int i = 0; i < fileCount; i++) {
             String uri = "";
@@ -66,10 +70,10 @@ public class OneLineSetups {
             ContentDetail detail = new ContentDetail();
             detail.description = new ContentDetailDescription("title");
 
-            Content.create(collection.id, detail, uri, Login.httpPublisher);
+            Content.create(collection.id, detail, uri, publisher);
         }
 
-        return Collection.get(collection.id, Login.httpPublisher).body;
+        return Collection.get(collection.id, publisher).body;
     }
 
     /**
@@ -81,15 +85,16 @@ public class OneLineSetups {
      * @return
      * @throws IOException
      */
-    public static CollectionDescription scheduledCollectionWithContent(String directory, int fileCount, int delayInSeconds) throws IOException {
+    public static CollectionDescription scheduledCollectionWithContent(Context context, String directory, int fileCount, int delayInSeconds) throws IOException {
         CollectionDescription collection = Collection.createCollectionDescription();
         collection.type = CollectionType.scheduled;
+        Http publisher = context.getPublisher();
 
         Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
         calendar.add(Calendar.SECOND, delayInSeconds);
         collection.publishDate = calendar.getTime();
 
-        collection = Collection.post(collection, Login.httpPublisher).body;
+        collection = Collection.post(collection, publisher).body;
         for(int i = 0; i < fileCount; i++) {
             String uri = "";
             if(directory.equals("") || directory.equals("/")) {
@@ -101,14 +106,14 @@ public class OneLineSetups {
             ContentDetail detail = new ContentDetail();
             detail.description = new ContentDetailDescription("title");
 
-            Content.create(collection.id, detail, uri, Login.httpPublisher);
+            Content.create(collection.id, detail, uri, publisher);
         }
 
-        return Collection.get(collection.id, Login.httpPublisher).body;
+        return Collection.get(collection.id, publisher).body;
     }
 
 
-    public static Http newSessionWithViewerPermissions(String name, String email) throws IOException {
+    public static Http newSessionWithViewerPermissions(Context context, String name, String email) throws IOException {
         // Given
         // A user with no email address
         User user = new User();
@@ -116,14 +121,14 @@ public class OneLineSetups {
         user.name = name;
 
         // Post the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Set their password
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = Random.password(8);
-        Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> responsePassword = context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
 
         // Change the password as the user to remove the temporary password restrictions.
@@ -149,7 +154,7 @@ public class OneLineSetups {
     }
 
 
-    public static Http newSessionWithPublisherPermissions(String name, String email, String password) throws IOException {
+    public static Http newSessionWithPublisherPermissions(Context context, String name, String email, String password) throws IOException {
         // Given
         // A user with no email address
         User user = new User();
@@ -157,21 +162,21 @@ public class OneLineSetups {
         user.name = name;
 
         // Post the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Set their password
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = password;
-        Response<String> responsePassword = Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
+        Response<String> responsePassword = context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
         assertEquals(HttpStatus.OK_200, responsePassword.statusLine.getStatusCode());
 
         // Assign them publisher permissions
         PermissionDefinition definition = new PermissionDefinition();
         definition.email = user.email;
         definition.editor = true;
-        Response<String> permissionResponse = Login.httpAdministrator.post(ZebedeeHost.permission, definition, String.class);
+        Response<String> permissionResponse = context.getAdministrator().post(ZebedeeHost.permission, definition, String.class);
         assertEquals(HttpStatus.OK_200, permissionResponse.statusLine.getStatusCode());
 
         // Change the password as the user to remove the temporary password restrictions.
@@ -195,66 +200,32 @@ public class OneLineSetups {
 
         return http;
     }
-    public static Http newSessionWithPublisherPermissions() throws IOException {
-        return newSessionWithPublisherPermissions("Rusty", "Rusty_" + Random.id() + "@example.com", Random.password(8));
+    public static Http newSessionWithPublisherPermissions(Context context) throws IOException {
+        return newSessionWithPublisherPermissions(context, "Rusty", "Rusty_" + Random.id() + "@example.com", Random.password(8));
     }
 
-    public static User newActiveUserWithViewerPermissions(String name, String email) throws IOException {
+    public static User newActiveUserWithViewerPermissions(Context context, String name, String email) throws IOException {
         // Create the user
         User user = new User();
         user.email = email;
         user.name = name;
 
         // Post the user
-        Response<User> response = Login.httpAdministrator.post(ZebedeeHost.users, user, User.class);
+        Response<User> response = context.getAdministrator().post(ZebedeeHost.users, user, User.class);
         assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
 
         // Set their password
         Credentials credentials = new Credentials();
         credentials.email = user.email;
         credentials.password = Random.password(8);
-        Login.httpAdministrator.post(ZebedeeHost.password, credentials, String.class);
+        context.getAdministrator().post(ZebedeeHost.password, credentials, String.class);
 
         return user;
     }
-    public static User newActiveUserWithViewerPermissions() throws IOException {
-        return newActiveUserWithViewerPermissions("Rusty", "Rusty_" + Random.id() + "@example.com");
+    public static User newActiveUserWithViewerPermissions(Context context) throws IOException {
+        return newActiveUserWithViewerPermissions(context, "Rusty", "Rusty_" + Random.id() + "@example.com");
     }
-    public static Http newSessionWithViewerPermissions() throws IOException {
-        return newSessionWithViewerPermissions("Rusty", "Rusty_" + Random.id() + "@example.com");
-    }
-
-    /**
-     * Creates and posts an empty team
-     *
-     * @return The {@link Team}
-     *
-     * @throws IOException
-     */
-    public static Team newTeam() throws IOException {
-        // Post a new team with name
-        String teamName = "Rusty_" + Random.id();
-        Teams.postTeam(teamName, Login.httpAdministrator);
-        // Retrieve the created Team object
-        Team team = Teams.getTeam(teamName, Login.httpAdministrator).body;
-        return team;
-    }
-    /**
-     * Creates and posts a team with members
-     *
-     * @param numberOfUsers the number of users to add to the team
-     *
-     * @return The {@link Team}
-     *
-     * @throws IOException
-     */
-    public static Team newTeam(int numberOfUsers) throws IOException {
-        // Post a new team with name
-        Team team = newTeam();
-        for(int i = 0; i < numberOfUsers; i++) {
-            User user = newActiveUserWithViewerPermissions();
-            Teams.postMember(team.name, user.email, Login.httpAdministrator);
-        }
-        return team;
+    public static Http newSessionWithViewerPermissions(Context context) throws IOException {
+        return newSessionWithViewerPermissions(context, "Rusty", "Rusty_" + Random.id() + "@example.com");
     }
 }
