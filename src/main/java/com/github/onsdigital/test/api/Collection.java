@@ -275,10 +275,6 @@ public class Collection extends ZebedeeApiTest {
         return "Rusty_" + Random.id().substring(0, 10);
     }
 
-    public static String createTeamNameForTest() {
-        return "Rusty_" + Random.id().substring(0, 5) + "_team";
-    }
-
     public static Response<CollectionDescription> get(String id, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(id);
         return http.get(idUrl, CollectionDescription.class);

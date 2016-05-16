@@ -2,7 +2,6 @@ package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
-import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.browser.model.User;
 import com.github.onsdigital.test.json.Credentials;
@@ -24,7 +23,7 @@ public class Teams {
         // Given the collections page after logging in
         CollectionsPage collectionPage = new LoginPage().login(publisher.email, publisher.password);
 
-        String teamName = Collection.createTeamNameForTest();
+        String teamName = Teams.createTeamName();
 
         // Move to teams page
         TeamsPage teamsPage = collectionPage.clickTeamsMenuLink();
@@ -39,7 +38,7 @@ public class Teams {
 
         // Given the collections page after logging in
         CollectionsPage collectionPage = new LoginPage().login(publisher.email, publisher.password);
-        String teamName = Collection.createTeamNameForTest();
+        String teamName = Teams.createTeamName();
 
         // Create a user
         User user1 = new User();
@@ -61,5 +60,10 @@ public class Teams {
         // Drag & drop
         teamDetailsPage.dragAndDropUser(user1.email.toLowerCase());
     }
+
+    private static String createTeamName() {
+        return com.github.onsdigital.test.api.Teams.createTeamName();
+    }
+
 
 }

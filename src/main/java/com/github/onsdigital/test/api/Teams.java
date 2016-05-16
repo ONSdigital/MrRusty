@@ -449,7 +449,7 @@ public class Teams extends ZebedeeApiTest {
      */
     public static Team createTeam(Context context) throws IOException {
         // Post a new team with name
-        String teamName = "Rusty_" + Random.id();
+        String teamName = createTeamName();
         Teams.postTeam(teamName, context.getAdministrator());
         // Retrieve the created Team object
         Team team = Teams.getTeam(teamName, context.getAdministrator()).body;
@@ -472,5 +472,10 @@ public class Teams extends ZebedeeApiTest {
             Teams.postMember(team.name, user.email, context.getAdministrator());
         }
         return team;
+    }
+
+
+    public static String createTeamName() {
+        return "Rusty_" + Random.id().substring(0, 5) + "_team";
     }
 }
