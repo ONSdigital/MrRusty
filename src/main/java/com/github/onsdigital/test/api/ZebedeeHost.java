@@ -16,6 +16,7 @@ public class ZebedeeHost {
     public static final Endpoint collections = new Endpoint(zebedeeHost, "collections");
     public static final Endpoint collection = new Endpoint(zebedeeHost, "collection");
     public static final Endpoint content = new Endpoint(zebedeeHost, "content");
+    public static final Endpoint data = new Endpoint(zebedeeHost, "data");
     public static final Endpoint transfer = new Endpoint(zebedeeHost, "transfer");
     public static final Endpoint browse = new Endpoint(zebedeeHost, "browse");
     public static final Endpoint complete = new Endpoint(zebedeeHost, "complete");
