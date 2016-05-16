@@ -10,18 +10,20 @@ public abstract class PublishingIntegrationTest {
     private static boolean hasSetupRun = false;
     private static boolean hasTeardownRun = false;
 
-    protected Context context = new Context();
+    protected static Context context = new Context();
 
     @BeforeClass
-    public static void oneTimeSetUp() throws Exception {
+    public synchronized static void setup() throws Exception {
         System.out.println("Running test setup code...");
-        hasSetupRun = true;
-        //new Context().setup();
+        if (!hasSetupRun) {
+            hasSetupRun = true;
+            context.setup();
+        }
     }
 
     @AfterClass
-    public static void oneTimeTearDown() {
+    public static void teardown() {
         System.out.println("Running test teardown code...");
-        new TearDownAfterTesting().teardown();
+        TearDownAfterTesting.doTeardown(context);
     }
 }
