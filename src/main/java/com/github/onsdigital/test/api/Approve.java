@@ -17,6 +17,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by kanemorgan on 02/04/2015.
@@ -156,9 +157,37 @@ public class Approve  extends ZebedeeApiTest {
         assertEquals(HttpStatus.CONFLICT_409, response.statusLine.getStatusCode());
     }
 
-
     public static Response<String> approve(String collectionID, Http http) throws IOException {
-        Endpoint endpoint = ZebedeeHost.approve.addPathSegment(collectionID);
-        return http.post(endpoint, null, String.class);
+        return approve(collectionID, http, 30);
     }
+
+    public static Response<String> approve(String collectionID, Http http, int secondsToWait) throws IOException {
+        Endpoint endpoint = ZebedeeHost.approve.addPathSegment(collectionID);
+        Response<String> response = http.post(endpoint, null, String.class);
+
+        int count = 0;
+        boolean approved = false;
+
+        while (count < secondsToWait) {
+            Response<CollectionDescription> getCollectionResponse = Collection.get(collectionID, context.getPublisher());
+            System.out.println("getCollectionResponse.body.approvedStatus = " + getCollectionResponse.body.approvedStatus);
+            if (getCollectionResponse.body.approvedStatus) {
+                approved = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+
+            count++;
+        }
+
+        if (!approved)
+            fail("Collection was not approved within " + secondsToWait + " seconds.");
+        
+        return response;
+    }
+
 }

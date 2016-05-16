@@ -181,6 +181,7 @@ public class Publish extends ZebedeeApiTest {
         while (count < secondsToWait) {
             Response<CollectionDescription> response = Collection.get(collectionID, context.getPublisher());
 
+            System.out.println("response.statusLine.toString() = " + response.statusLine.toString());
             if (response.statusLine.getStatusCode() == 404 || response.body.publishComplete) {
                 published = true;
                 break;
