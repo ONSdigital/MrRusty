@@ -14,7 +14,9 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @DependsOn(Content.class)
 public class Complete extends ZebedeeApiTest {
@@ -136,6 +138,7 @@ public class Complete extends ZebedeeApiTest {
 
     /**
      * Convenience method to complete content in one line
+     *
      * @param collectionName
      * @param uri
      * @param http
@@ -146,8 +149,10 @@ public class Complete extends ZebedeeApiTest {
         Endpoint contentEndpoint = ZebedeeHost.complete.addPathSegment(collectionName).setParameter("uri", uri);
         return http.post(contentEndpoint, "", String.class);
     }
+
     /**
      * Convenience method to complete content in one line
+     *
      * @param collectionDescription
      * @param http
      * @throws IOException

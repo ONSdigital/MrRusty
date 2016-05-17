@@ -150,7 +150,7 @@ public class Publish extends ZebedeeApiTest {
 
         // Expect
         // a response of okay
-        assertEquals(CollectionType.manual, collection.type);
+        assertEquals(CollectionType.scheduled, collection.type);
     }
 
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {
@@ -181,7 +181,7 @@ public class Publish extends ZebedeeApiTest {
         while (count < secondsToWait) {
             Response<CollectionDescription> response = Collection.get(collectionID, context.getPublisher());
 
-            System.out.println("response.statusLine.toString() = " + response.statusLine.toString());
+            //System.out.println("response.statusLine.toString() = " + response.statusLine.toString());
             if (response.statusLine.getStatusCode() == 404 || response.body.publishComplete) {
                 published = true;
                 break;

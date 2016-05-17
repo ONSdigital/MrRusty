@@ -24,7 +24,7 @@ public abstract class FlorenceBrowserTest extends PublishingIntegrationTest {
     @Before
     public void setUp() throws Exception {
 
-        System.out.println("Running setup in FlorenceBrowserTest");
+        //System.out.println("Running setup in FlorenceBrowserTest");
 
         String browserStackUrl = Configuration.getBrowserStackUrl();
         if (StringUtils.isNotBlank(browserStackUrl)) {

@@ -14,7 +14,7 @@ public abstract class PublishingIntegrationTest {
 
     @BeforeClass
     public synchronized static void setup() throws Exception {
-        System.out.println("Running setup in PublishingIntegrationTest...");
+        //System.out.println("Running setup in PublishingIntegrationTest...");
 
         if (Setup.context != null) {
             context = Setup.context;
@@ -29,7 +29,7 @@ public abstract class PublishingIntegrationTest {
 
     @AfterClass
     public static void teardown() {
-        System.out.println("Running test teardown code...");
+        //System.out.println("Running test teardown code...");
 
         if (Setup.context != null)
             return; // hack to skip the class teardown when running the full suite.

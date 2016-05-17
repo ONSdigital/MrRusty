@@ -8,6 +8,8 @@ import com.github.onsdigital.http.Response;
 import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.*;
+import com.github.onsdigital.test.api.Complete;
+import com.github.onsdigital.test.api.Review;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.Credentials;
 import com.github.onsdigital.test.json.PermissionDefinition;
