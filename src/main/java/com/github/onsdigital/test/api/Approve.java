@@ -24,7 +24,7 @@ import static org.junit.Assert.fail;
  */
 
 @Api
-@DependsOn(com.github.onsdigital.test.api.Content.class)
+@DependsOn(Review.class)
 public class Approve  extends ZebedeeApiTest {
 
     private final Http publisher = context.getPublisher();
@@ -175,7 +175,7 @@ public class Approve  extends ZebedeeApiTest {
 
         while (count < secondsToWait) {
             Response<CollectionDescription> getCollectionResponse = Collection.get(collectionID, context.getPublisher());
-            System.out.println("getCollectionResponse.body.approvedStatus = " + getCollectionResponse.body.approvedStatus);
+            //System.out.println("getCollectionResponse.body.approvedStatus = " + getCollectionResponse.body.approvedStatus);
             if (getCollectionResponse.body.approvedStatus) {
                 approved = true;
                 break;
