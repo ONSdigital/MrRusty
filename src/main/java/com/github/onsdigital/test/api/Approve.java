@@ -146,7 +146,7 @@ public class Approve  extends ZebedeeApiTest {
     public void shouldReturnConflictForCollectionsThatHaveIncompleteItems() throws IOException {
         // Given
         // ...a collection with a file
-        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context,1);
+        CollectionDescription collection = OneLineSetups.publishedCollectionWithContent(context, 1);
 
         // When
         // we try to approve it using appropriate credentials
@@ -164,6 +164,11 @@ public class Approve  extends ZebedeeApiTest {
     public static Response<String> approve(String collectionID, Http http, int secondsToWait) throws IOException {
         Endpoint endpoint = ZebedeeHost.approve.addPathSegment(collectionID);
         Response<String> response = http.post(endpoint, null, String.class);
+
+        // if the status is not OK then just return as the approval has failed.
+        if (response.statusLine.getStatusCode() != org.apache.http.HttpStatus.SC_OK) {
+            return response;
+        }
 
         int count = 0;
         boolean approved = false;
