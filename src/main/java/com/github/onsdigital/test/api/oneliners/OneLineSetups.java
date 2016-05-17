@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.*;
 import com.github.onsdigital.test.json.*;
+import com.github.onsdigital.test.json.page.base.PageType;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -69,6 +70,8 @@ public class OneLineSetups {
 
             ContentDetail detail = new ContentDetail();
             detail.description = new ContentDetailDescription("title");
+            detail.uri = uri;
+            detail.type = PageType.article.toString();
 
             Content.create(collection.id, detail, uri, publisher);
         }
