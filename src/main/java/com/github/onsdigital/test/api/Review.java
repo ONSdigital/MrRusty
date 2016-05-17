@@ -14,6 +14,7 @@ import org.junit.Test;
 import javax.ws.rs.POST;
 import java.io.IOException;
 
+import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.*;
 
 @DependsOn(Complete.class)
@@ -170,11 +171,11 @@ public class Review extends ZebedeeApiTest {
         String uri = collection.inProgressUris.get(0);
 
         Complete.complete(collection.id, uri, context.getPublisher());
-        review(collection.id, uri, context.getSecondSetOfEyes()); // Review
+        assertOk(review(collection.id, uri, context.getSecondSetOfEyes())); // Review
 
         // When
         // we call review on the content again
-        Response<String> response = review(collection.id, uri, context.getThirdSetOfEyes());
+        Response<String> response = review(collection.id, uri, context.getSecondSetOfEyes());
 
         // Then
         // We get a bad request error code

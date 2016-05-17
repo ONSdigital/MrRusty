@@ -33,9 +33,6 @@ public class Context {
     public static User secondSetOfEyesUser = user("Myfanwy Morgan", "mm@magicroundabout.ons.gov.uk");
     public static Credentials secondSetOfEyesCredentials = credentials(secondSetOfEyesUser.email, Random.password(8), false);
 
-    public static User thirdSetOfEyesUser = user("Dai Griffiths", "dg@magicroundabout.ons.gov.uk");
-    public static Credentials thirdSetOfEyesCredentials = credentials(thirdSetOfEyesUser.email, Random.password(8), false);
-
     public static User viewerUser = user("Stacy To", "statto@magicroundabout.ons.gov.uk");
     public static Credentials viewerCredentials = credentials(viewerUser.email, Random.password(8), false);
 
@@ -79,7 +76,6 @@ public class Context {
         tokenAdministrator =  getAdministrator().post(ZebedeeHost.login, adminCredentials, String.class).body;
         tokenPublisher = getPublisher().post(ZebedeeHost.login, publisherCredentials, String.class).body;
         tokenSecondSetOfEyes = getSecondSetOfEyes().post(ZebedeeHost.login, secondSetOfEyesCredentials, String.class).body;
-        tokenThirdSetOfEyes = getThirdSetOfEyes().post(ZebedeeHost.login, thirdSetOfEyesCredentials, String.class).body;
         tokenViewer = getViewer().post(ZebedeeHost.login, viewerCredentials, String.class).body;
 
         administrator.addHeader("x-florence-token", tokenAdministrator);
@@ -120,12 +116,6 @@ public class Context {
             checkOk(secondSetOfEyes, "Unable to create publisher user " + secondSetOfEyesUser);
         }
 
-        // Second set of eyes
-        Response<User> thirdSetOfEyes = systemSession.post(ZebedeeHost.users, thirdSetOfEyesUser, User.class);
-        if (admin.statusLine.getStatusCode() != 409) {
-            checkOk(thirdSetOfEyes, "Unable to create publisher user " + thirdSetOfEyesUser);
-        }
-
         // Content Owner
         Response<User> contentOwner = systemSession.post(ZebedeeHost.users, viewerUser, User.class);
         if (admin.statusLine.getStatusCode() != 409) {
@@ -152,7 +142,6 @@ public class Context {
         setUserPassword(adminCredentials);
         setUserPassword(publisherCredentials);
         setUserPassword(secondSetOfEyesCredentials);
-        setUserPassword(thirdSetOfEyesCredentials);
         setUserPassword(viewerCredentials);
         setUserPassword(newUserCredentials);
 
@@ -203,16 +192,9 @@ public class Context {
         Response<String> secondSetOfEyesPermission = systemSession.post(ZebedeeHost.permission, secondSetOfEyesPermissionDefinition, String.class);
         checkOk(secondSetOfEyesPermission, "Unable to set editor permission for " + secondSetOfEyesUser);
 
-        // Second set of eyes
-        PermissionDefinition thirdSetOfEyesPermissionDefinition = permission(thirdSetOfEyesUser, false, true);
-        Response<String> thirdSetOfEyesPermission = systemSession.post(ZebedeeHost.permission, thirdSetOfEyesPermissionDefinition, String.class);
-        checkOk(thirdSetOfEyesPermission, "Unable to set editor permission for " + thirdSetOfEyesUser);
-
-        // Content Owner
-
         // Add content user to the economy team
-        Response<Boolean> team = systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
-        Response<Boolean> addUser = systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", viewerUser.email), "", Boolean.class);
+        systemSession.post(ZebedeeHost.teams.addPathSegment("economy"), "", Boolean.class);
+        systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", viewerUser.email), "", Boolean.class);
 
         // new user
         PermissionDefinition newUserPermissionDefinition = permission(newUserWithTemporaryPassword, false, true);
