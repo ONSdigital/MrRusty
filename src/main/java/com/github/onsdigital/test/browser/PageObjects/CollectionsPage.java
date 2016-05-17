@@ -31,8 +31,8 @@ public class CollectionsPage extends FlorencePage {
     Select hourInput;
     Select minInput;
 
-    public CollectionsPage(WebDriver driver) {
-        super(driver);
+    public CollectionsPage() {
+        super();
         initialisePage();
     }
 
@@ -274,7 +274,7 @@ public class CollectionsPage extends FlorencePage {
 
     public BrowsePage clickCreateCollection() {
         createCollectionButton.click();
-        return new BrowsePage(driver);
+        return new BrowsePage();
     }
 
     public CollectionDetailsPage clickCollectionByName(String collectionName) {
@@ -289,7 +289,7 @@ public class CollectionsPage extends FlorencePage {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return new CollectionDetailsPage(driver);
+                return new CollectionDetailsPage();
             }
         }
 

@@ -26,8 +26,8 @@ public class WorkspacePage extends FlorencePage {
      *
      * @param driver
      */
-    public WorkspacePage(WebDriver driver) {
-        super(driver);
+    public WorkspacePage() {
+        super();
     }
 
     /**
@@ -56,7 +56,7 @@ public class WorkspacePage extends FlorencePage {
      */
     public CreatePage clickCreateMenuItem() {
         createButton.click();
-        return new CreatePage(driver);
+        return new CreatePage();
     }
 
     /**
@@ -66,7 +66,7 @@ public class WorkspacePage extends FlorencePage {
      */
     public EditPage clickEditMenuItem() {
         editButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 
 

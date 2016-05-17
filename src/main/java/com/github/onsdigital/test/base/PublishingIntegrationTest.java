@@ -14,7 +14,7 @@ public abstract class PublishingIntegrationTest {
 
     @BeforeClass
     public synchronized static void setup() throws Exception {
-        System.out.println("Running test setup code...");
+        System.out.println("Running setup in PublishingIntegrationTest...");
 
         if (Setup.context != null) {
             context = Setup.context;

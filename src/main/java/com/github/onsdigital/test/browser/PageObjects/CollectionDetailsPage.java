@@ -7,6 +7,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class CollectionDetailsPage extends CollectionsPage {
@@ -17,8 +18,8 @@ public class CollectionDetailsPage extends CollectionsPage {
     WebElement workOnCollectionButton;
 
 
-    public CollectionDetailsPage(WebDriver driver) {
-        super(driver);
+    public CollectionDetailsPage() {
+        super();
         initialisePage();
     }
 
@@ -42,7 +43,7 @@ public class CollectionDetailsPage extends CollectionsPage {
     public BrowsePage clickWorkOnCollection() {
         workOnCollectionButton = waitAndFind(workOnCollectionButtonLocator);
         workOnCollectionButton.click();
-        return new BrowsePage(this.driver);
+        return new BrowsePage();
     }
 
     public SelectedPagePartial clickCollectionPageByName(String pageName) {
@@ -59,7 +60,7 @@ public class CollectionDetailsPage extends CollectionsPage {
                 System.out.println("pageSpan.getText() = " + pageSpan.getText());
                 if (pageSpan.getText().contains(pageName)) {
                     pageSpan.click();
-                    return new SelectedPagePartial(this.driver, page);
+                    return new SelectedPagePartial(page);
                 }
             } catch (NotFoundException exception) {
                 // no pages in this page list - do nothing.
@@ -79,7 +80,7 @@ public class CollectionDetailsPage extends CollectionsPage {
         new WebDriverWait(driver, 5).until(ExpectedConditions.invisibilityOfElementLocated(By.className("collection-selected")));
 
 
-        return new CollectionsPage(driver);
+        return new CollectionsPage();
     }
 
     private void waitForAnimationToFinish() {
@@ -91,16 +92,18 @@ public class CollectionDetailsPage extends CollectionsPage {
      *
      * @return
      */
-    private static boolean hasAnimationFinished(WebDriver driver) {
-        boolean isAnimated = (boolean) PageObject.runScript(driver, "return jQuery('.collection-selected').is(':animated')");
+    private static boolean hasAnimationFinished() {
+        boolean isAnimated = (boolean) PageObject.runScript("return jQuery('.collection-selected').is(':animated')");
         //System.out.println("Checking isAnimated...." + isAnimated);
         return !isAnimated;
     }
 
     private static ExpectedCondition<Boolean> animationFinished() {
         return new ExpectedCondition<Boolean>() {
-            public Boolean apply(WebDriver driver) {
-                return hasAnimationFinished(driver);
+            @Nullable
+            @Override
+            public Boolean apply(WebDriver input) {
+                return hasAnimationFinished();
             }
         };
     }

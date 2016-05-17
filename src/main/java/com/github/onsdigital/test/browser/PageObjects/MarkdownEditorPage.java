@@ -48,14 +48,14 @@ public class MarkdownEditorPage extends PageObject {
      *
      * @param driver
      */
-    public MarkdownEditorPage(WebDriver driver) {
-        super(driver);
+    public MarkdownEditorPage() {
+        super();
         initialisePage();
     }
 
     public EditPage clickCancel() {
         cancelButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 
     public MarkdownEditorPage clickSave() {
@@ -65,22 +65,22 @@ public class MarkdownEditorPage extends PageObject {
 
     public ChartBuilderPage clickCreateChart() {
         chartButton.click();
-        return new ChartBuilderPage (driver);
+        return new ChartBuilderPage ();
     }
 
     public TableBuilderPage clickCreateTable() {
         tableButton.click();
-        return new TableBuilderPage(driver);
+        return new TableBuilderPage();
     }
 
     public ImageBuilderPage clickCreateImage() {
         imageButton.click();
-        return new ImageBuilderPage(driver);
+        return new ImageBuilderPage();
     }
 
     public EditPage clickSaveAndExit() {
         exitButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 
     public MarkdownEditorPage typeContent(String content) {

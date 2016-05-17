@@ -1,8 +1,12 @@
 package com.github.onsdigital.selenium;
 
+import com.github.webdriverextensions.Bot;
+import com.github.webdriverextensions.WebDriverExtensionFieldDecorator;
+import com.github.webdriverextensions.WebPage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -12,12 +16,19 @@ import java.net.URISyntaxException;
 /**
  * Created by david on 08/04/2015.
  */
-public class PageObject {
+public class PageObject extends WebPage {
 
-    protected WebDriver driver;
+    protected WebDriver driver = Bot.driver();
 
-    protected PageObject(WebDriver driver) {
-        this.driver = driver;
+    @Override
+    public void open(Object... objects) {
+        // initialise up all the WebElement fields annotated with @FindBy
+        PageFactory.initElements(new WebDriverExtensionFieldDecorator(Bot.driver()), this);
+    }
+
+    @Override
+    public void assertIsOpen(Object... objects) throws AssertionError {
+
     }
 
     /**
@@ -26,7 +37,7 @@ public class PageObject {
      * @return
      */
     protected WebElement find(By selector) {
-        return driver.findElement(selector);
+        return Bot.driver().findElement(selector);
     }
 
     /**
@@ -38,7 +49,7 @@ public class PageObject {
         try {
             return (new WebDriverWait(driver, 5)).until(ExpectedConditions.visibilityOfElementLocated(selector));
         } catch (TimeoutException timeoutException) {
-            System.out.println(driver.getPageSource());
+            System.out.println(Bot.driver().getPageSource());
             throw timeoutException;
         }
     }
@@ -49,7 +60,7 @@ public class PageObject {
      */
     public void scrollTo(String selector) {
         String js = "$('" + selector + "')[0].scrollIntoView()";
-        ((JavascriptExecutor)driver).executeScript(js);
+        ((JavascriptExecutor)Bot.driver()).executeScript(js);
     }
 
     /**
@@ -57,8 +68,8 @@ public class PageObject {
      * @param script
      * @return
      */
-    public Object runScript(String script) {
-        return runScript(driver, script);
+    public static Object runScript(String script) {
+        return runScript(Bot.driver(), script);
     }
 
     public static Object runScript(WebDriver driver, String script) {
@@ -66,7 +77,7 @@ public class PageObject {
     }
 
     protected void openIfNecessary(String url) {
-        String currentUrl = driver.getCurrentUrl();
+        String currentUrl = Bot.driver().getCurrentUrl();
         URIBuilder builder = null;
         try {
             builder = new URIBuilder(currentUrl);
@@ -74,18 +85,18 @@ public class PageObject {
             e.printStackTrace();
         }
         if (!StringUtils.equalsIgnoreCase(url, builder.getHost())) {
-            driver.get(url);
+            Bot.driver().get(url);
         }
     }
 
     // wait for an expected JS alert to display and accept it.
     public void acceptAlert() {
-        Alert alert = (new WebDriverWait(driver, 5)).until(ExpectedConditions.alertIsPresent());
+        Alert alert = (new WebDriverWait(Bot.driver(), 5)).until(ExpectedConditions.alertIsPresent());
         alert.accept();
     }
 
     public void waitForAnimations() {
-        new WebDriverWait(driver, 5).until(allAnimationsFinished());
+        new WebDriverWait(Bot.driver(), 5).until(allAnimationsFinished());
     }
 
     /**

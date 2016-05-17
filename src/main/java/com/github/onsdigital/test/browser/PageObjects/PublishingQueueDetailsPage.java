@@ -9,8 +9,8 @@ import java.util.List;
 
 public class PublishingQueueDetailsPage extends PublishingQueuePage {
 
-    public PublishingQueueDetailsPage(WebDriver driver) {
-        super(driver);
+    public PublishingQueueDetailsPage() {
+        super();
         initialisePage();
     }
 
@@ -96,7 +96,7 @@ public class PublishingQueueDetailsPage extends PublishingQueuePage {
 
         // return to the collections page
         clickCollectionsMenuLink();
-        return new CollectionsPage(driver);
+        return new CollectionsPage();
     }
 
 }

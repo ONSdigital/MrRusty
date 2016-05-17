@@ -4,7 +4,6 @@ import com.github.onsdigital.selenium.PageObjectException;
 import com.github.onsdigital.test.json.Credentials;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class LoginPage extends FlorencePage {
@@ -30,11 +29,6 @@ public class LoginPage extends FlorencePage {
 
     public LoginPage() {
         super();
-        initialisePage();
-    }
-
-    public LoginPage(WebDriver driver) {
-        super(driver);
         initialisePage();
     }
 
@@ -86,7 +80,7 @@ public class LoginPage extends FlorencePage {
         typeUsername(username);
         typePassword(password);
         loginButton.click();
-        return new LoginPage(driver);
+        return new LoginPage();
     }
 
     /**
@@ -96,7 +90,7 @@ public class LoginPage extends FlorencePage {
         typeUsername(username);
         typePassword(password);
         loginButton.click();
-        return new LoginPage(driver);
+        return new LoginPage();
     }
 
     /**
@@ -124,7 +118,7 @@ public class LoginPage extends FlorencePage {
      */
     public CollectionsPage clickLogin() {
         passwordInput.submit();
-        return new CollectionsPage(driver);
+        return new CollectionsPage();
     }
 
     /**
@@ -145,6 +139,6 @@ public class LoginPage extends FlorencePage {
         WebElement confirmButton = waitAndFind(confirmButtonLocator);
         confirmButton.click();
 
-        return new CollectionsPage(driver);
+        return new CollectionsPage();
     }
 }

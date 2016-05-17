@@ -19,8 +19,8 @@ public class GoogleHomepage extends PageObject {
 
     private static String searchBoxXpath = "//input[@type='text' and @name='q']";
 
-    public GoogleHomepage(WebDriver driver) {
-        super(driver);
+    public GoogleHomepage() {
+        super();
     }
 
     public void open() {
@@ -52,7 +52,7 @@ public class GoogleHomepage extends PageObject {
         searchBox.submit();
 
         // Return the next PageObject:
-        return new GoogleResultPage(driver);
+        return new GoogleResultPage();
     }
 
     private void checkSearchControls() {
@@ -74,7 +74,7 @@ public class GoogleHomepage extends PageObject {
     public static void main(String[] args) {
         try {
             WebDriver driver = Drivers.get();
-            GoogleHomepage googleHomepage = new GoogleHomepage(driver);
+            GoogleHomepage googleHomepage = new GoogleHomepage();
             GoogleResultPage resultPage = googleHomepage.search("David Carboni");
             System.out.println(resultPage.getResults());
             String currentUrl = driver.getCurrentUrl();

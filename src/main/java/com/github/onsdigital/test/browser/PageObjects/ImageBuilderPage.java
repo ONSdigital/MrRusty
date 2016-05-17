@@ -75,29 +75,29 @@ public class ImageBuilderPage extends PageObject {
      *
      * @param driver
      */
-    public ImageBuilderPage(WebDriver driver) {
-        super(driver);
+    public ImageBuilderPage() {
+        super();
         initialisePage();
     }
 
     public MarkdownEditorPage clickCancelImageFromMarkdown() {
         cancelButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
     public WorkspacePage clickCancelImageFromMenu() {
         cancelButton.click();
-        return new WorkspacePage(driver);
+        return new WorkspacePage();
     }
 
     public MarkdownEditorPage clickCreateImageFromMarkdown() {
         createButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
     public WorkspacePage clickCreateImageFromMenu() {
         createButton.click();
-        return new WorkspacePage(driver);
+        return new WorkspacePage();
     }
 
     public ImageBuilderPage typeImageName(String imageName) {
@@ -133,7 +133,7 @@ public class ImageBuilderPage extends PageObject {
     }
 
     public ImageBuilderPage fillInImage() {
-        ImageBuilderPage image = new ImageBuilderPage(driver);
+        ImageBuilderPage image = new ImageBuilderPage();
         image.typeImageName("Test image");
         image.typeSubtitleName("Test image subtitle");
         image.typeSourceName("ONS test data");
@@ -141,7 +141,7 @@ public class ImageBuilderPage extends PageObject {
         image.typeAltTextName("Image description for accesibility");
         image.typeNotesName("Notes go here, now testing");
 
-        return new ImageBuilderPage(driver);
+        return new ImageBuilderPage();
     }
 
 }

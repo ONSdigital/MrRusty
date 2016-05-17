@@ -16,8 +16,8 @@ public class BrowsePage extends WorkspacePage {
 
     WebElement browseTree;
 
-    public BrowsePage(WebDriver driver) {
-        super(driver);
+    public BrowsePage() {
+        super();
         initialisePage();
     }
 
@@ -77,7 +77,7 @@ public class BrowsePage extends WorkspacePage {
                 .findElement(createButtonLocator);
         button.click();
 
-        return new CreatePage(driver);
+        return new CreatePage();
     }
 
     public EditPage clickEditForCurrentPage() {
@@ -87,7 +87,7 @@ public class BrowsePage extends WorkspacePage {
                 .findElement(createButtonLocator);
         button.click();
 
-        return new EditPage(driver);
+        return new EditPage();
     }
 
     public BrowsePage clickDeleteForCurrentPage() {
@@ -98,6 +98,6 @@ public class BrowsePage extends WorkspacePage {
                 break;
             }
         }
-        return new BrowsePage(driver);
+        return new BrowsePage();
     }
 }

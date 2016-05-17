@@ -27,11 +27,6 @@ public class FlorencePage extends PageObject {
     WebElement teamsMenuLink;
     WebElement publishingQueueMenuLink;
 
-    protected FlorencePage() {
-        super(Drivers.get());
-        openIfNecessary(Configuration.getFlorenceUrl());
-    }
-
     /**
      * Get the page source of the current page.
      * @return
@@ -40,8 +35,8 @@ public class FlorencePage extends PageObject {
         return driver.getPageSource();
     }
 
-    protected FlorencePage(WebDriver driver) {
-        super(driver);
+    protected FlorencePage() {
+        openIfNecessary(Configuration.getFlorenceUrl());
     }
 
     /**
@@ -60,7 +55,7 @@ public class FlorencePage extends PageObject {
             throw new PageObjectException("Failed to recognise the logout menu link.", exception);
         }
 
-        return new LoginPage(driver);
+        return new LoginPage();
     }
 
     /**
@@ -78,26 +73,26 @@ public class FlorencePage extends PageObject {
     public CollectionsPage clickCollectionsMenuLink() {
         collectionsMenuLink = waitAndFind(collectionsLocator);
         this.collectionsMenuLink.click();
-        return new CollectionsPage(driver);
+        return new CollectionsPage();
     }
 
     public TeamsPage clickTeamsMenuLink() {
         teamsMenuLink = waitAndFind(teamsLocator);
         this.teamsMenuLink.click();
-        return new TeamsPage(driver);
+        return new TeamsPage();
     }
 
     public UsersPage clickUsersMenuLink() {
         usersMenuLink = waitAndFind(usersLocator);
         this.usersMenuLink.click();
-        return new UsersPage(driver);
+        return new UsersPage();
     }
 
     public PublishingQueuePage clickPublishingQueueMenuLink() {
         publishingQueueMenuLink = waitAndFind(publishingQueueLocator);
         this.publishingQueueMenuLink.findElement(By.linkText("Publishing queue")).click();
 
-        return new PublishingQueuePage(driver);
+        return new PublishingQueuePage();
     }
 
     protected void acceptFlorenceAlert() {

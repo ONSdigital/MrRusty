@@ -4,11 +4,7 @@ package com.github.onsdigital.test.browser.PageObjects;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-
-import java.util.List;
 
 public class TeamDetailsPage extends TeamsPage {
 
@@ -22,8 +18,8 @@ public class TeamDetailsPage extends TeamsPage {
     WebElement deleteTeamButton;
     WebElement doneButton;
 
-    public TeamDetailsPage(WebDriver driver) {
-        super(driver);
+    public TeamDetailsPage() {
+        super();
         initialisePage();
     }
 
@@ -44,37 +40,6 @@ public class TeamDetailsPage extends TeamsPage {
     public TeamDetailsPage clickAddUserButton () {
         addRemoveMembersButton = find(addRemoveMembersButtonLocator);
         addRemoveMembersButton.click();
-        return this;
-    }
-
-
-    public TeamDetailsPage dragAndDropUser(String teamUser) {
-
-        initialisePage();
-
-        List<WebElement> users = driver.findElements(By.cssSelector(".ui-draggable.ui-draggable-handle"));
-
-        WebElement to = driver.findElement(By.cssSelector("ul.team-list.ui-droppable"));
-
-        WebElement done = driver.findElement(By.className("btn-team-selector-cancel"));
-
-        for (WebElement user : users) {
-
-            if (user.getText().equals(teamUser)) {
-
-                (new Actions(driver)).dragAndDrop(user, to).perform();
-
-                done.click();
-
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
         return this;
     }
 

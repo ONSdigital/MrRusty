@@ -9,8 +9,8 @@ public class PublishingQueuePage extends FlorencePage {
 
     WebElement publishTable;
 
-    public PublishingQueuePage(WebDriver driver) {
-        super(driver);
+    public PublishingQueuePage() {
+        super();
         initialisePage();
     }
 
@@ -38,7 +38,7 @@ public class PublishingQueuePage extends FlorencePage {
             throw new NotFoundException("Could not find [manual collection]");
         }
         waitForAnimations();
-        return new PublishingQueueDetailsPage(driver);
+        return new PublishingQueueDetailsPage();
 
     }
 
@@ -60,7 +60,7 @@ public class PublishingQueuePage extends FlorencePage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new PublishingQueueDetailsPage(driver);
+        return new PublishingQueueDetailsPage();
 
     }
 }

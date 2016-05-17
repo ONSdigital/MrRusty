@@ -13,8 +13,8 @@ public class TeamsPage extends FlorencePage {
     WebElement teamNameInput;
     WebElement createTeamButton;
 
-    public TeamsPage(WebDriver driver) {
-        super(driver);
+    public TeamsPage() {
+        super();
         initialisePage();
     }
 
@@ -43,7 +43,7 @@ public class TeamsPage extends FlorencePage {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new TeamsPage(driver);
+        return new TeamsPage();
     }
 
     public TeamDetailsPage clickTeamByName(String teamName) {
@@ -60,7 +60,7 @@ public class TeamsPage extends FlorencePage {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                return new TeamDetailsPage(driver);
+                return new TeamDetailsPage();
             }
         }
 

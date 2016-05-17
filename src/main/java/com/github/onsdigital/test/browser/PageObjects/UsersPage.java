@@ -27,8 +27,8 @@ public class UsersPage extends FlorencePage {
     WebElement createUserButton;
     WebElement userCreatedConfirmButton;
 
-    public UsersPage(WebDriver driver) {
-        super(driver);
+    public UsersPage() {
+        super();
         initialisePage();
     }
 

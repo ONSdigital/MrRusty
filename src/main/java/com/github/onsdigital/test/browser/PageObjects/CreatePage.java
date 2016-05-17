@@ -47,8 +47,8 @@ public class CreatePage extends WorkspacePage {
      *
      * @param driver
      */
-    public CreatePage(WebDriver driver) {
-        super(driver);
+    public CreatePage() {
+        super();
         initialisePage();
     }
 
@@ -127,7 +127,7 @@ public class CreatePage extends WorkspacePage {
     public EditPage clickCreatePage() {
         createButton = waitAndFind(createButtonLocator);
         createButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 
     /**

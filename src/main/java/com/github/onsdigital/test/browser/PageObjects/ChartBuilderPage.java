@@ -97,31 +97,29 @@ public class ChartBuilderPage extends PageObject {
     /**
      * Constructor for a previously instantiated WebDriver object.
      *
-     * @param driver
      */
-    public ChartBuilderPage(WebDriver driver) {
-        super(driver);
+    public ChartBuilderPage() {
         initialisePage();
     }
 
     public MarkdownEditorPage clickCancelChartFromMarkdown() {
         cancelButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
     public WorkspacePage clickCancelChartFromMenu() {
         cancelButton.click();
-        return new WorkspacePage(driver);
+        return new WorkspacePage();
     }
 
     public MarkdownEditorPage clickCreateChartFromMarkdown() {
         createButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
     public WorkspacePage clickCreateChartFromMenu() {
         createButton.click();
-        return new WorkspacePage(driver);
+        return new WorkspacePage();
     }
 
     public ChartBuilderPage typeChartName(String chartName) {
@@ -198,7 +196,7 @@ public class ChartBuilderPage extends PageObject {
     }
 
     public ChartBuilderPage fillInChart() {
-        ChartBuilderPage chart = new ChartBuilderPage(driver);
+        ChartBuilderPage chart = new ChartBuilderPage();
         chart.typeChartName("Test chart");
         chart.typeSubtitleName("Test chart subtitle");
         chart.typeSourceName("ONS test data");
@@ -212,7 +210,7 @@ public class ChartBuilderPage extends PageObject {
         chart.typeXAxisName("X axis label");
         chart.typeNotesName("Notes go here, now testing");
 
-        return new ChartBuilderPage(driver);
+        return new ChartBuilderPage();
     }
 
 }

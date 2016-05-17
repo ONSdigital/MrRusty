@@ -36,17 +36,17 @@ public class PageSectionPartial extends EditPage {
      * @param driver
      */
     public PageSectionPartial(WebDriver driver, WebElement section) {
-        super(driver);
+        super();
         initialisePage(section);
     }
 
     public MarkdownEditorPage clickEditPage() {
         editButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
     public EditPage clickDeletePage() {
         deleteButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 }

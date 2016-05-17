@@ -2,6 +2,7 @@ package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
+import com.github.onsdigital.test.base.FlorenceBrowserTest;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
 import com.github.onsdigital.test.json.Credentials;
@@ -12,7 +13,7 @@ import java.io.IOException;
 
 // depend on the last API tests
 @DependsOn(com.github.onsdigital.test.api.Publish.class)
-public class Login {
+public class Login extends FlorenceBrowserTest {
 
     /**
      * Tests login using the administrator credentials.

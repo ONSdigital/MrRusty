@@ -4,7 +4,6 @@ import com.github.onsdigital.selenium.PageObjectException;
 import com.github.webdriverextensions.Bot;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
@@ -37,10 +36,9 @@ public class EditPage extends WorkspacePage {
     /**
      * Constructor for a previously instantiated WebDriver object.
      *
-     * @param driver
      */
-    public EditPage(WebDriver driver) {
-        super(driver);
+    public EditPage() {
+        super();
         initialisePage();
     }
 
@@ -138,12 +136,12 @@ public class EditPage extends WorkspacePage {
     public CollectionsPage clickSubmitForReview() {
         WebElement submitForReviewButton = find(submitForReviewButtonLocator);
         submitForReviewButton.click();
-        return new CollectionsPage(this.driver);
+        return new CollectionsPage();
     }
 
     public CollectionsPage clickSubmitForApproval() {
         WebElement submitForApprovalButton = waitAndFind(submitForApprovalButtonLocator);
         submitForApprovalButton.click();
-        return new CollectionsPage(this.driver);
+        return new CollectionsPage();
     }
 }

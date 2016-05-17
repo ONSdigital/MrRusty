@@ -20,8 +20,8 @@ public class GoogleResultPage extends PageObject {
     private static String resultXpath = "//li[@class='g']//a";
     private ExecutorService pool = Executors.newCachedThreadPool();
 
-    public GoogleResultPage(WebDriver driver) {
-        super(driver);
+    public GoogleResultPage() {
+        super();
     }
 
     public List<NameValuePair> getResults() {
@@ -37,7 +37,7 @@ public class GoogleResultPage extends PageObject {
 //                    try {
 //                        WebDriverWait wait = new WebDriverWait(driver, 2);
 //                        wait.until(new ExpectedCondition<Boolean>() {
-//                            public Boolean apply(WebDriver driver) {
+//                            public Boolean apply() {
 //                                String dataHref = elementReference.getAttribute("data-href");
 //                                if (dataHref != null)
 //                                    return true;

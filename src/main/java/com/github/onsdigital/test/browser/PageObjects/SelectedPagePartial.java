@@ -3,7 +3,6 @@ package com.github.onsdigital.test.browser.PageObjects;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class SelectedPagePartial extends CollectionsPage {
@@ -36,20 +35,19 @@ public class SelectedPagePartial extends CollectionsPage {
     /**
      * Constructor for a previously instantiated WebDriver object.
      *
-     * @param driver
      */
-    public SelectedPagePartial(WebDriver driver, WebElement section) {
-        super(driver);
+    public SelectedPagePartial(WebElement section) {
+        super();
         initialisePage(section);
     }
 
     public EditPage clickEditFile() {
         editButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 
     public EditPage clickDeleteFile() {
         deleteButton.click();
-        return new EditPage(driver);
+        return new EditPage();
     }
 }

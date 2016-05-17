@@ -2,6 +2,7 @@ package com.github.onsdigital.test.browser;
 
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
+import com.github.onsdigital.test.base.FlorenceBrowserTest;
 import com.github.onsdigital.test.browser.PageObjects.CollectionsPage;
 import com.github.onsdigital.test.browser.PageObjects.LoginPage;
 import com.github.onsdigital.test.browser.PageObjects.UsersPage;
@@ -13,7 +14,7 @@ import javax.ws.rs.POST;
 import java.io.IOException;
 
 @DependsOn({Login.class})
-public class Users {
+public class Users extends FlorenceBrowserTest {
 
     Credentials publisher = Context.systemCredentials;
 
