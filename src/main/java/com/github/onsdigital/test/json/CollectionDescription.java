@@ -18,6 +18,7 @@ public class CollectionDescription extends CollectionBase {
     public boolean approvedStatus;
     public boolean publishComplete;
     public String publishTransactionId;
+    public boolean isEncrypted;
 
     public List<String> teams; // list of team Id's
 
