@@ -1,13 +1,12 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
-import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.selenium.PageObjectException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class TableBuilderPage extends PageObject {
+public class TableBuilderPage extends FlorencePage {
 
     //<input type="text" id="table-title" placeholder="[Title]" value="">
     // <input type="file" name="files" id="files">
@@ -30,7 +29,7 @@ public class TableBuilderPage extends PageObject {
     /**
      * Check the expected elements are located in the page.
      */
-    protected void initialisePage() {
+    protected FlorencePage initialisePage() {
         try {
             cancelButton = waitAndFind(cancelButtonLocator);
             createButton = find(createButtonLocator);
@@ -41,6 +40,7 @@ public class TableBuilderPage extends PageObject {
         } catch (NoSuchElementException exception) {
             throw new PageObjectException("Failed to recognise the " + this.getClass().getSimpleName() + " contents.", exception);
         }
+        return this;
     }
 
     /**
@@ -48,19 +48,24 @@ public class TableBuilderPage extends PageObject {
      *
      * @param driver
      */
-    public TableBuilderPage(WebDriver driver) {
-        super(driver);
+    public TableBuilderPage() {
+        super();
         initialisePage();
     }
 
     public MarkdownEditorPage clickCancel() {
         cancelButton.click();
-        return new MarkdownEditorPage(driver);
+        return new MarkdownEditorPage();
     }
 
-    public MarkdownEditorPage clickCreate() {
+
+    public EditPage clickCreate() {
         createButton.click();
-        return new MarkdownEditorPage(driver);
+        try {
+            acceptFlorenceAlert();
+        } catch (Exception e) { }
+
+        return new EditPage();
     }
 
     public TableBuilderPage typeTableName(String tableName) {
@@ -68,8 +73,13 @@ public class TableBuilderPage extends PageObject {
         return this;
     }
 
-    public TableBuilderPage set(String tableName) {
-        tableNameEntry.sendKeys(tableName);
+    public TableBuilderPage typeTableFileLocation(String path) {
+        fileEntry.sendKeys(path);
+        return this;
+    }
+
+    public TableBuilderPage clickSubmit() {
+        fileEntry.submit();
         return this;
     }
 }
