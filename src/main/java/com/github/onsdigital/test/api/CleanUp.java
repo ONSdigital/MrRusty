@@ -57,6 +57,7 @@ public class CleanUp {
 
         // We get the list of collections
         Endpoint usersEndpoint = ZebedeeHost.users;
+        Endpoint teamsEndpoint = ZebedeeHost.teams;
         Response<UserList> getResponse = context.getAdministrator().get(usersEndpoint, UserList.class);
 
         if (getResponse == null) {
@@ -71,6 +72,7 @@ public class CleanUp {
             if (StringUtils.startsWithIgnoreCase(user.email, "rusty_")) {
                 System.out.println("Deleting user " + user.name + " with email " + user.email);
                 context.getAdministrator().delete(usersEndpoint.setParameter("email", user.email), String.class);
+                context.getAdministrator().delete(teamsEndpoint.setParameter("email", user.email), String.class);
             }
         }
     }

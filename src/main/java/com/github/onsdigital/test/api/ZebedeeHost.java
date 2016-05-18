@@ -25,6 +25,7 @@ public class ZebedeeHost {
     public static final Endpoint publish = new Endpoint(zebedeeHost, "publish");
     public static final Endpoint collectionBrowseTree = new Endpoint(zebedeeHost, "collectionBrowseTree");
     public static final Endpoint collectionDetails = new Endpoint(zebedeeHost, "collectionDetails");
+    public static final Endpoint userPublisherType = new Endpoint(zebedeeHost, "userPublisherType");
 
 
     private static String getValue(String key) {

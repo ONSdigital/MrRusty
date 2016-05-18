@@ -40,7 +40,7 @@ public class Permissions extends ZebedeeApiTest {
 
         // When
         // admin assigns permissions
-        Response<String> response = postPermission(permission(user.email, Boolean.TRUE, null), context.getAdministrator());
+        Response<String> response = postPermission(permission(user.email, Boolean.TRUE, null, false), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
@@ -48,6 +48,22 @@ public class Permissions extends ZebedeeApiTest {
 
         PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
         assertTrue(BooleanUtils.isTrue(permissions.admin));
+    }
+
+    /**
+     * Test verifies that a use can be create with Data Visualisation permission.
+     */
+    @Test
+    public void shouldCreateUserWithDataVisualisationPermission() throws Exception {
+        User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
+
+        Response<String> response = postPermission(permission(user.email, false, false, true), context.getAdministrator());
+        assertEquals(HttpStatus.OK_200, response.statusLine.getStatusCode());
+
+        PermissionDefinition permissions = getPermissions(user.email, context.getAdministrator()).body;
+        assertTrue(BooleanUtils.isTrue(permissions.dataVisPublisher));
+        assertTrue(BooleanUtils.isFalse(permissions.admin));
+        assertTrue(BooleanUtils.isTrue(permissions.editor));
     }
 
     /**
@@ -62,11 +78,11 @@ public class Permissions extends ZebedeeApiTest {
         // Given
         // an admin user
         User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
-        postPermission(permission(user.email, Boolean.TRUE, null), context.getAdministrator());
+        postPermission(permission(user.email, true, null, false), context.getAdministrator());
 
         // When
         // admin revokes permissions
-        Response<String> response = postPermission(permission(user.email, Boolean.FALSE, null), context.getAdministrator());
+        Response<String> response = postPermission(permission(user.email, false, null, false), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
@@ -91,7 +107,7 @@ public class Permissions extends ZebedeeApiTest {
 
         // When
         // admin assigns permissions
-        Response<String> response = postPermission(permission(user.email, null, Boolean.TRUE), context.getAdministrator());
+        Response<String> response = postPermission(permission(user.email, null, true, false), context.getAdministrator());
 
         // Expect
         // a response of 200 - success and they have admin permissions
@@ -113,11 +129,11 @@ public class Permissions extends ZebedeeApiTest {
         // Given
         // an admin user
         User user = OneLineSetups.newActiveUserWithViewerPermissions(context);
-        postPermission(permission(user.email, null, Boolean.TRUE), context.getAdministrator());
+        postPermission(permission(user.email, null, true, false), context.getAdministrator());
 
         // When
         // admin revokes permissions
-        PermissionDefinition permission = permission(user.email, null, Boolean.FALSE);
+        PermissionDefinition permission = permission(user.email, null, false, false);
         Response<String> response = postPermission(permission, context.getAdministrator());
 
         // Expect
@@ -129,18 +145,19 @@ public class Permissions extends ZebedeeApiTest {
     }
 
 
-    public Response<String> postPermission(PermissionDefinition definition, Http http) throws IOException {
+    public static Response<String> postPermission(PermissionDefinition definition, Http http) throws IOException {
         return http.post(ZebedeeHost.permission, definition, String.class);
     }
     public Response<PermissionDefinition> getPermissions(String email, Http http) throws IOException {
         return http.get(ZebedeeHost.permission.setParameter("email", email), PermissionDefinition.class);
     }
 
-    public PermissionDefinition permission(String email, Boolean admin, Boolean editor) {
+    public static PermissionDefinition permission(String email, Boolean admin, Boolean editor, Boolean dataVisPublisher) {
         PermissionDefinition permissionDefinition = new PermissionDefinition();
         permissionDefinition.email = email;
         permissionDefinition.admin = admin;
         permissionDefinition.editor = editor;
+        permissionDefinition.dataVisPublisher = dataVisPublisher;
         return permissionDefinition;
     }
 }

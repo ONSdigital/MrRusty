@@ -7,7 +7,7 @@ public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081/florence/index.html";
     private static final String DEFAULT_SYSTEM_USER = "florence@magicroundabout.ons.gov.uk";
-    private static final String DEFAULT_SYSTEM_PASSWORD = "Doug4l";
+    private static final String DEFAULT_SYSTEM_PASSWORD = "master of puppets is";
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);

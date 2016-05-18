@@ -19,6 +19,8 @@ import java.io.IOException;
  */
 public class Context {
 
+    public static final String FLO_TOKEN_HEADER = "x-florence-token";
+
     Http systemSession = Sessions.get("system");
 
     public static User systemUser = user("Florence Nightingale", Configuration.getSystemUsername());
@@ -42,18 +44,23 @@ public class Context {
     public static User scallywagUser = user("Ha Querr", "script.kiddie@bluecat.com");
     public static Credentials scallywagCredentials = credentials(scallywagUser.email, Random.password(8), false);
 
+    public static User dataVisPublisher = user("Tyrion Lanister", "data.vis@test.com");
+    public static Credentials dataVisPublisherCredentials = credentials(dataVisPublisher.email, Random.password(8), false);
+
     private Http administrator;
     private Http publisher;
     private Http secondSetOfEyes;
     private Http thirdSetOfEyes;
     private Http viewer;
     private Http scallyWag;
-    
+    private Http dataVis;
+
     private String tokenAdministrator;
     private String tokenPublisher;
     private String tokenSecondSetOfEyes;
     private String tokenThirdSetOfEyes;
     private String tokenViewer;
+    private String tokenDataVis;
 
     public Context() {
         administrator = Sessions.get("administrator");
@@ -62,6 +69,7 @@ public class Context {
         thirdSetOfEyes = Sessions.get("thirdSetOfEyes");
         viewer = Sessions.get("viewer");
         scallyWag = Sessions.get("scallywag");
+        dataVis = Sessions.get("dataVis");
     }
 
     public void setup() throws Exception {
@@ -77,12 +85,14 @@ public class Context {
         tokenPublisher = getPublisher().post(ZebedeeHost.login, publisherCredentials, String.class).body;
         tokenSecondSetOfEyes = getSecondSetOfEyes().post(ZebedeeHost.login, secondSetOfEyesCredentials, String.class).body;
         tokenViewer = getViewer().post(ZebedeeHost.login, viewerCredentials, String.class).body;
+        tokenDataVis = dataVis.post(ZebedeeHost.login, dataVisPublisherCredentials, String.class).body;
 
-        administrator.addHeader("x-florence-token", tokenAdministrator);
-        publisher.addHeader("x-florence-token", tokenPublisher);
-        secondSetOfEyes.addHeader("x-florence-token", tokenSecondSetOfEyes);
-        thirdSetOfEyes.addHeader("x-florence-token", tokenThirdSetOfEyes);
-        viewer.addHeader("x-florence-token", tokenViewer);
+        administrator.addHeader(FLO_TOKEN_HEADER, tokenAdministrator);
+        publisher.addHeader(FLO_TOKEN_HEADER, tokenPublisher);
+        secondSetOfEyes.addHeader(FLO_TOKEN_HEADER, tokenSecondSetOfEyes);
+        thirdSetOfEyes.addHeader(FLO_TOKEN_HEADER, tokenThirdSetOfEyes);
+        viewer.addHeader(FLO_TOKEN_HEADER, tokenViewer);
+        dataVis.addHeader(FLO_TOKEN_HEADER, tokenDataVis);
     }
 
     private void loginAsSystemOwner() throws IOException {
@@ -127,14 +137,21 @@ public class Context {
         if (admin.statusLine.getStatusCode() != 409) {
             checkOk(newUser, "Unable to create new user " + newUser);
         }
+
+        // New user with temp password
+        Response<User> dataVisDude = systemSession.post(ZebedeeHost.users, dataVisPublisher, User.class);
+        if (admin.statusLine.getStatusCode() != 409) {
+            checkOk(newUser, "Unable to create data vis dude " + dataVisDude);
+        }
     }
 
-    private PermissionDefinition permission(User user, boolean admin, boolean editor) {
+    private PermissionDefinition permission(User user, boolean admin, boolean editor, boolean dataVisPublisher) {
 
         PermissionDefinition permissionDefinition = new PermissionDefinition();
         permissionDefinition.email = user.email;
         permissionDefinition.admin = admin;
         permissionDefinition.editor = editor;
+        permissionDefinition.dataVisPublisher = dataVisPublisher;
         return permissionDefinition;
     }
 
@@ -144,6 +161,7 @@ public class Context {
         setUserPassword(secondSetOfEyesCredentials);
         setUserPassword(viewerCredentials);
         setUserPassword(newUserCredentials);
+        setUserPassword(dataVisPublisherCredentials);
 
         Response<String> admin = systemSession.post(ZebedeeHost.password, newUserCredentials, String.class);
         checkOk(admin, "Unable to set password for user with email " + newUserCredentials.email);
@@ -178,17 +196,17 @@ public class Context {
     private void setPermissions() throws IOException {
 
         // Admin
-        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false);
+        PermissionDefinition adminPermissionDefinition = permission(adminUser, true, false, false);
         Response<String> adminPermission = systemSession.post(ZebedeeHost.permission, adminPermissionDefinition, String.class);
         checkOk(adminPermission, "Unable to set admin permission for " + adminUser);
 
         // Publisher
-        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true);
+        PermissionDefinition publisherPermissionDefinition = permission(publisherUser, false, true, false);
         Response<String> publisherPermission = systemSession.post(ZebedeeHost.permission, publisherPermissionDefinition, String.class);
         checkOk(publisherPermission, "Unable to set editor permission for " + publisherUser);
 
         // Second set of eyes
-        PermissionDefinition secondSetOfEyesPermissionDefinition = permission(secondSetOfEyesUser, false, true);
+        PermissionDefinition secondSetOfEyesPermissionDefinition = permission(secondSetOfEyesUser, false, true, false);
         Response<String> secondSetOfEyesPermission = systemSession.post(ZebedeeHost.permission, secondSetOfEyesPermissionDefinition, String.class);
         checkOk(secondSetOfEyesPermission, "Unable to set editor permission for " + secondSetOfEyesUser);
 
@@ -197,9 +215,13 @@ public class Context {
         systemSession.post(ZebedeeHost.teams.addPathSegment("economy").setParameter("email", viewerUser.email), "", Boolean.class);
 
         // new user
-        PermissionDefinition newUserPermissionDefinition = permission(newUserWithTemporaryPassword, false, true);
+        PermissionDefinition newUserPermissionDefinition = permission(newUserWithTemporaryPassword, false, true, false);
         Response<String> newUserPermission = systemSession.post(ZebedeeHost.permission, newUserPermissionDefinition, String.class);
         checkOk(newUserPermission, "Unable to set editor permission for " + newUserWithTemporaryPassword);
+
+        PermissionDefinition dataVisPubPermissionDefinition = permission(adminUser, false, false, true);
+        Response<String> dataVisPermission = systemSession.post(ZebedeeHost.permission, dataVisPubPermissionDefinition, String.class);
+        checkOk(adminPermission, "Unable to set admin permission for " + dataVisPublisher);
     }
 
     /**
@@ -270,5 +292,9 @@ public class Context {
 
     public Http getScallyWag() {
         return scallyWag;
+    }
+
+    public Http getDataVis() {
+        return dataVis;
     }
 }
