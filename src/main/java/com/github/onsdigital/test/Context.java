@@ -44,8 +44,8 @@ public class Context {
     public static User scallywagUser = user("Ha Querr", "script.kiddie@bluecat.com");
     public static Credentials scallywagCredentials = credentials(scallywagUser.email, Random.password(8), false);
 
-    public static User dataVisPublisher = user("Tyrion Lanister", "data.vis@test.com");
-    public static Credentials dataVisPublisherCredentials = credentials(dataVisPublisher.email, Random.password(8), false);
+    public static User dataVisPublisher = user("Tyrion Lanister", "data-vis@test.com");
+    public static Credentials dataVisPublisherCredentials = credentials(dataVisPublisher.email, Configuration.getDefaultPassword(), false);
 
     private Http administrator;
     private Http publisher;
@@ -219,7 +219,7 @@ public class Context {
         Response<String> newUserPermission = systemSession.post(ZebedeeHost.permission, newUserPermissionDefinition, String.class);
         checkOk(newUserPermission, "Unable to set editor permission for " + newUserWithTemporaryPassword);
 
-        PermissionDefinition dataVisPubPermissionDefinition = permission(adminUser, false, false, true);
+        PermissionDefinition dataVisPubPermissionDefinition = permission(dataVisPublisher, false, false, true);
         Response<String> dataVisPermission = systemSession.post(ZebedeeHost.permission, dataVisPubPermissionDefinition, String.class);
         checkOk(adminPermission, "Unable to set admin permission for " + dataVisPublisher);
     }

@@ -7,7 +7,8 @@ public class Configuration {
 
     private static final String DEFAULT_FLORENCE_URL = "http://localhost:8081/florence/index.html";
     private static final String DEFAULT_SYSTEM_USER = "florence@magicroundabout.ons.gov.uk";
-    private static final String DEFAULT_SYSTEM_PASSWORD = "master of puppets is";
+    private static final String DEFAULT_SYSTEM_PASSWORD = "Doug4l";
+    private static final String DEFAULT_PASSWORD = "one two three four";
 
     public static String getFlorenceUrl() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_URL"), DEFAULT_FLORENCE_URL);
@@ -19,6 +20,10 @@ public class Configuration {
 
     public static String getSystemUserPassword() {
         return StringUtils.defaultIfBlank(getValue("FLORENCE_ADMIN_PASSWORD"), DEFAULT_SYSTEM_PASSWORD);
+    }
+
+    public static String getDefaultPassword() {
+        return DEFAULT_PASSWORD;
     }
 
 
