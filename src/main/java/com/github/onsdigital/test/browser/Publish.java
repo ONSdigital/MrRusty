@@ -1,7 +1,6 @@
 package com.github.onsdigital.test.browser;
 
 import com.github.davidcarboni.cryptolite.Random;
-import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.base.FlorenceBrowserTest;
@@ -9,7 +8,7 @@ import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
 import org.junit.Test;
 
-@DependsOn({Collections.class})
+//@DependsOn({Collections.class})
 public class Publish extends FlorenceBrowserTest {
 
 //    Credentials publisher = Context.publisherCredentials;
