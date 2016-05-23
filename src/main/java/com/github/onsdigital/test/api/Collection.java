@@ -7,6 +7,7 @@ import com.github.onsdigital.http.Endpoint;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
+import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.base.ZebedeeApiTest;
 import com.github.onsdigital.test.json.CollectionDescription;
@@ -26,10 +27,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.function.Predicate;
 
 import static com.github.onsdigital.test.AssertResponse.assertOk;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @Api
 @DependsOn(com.github.onsdigital.test.api.Permissions.class)
@@ -278,5 +281,48 @@ public class Collection extends ZebedeeApiTest {
     public static Response<CollectionDescription> get(String id, Http http) throws IOException {
         Endpoint idUrl = ZebedeeHost.collection.addPathSegment(id);
         return http.get(idUrl, CollectionDescription.class);
+    }
+
+    /**
+     * Generic method to wait for a collection related predicate to return true.
+     * This can be used when waiting for an operation to complete that changes a collection property.
+     *
+     * Example:
+     *
+     * @param predicate - the predicate that is expected to return true.
+     * @param context - the context to call the API.
+     * @param collectionID - The ID of the collection to check.
+     * @param secondsToWait - The maximum number of seconds to wait for the condition to be met.
+     * @param failureMessage - The message to fail the test with if the timeout occurs.
+     * @throws IOException
+     */
+    public static void waitFor(
+            Predicate<Response<CollectionDescription>> predicate,
+            Context context,
+            String collectionID,
+            int secondsToWait,
+            String failureMessage) throws IOException {
+
+        int count = 0;
+        boolean result = false;
+
+        while (count < secondsToWait) {
+            Response<CollectionDescription> response = Collection.get(collectionID, context.getPublisher());
+
+            if (predicate.test(response)) {
+                result = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+
+            count++;
+        }
+
+        if (!result)
+            fail(failureMessage);
     }
 }

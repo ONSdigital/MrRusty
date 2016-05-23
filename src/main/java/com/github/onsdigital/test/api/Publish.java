@@ -3,14 +3,12 @@ package com.github.onsdigital.test.api;
 import com.github.davidcarboni.cryptolite.Random;
 import com.github.davidcarboni.restolino.framework.Api;
 import com.github.onsdigital.http.Endpoint;
-import com.github.onsdigital.http.Host;
 import com.github.onsdigital.http.Http;
 import com.github.onsdigital.http.Response;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.Context;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.base.ZebedeeApiTest;
-import com.github.onsdigital.test.configuration.Configuration;
 import com.github.onsdigital.test.json.CollectionDescription;
 import com.github.onsdigital.test.json.CollectionType;
 import org.eclipse.jetty.http.HttpStatus;
@@ -21,7 +19,8 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.github.onsdigital.test.AssertResponse.assertOk;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by thomasridd on 05/06/2015.
@@ -30,8 +29,6 @@ import static org.junit.Assert.*;
 @Api
 @DependsOn({Approve.class, Permissions.class})
 public class Publish extends ZebedeeApiTest {
-
-    public static final Host florenceHost = new Host(Configuration.getFlorenceUrl());
 
     /**
      * Tests approval using simple collection setup and publisher credentials
@@ -138,19 +135,13 @@ public class Publish extends ZebedeeApiTest {
     @Test
     public void timedPublish_ifCollectionNotApproved_shouldRevertToManual() throws IOException, InterruptedException {
         // Given
-        // a collection that we add files to and then
         CollectionDescription collection = OneLineSetups.scheduledCollectionWithContent(context, "/rusty/", 2, 5);
-
         assertNotNull(collection);
 
         // When
         // we approve it using publish credentials
-        Thread.sleep(6000);
-        collection = Collection.get(collection.id, context.getPublisher()).body;
-
-        // Expect
-        // a response of okay
-        assertEquals(CollectionType.scheduled, collection.type);
+        Collection.waitFor(collectionResponse -> collectionResponse.body.type == CollectionType.manual,
+                context, collection.id, 10, "Collection was not published.");
     }
 
     public static Response<String> publishWithBreak(String collectionID, Http http) throws IOException {
@@ -174,28 +165,11 @@ public class Publish extends ZebedeeApiTest {
      */
     public static void publishAndWait(Context context, String collectionID, Http httpPublisher, int secondsToWait) throws IOException {
         publish(collectionID, httpPublisher);
+        waitForCollectionToBePublished(context, collectionID, secondsToWait);
+    }
 
-        int count = 0;
-        boolean published = false;
-
-        while (count < secondsToWait) {
-            Response<CollectionDescription> response = Collection.get(collectionID, context.getPublisher());
-
-            //System.out.println("response.statusLine.toString() = " + response.statusLine.toString());
-            if (response.statusLine.getStatusCode() == 404 || response.body.publishComplete) {
-                published = true;
-                break;
-            }
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-            }
-
-            count++;
-        }
-
-        if (!published)
-            fail("Collection was not published");
+    public static void waitForCollectionToBePublished(Context context, String collectionID, int secondsToWait) throws IOException {
+        Collection.waitFor(collectionResponse -> collectionResponse.statusLine.getStatusCode() == 404 || collectionResponse.body.publishComplete,
+                context, collectionID, secondsToWait, "Collection was not published.");
     }
 }
