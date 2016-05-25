@@ -26,6 +26,7 @@ public class ZebedeeHost {
     public static final Endpoint collectionBrowseTree = new Endpoint(zebedeeHost, "collectionBrowseTree");
     public static final Endpoint collectionDetails = new Endpoint(zebedeeHost, "collectionDetails");
     public static final Endpoint userPublisherType = new Endpoint(zebedeeHost, "userPublisherType");
+    public static final Endpoint dataVisualisationZip = new Endpoint(zebedeeHost, "DataVisualisationZip");
 
 
     private static String getValue(String key) {
