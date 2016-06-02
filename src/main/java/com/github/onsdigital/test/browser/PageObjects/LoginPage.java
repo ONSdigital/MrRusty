@@ -10,7 +10,7 @@ public class LoginPage extends FlorencePage {
 
     By usernameLocator = By.id("email");
     By passwordLocator = By.id("password");
-    By loginButtonLocator = By.className("btn-florence-login");
+    By loginButtonLocator = By.id("login");
 
     By currentPasswordLocator = By.id("password-old");
     By newPasswordLocator = By.id("password-new");
@@ -76,17 +76,7 @@ public class LoginPage extends FlorencePage {
         return clickLogin();
     }
 
-    public LoginPage loginLogin(String username, String password) {
-        typeUsername(username);
-        typePassword(password);
-        loginButton.click();
-        return new LoginPage();
-    }
-
-    /**
-     * Simulate clicking the login button on the login page expecting it to fail.
-     */
-    public LoginPage clickLoginExpectingFailure(String username, String password) {
+    public LoginPage loginExpectFailure(String username, String password) {
         typeUsername(username);
         typePassword(password);
         loginButton.click();
@@ -117,7 +107,7 @@ public class LoginPage extends FlorencePage {
      * Simulate clicking the login button on the login page.
      */
     public CollectionsPage clickLogin() {
-        passwordInput.submit();
+        loginButton.click();
         return new CollectionsPage();
     }
 
