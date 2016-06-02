@@ -1,5 +1,6 @@
 package com.github.onsdigital.test.base;
 
+import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.test.configuration.Configuration;
 import com.github.webdriverextensions.Bot;
 import com.github.webdriverextensions.WebDriverExtensionsContext;
@@ -37,11 +38,13 @@ public abstract class FlorenceBrowserTest extends PublishingIntegrationTest {
             WebDriverExtensionsContext.setDriver(new ChromeDriver());
             Bot.driver().manage().window().setSize(new Dimension(1600, 1200));
         }
+
+        PageObject.openIfNecessary(Configuration.getFlorenceUrl());
     }
 
     @After
     public void tearDown() throws Exception {
-        //Bot.driver().quit();
-        //WebDriverExtensionsContext.removeDriver();
+        Bot.driver().quit();
+        WebDriverExtensionsContext.removeDriver();
     }
 }
