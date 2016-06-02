@@ -30,7 +30,6 @@ public class Password extends ZebedeeApiTest {
 
     private User user;
     private Credentials credentials;
-    Http http = context.getAdministrator();
 
     @Before
     public void setUp() throws Exception {
