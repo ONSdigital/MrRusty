@@ -55,7 +55,7 @@ public class Users extends FlorenceBrowserTest {
         usersPage.clickLogoutMenuLink();
 
         // logging in with new user
-        LoginPage loginPage = new LoginPage().loginLogin(user1.email.toLowerCase(), user1.password);
+        LoginPage loginPage = new LoginPage().loginExpectFailure(user1.email.toLowerCase(), user1.password);
         loginPage.changePassword(user1.password, "set up new password");
     }
 }
