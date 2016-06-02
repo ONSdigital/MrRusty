@@ -6,14 +6,13 @@ import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.base.FlorenceBrowserTest;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
-import org.junit.Test;
 
 //@DependsOn({Collections.class})
 public class Release extends FlorenceBrowserTest {
 
     Credentials publisher = Context.publisherCredentials;
 
-    @Test
+    //@Test
     public void shouldCreateRelease() {
 
         // login and create a collection

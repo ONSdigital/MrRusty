@@ -82,7 +82,7 @@ public class PageObject extends WebPage {
         return ((JavascriptExecutor) driver).executeScript(script);
     }
 
-    protected void openIfNecessary(String url) {
+    public static void openIfNecessary(String url) {
         String currentUrl = Bot.driver().getCurrentUrl();
         URIBuilder builder = null;
         try {

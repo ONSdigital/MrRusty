@@ -1,12 +1,9 @@
 package com.github.onsdigital.test.browser.PageObjects;
 
-import com.github.onsdigital.selenium.Drivers;
 import com.github.onsdigital.selenium.PageObject;
 import com.github.onsdigital.selenium.PageObjectException;
-import com.github.onsdigital.test.configuration.Configuration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -29,14 +26,11 @@ public class FlorencePage extends PageObject {
 
     /**
      * Get the page source of the current page.
+     *
      * @return
      */
     public String getSource() {
         return driver.getPageSource();
-    }
-
-    protected FlorencePage() {
-        openIfNecessary(Configuration.getFlorenceUrl());
     }
 
     /**
@@ -44,10 +38,10 @@ public class FlorencePage extends PageObject {
      * This isn't declared as a class member as it is only
      * visible once the user has logged in. We cannot assume
      * it is always present in the page.
+     *
      * @return
      */
-    public LoginPage clickLogoutMenuLink()
-    {
+    public LoginPage clickLogoutMenuLink() {
         try {
             WebElement logoutMenuLink = waitAndFind(logoutLocator);
             logoutMenuLink.click();

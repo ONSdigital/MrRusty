@@ -6,7 +6,6 @@ import com.github.onsdigital.test.api.Collection;
 import com.github.onsdigital.test.base.FlorenceBrowserTest;
 import com.github.onsdigital.test.browser.PageObjects.*;
 import com.github.onsdigital.test.json.Credentials;
-import org.junit.Test;
 
 //@DependsOn({Collections.class})
 public class Publish extends FlorenceBrowserTest {
@@ -14,7 +13,7 @@ public class Publish extends FlorenceBrowserTest {
 //    Credentials publisher = Context.publisherCredentials;
     Credentials publisher = Context.systemCredentials;
 
-    @Test
+    //@Test
     public void shouldPublishContent() throws InterruptedException {
 
         // login and create a collection
