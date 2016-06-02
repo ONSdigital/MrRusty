@@ -1,12 +1,10 @@
 package com.github.onsdigital.selenium;
 
 import com.github.webdriverextensions.Bot;
-import com.github.webdriverextensions.WebDriverExtensionFieldDecorator;
 import com.github.webdriverextensions.WebPage;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -18,12 +16,20 @@ import java.net.URISyntaxException;
  */
 public class PageObject extends WebPage {
 
-    protected WebDriver driver = Bot.driver();
+    protected WebDriver driver;
+
+    public PageObject(WebDriver driver) {
+        this.driver = driver;
+    }
+
+    public PageObject() {
+        driver = Bot.driver();
+    }
 
     @Override
     public void open(Object... objects) {
         // initialise up all the WebElement fields annotated with @FindBy
-        PageFactory.initElements(new WebDriverExtensionFieldDecorator(Bot.driver()), this);
+        //PageFactory.initElements(new WebDriverExtensionFieldDecorator(Bot.driver()), this);
     }
 
     @Override
