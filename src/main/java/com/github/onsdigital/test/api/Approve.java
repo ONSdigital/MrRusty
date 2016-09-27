@@ -9,6 +9,7 @@ import com.github.onsdigital.http.Sessions;
 import com.github.onsdigital.junit.DependsOn;
 import com.github.onsdigital.test.api.oneliners.OneLineSetups;
 import com.github.onsdigital.test.base.ZebedeeApiTest;
+import com.github.onsdigital.test.json.ApprovalStatus;
 import com.github.onsdigital.test.json.CollectionDescription;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class Approve  extends ZebedeeApiTest {
         // Expect
         // the collection is now approved
         CollectionDescription collectionDescription = Collection.get(collection.id, publisher).body;
-        assertEquals(true, collectionDescription.approvedStatus);
+        assertEquals(ApprovalStatus.COMPLETE, collectionDescription.approvalStatus);
     }
 
     /**
@@ -176,7 +177,7 @@ public class Approve  extends ZebedeeApiTest {
         while (count < secondsToWait) {
             Response<CollectionDescription> getCollectionResponse = Collection.get(collectionID, context.getPublisher());
             //System.out.println("getCollectionResponse.body.approvedStatus = " + getCollectionResponse.body.approvedStatus);
-            if (getCollectionResponse.body.approvedStatus) {
+            if (getCollectionResponse.body.approvalStatus.equals(ApprovalStatus.COMPLETE)) {
                 approved = true;
                 break;
             }

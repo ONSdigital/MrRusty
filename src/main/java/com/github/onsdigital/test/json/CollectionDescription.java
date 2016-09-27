@@ -15,7 +15,7 @@ public class CollectionDescription extends CollectionBase {
     public List<String> inProgressUris;
     public List<String> completeUris;
     public List<String> reviewedUris;
-    public boolean approvedStatus;
+    public ApprovalStatus approvalStatus = ApprovalStatus.NOT_STARTED;
     public boolean publishComplete;
     public String publishTransactionId;
     public boolean isEncrypted;
